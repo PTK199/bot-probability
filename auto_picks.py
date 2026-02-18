@@ -893,12 +893,23 @@ def get_auto_games(target_date):
             ensemble_prediction_model,
             trap_hunter_funnel,
             calculate_expected_value,
+            protocol_unstoppable_90,
+            funnel_laundromat,
+            coach_tactical_matrix,
         )
         FUNNEL_ACTIVE = True
-        print("[AUTO-ENGINE] ✅ AI Engine CONNECTED")
+        print("[AUTO-ENGINE] ✅ AI Engine CONNECTED (+ GOD MODE + LAUNDROMAT + COACH DNA)")
     except Exception as e:
         print(f"[AUTO-ENGINE] ⚠️ AI Engine not available: {e}")
         FUNNEL_ACTIVE = False
+
+    try:
+        from specialized_modules import tracker_sharp_money
+        SHARP_MONEY_ACTIVE = True
+        print("[AUTO-ENGINE] ✅ Sharp Money Tracker CONNECTED")
+    except Exception as e:
+        SHARP_MONEY_ACTIVE = False
+        print(f"[AUTO-ENGINE] ⚠️ Sharp Money not available: {e}")
 
     try:
         from knowledge_base import SPORTS_KNOWLEDGE
@@ -1126,6 +1137,96 @@ def get_auto_games(target_date):
                         tip["prob"] = max(30, tip["prob"] - 8)
                         tip["reason"] += f" | 🕵️ TRAP DETECTED"
                         funnel_notes.append(traps[0])
+                except Exception:
+                    pass
+
+            # ─── STAGE 4.1: GOD MODE (UNSTOPPABLE 90% PROTOCOL) ───
+            # Gives massive +20% boost to TRUE LOCKS (elite form + health + motivation)
+            if FUNNEL_ACTIVE and KB_ACTIVE:
+                try:
+                    h_key = home.lower().split()[-1] if home else ""
+                    a_key = away.lower().split()[-1] if away else ""
+                    h_profile = SPORTS_KNOWLEDGE.get(h_key, {})
+                    a_profile = SPORTS_KNOWLEDGE.get(a_key, {})
+                    
+                    sel_lower = tip.get("selection", "").lower()
+                    is_home_pick = home.lower() in sel_lower or any(
+                        p in sel_lower for p in home.lower().split() if len(p) > 3
+                    )
+                    
+                    if is_home_pick:
+                        god_boost, god_reasons = protocol_unstoppable_90(h_profile, a_profile, True)
+                    else:
+                        god_boost, god_reasons = protocol_unstoppable_90(a_profile, h_profile, False)
+                    
+                    if god_boost > 0:
+                        tip["prob"] = min(97, tip["prob"] + god_boost)
+                        tip["badge"] = "🔐 GOD MODE"
+                        for gr in god_reasons[:2]:
+                            funnel_notes.append(gr)
+                        print(f"[AUTO-ENGINE] 🔐 GOD MODE ACTIVATED: {home} vs {away} (+{god_boost}%)")
+                except Exception:
+                    pass
+
+            # ─── STAGE 4.2: LAUNDROMAT (BOOKIE TRAP DETECTOR) ───
+            # Detects when public favorites have suspiciously high odds
+            if FUNNEL_ACTIVE and KB_ACTIVE:
+                try:
+                    h_key = home.lower().split()[-1] if home else ""
+                    a_key = away.lower().split()[-1] if away else ""
+                    h_profile = SPORTS_KNOWLEDGE.get(h_key, {"name": home})
+                    a_profile = SPORTS_KNOWLEDGE.get(a_key, {"name": away})
+                    h_profile["name"] = home
+                    a_profile["name"] = away
+                    
+                    laundry_adj, laundry_msg = funnel_laundromat(
+                        h_profile, float(tip.get("odd", 1.5)), a_profile
+                    )
+                    if laundry_adj != 0:
+                        tip["prob"] = max(30, tip["prob"] + laundry_adj)
+                        funnel_notes.append(f"🧼 LAUNDROMAT: {laundry_adj:+d}%")
+                except Exception:
+                    pass
+
+            # ─── STAGE 4.3: SHARP MONEY TRACKER (365S SENTIMENT) ───
+            # Uses 365Scores public voting data to detect reverse line movement
+            if SHARP_MONEY_ACTIVE and SCORES365_ACTIVE:
+                try:
+                    intel = intel_map.get(home)
+                    if intel:
+                        sentiment = intel.get("public_sentiment", {})
+                        total_votes = sentiment.get("total_votes", 0)
+                        
+                        if total_votes > 300:
+                            h_vote = sentiment.get("home_pct", 50)
+                            a_vote = sentiment.get("away_pct", 50)
+                            
+                            sel_lower = tip.get("selection", "").lower()
+                            is_home_pick = home.lower() in sel_lower or any(
+                                p in sel_lower for p in home.lower().split() if len(p) > 3
+                            )
+                            
+                            # Determine if we're betting WITH or AGAINST the public
+                            our_pct = h_vote if is_home_pick else a_vote
+                            
+                            if our_pct > 70:
+                                # Public is heavily on our side — check for trap
+                                if tip_odd > 1.60:
+                                    # High public% + high odds = potential trap
+                                    sharp_adj, sharp_msg = tracker_sharp_money(
+                                        home if is_home_pick else away, our_pct, "up"
+                                    )
+                                    if sharp_adj != 0:
+                                        tip["prob"] = max(30, tip["prob"] + sharp_adj)
+                                        funnel_notes.append(f"💰 SHARP: {sharp_msg[:60]}")
+                            elif our_pct < 30:
+                                # We're contrarian — smart money might be with us
+                                sharp_adj, sharp_msg = tracker_sharp_money(
+                                    home if is_home_pick else away, our_pct, "down"
+                                )
+                                if sharp_adj > 0:
+                                    tip["prob"] = min(95, tip["prob"] + 3)
+                                    funnel_notes.append("💰 SHARP: Contrarian play — smart money aligned")
                 except Exception:
                     pass
 
