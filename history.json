@@ -308,10 +308,10 @@
         "selection": "Over 225.5 Pontos",
         "odd": 1.9,
         "prob": 82,
-        "status": "LOST",
-        "score": "0-0",
-        "profit": "-100%",
-        "badge": "🚀 OVER"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -322,10 +322,10 @@
         "selection": "Over 224.5 Pontos",
         "odd": 1.9,
         "prob": 82,
-        "status": "LOST",
-        "score": "0-0",
-        "profit": "-100%",
-        "badge": "🚀 OVER"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -336,10 +336,10 @@
         "selection": "Over 216.5 Pontos",
         "odd": 1.9,
         "prob": 82,
-        "status": "LOST",
-        "score": "0-0",
-        "profit": "-100%",
-        "badge": "🚀 OVER"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "11/02",
@@ -350,10 +350,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "113-126",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -364,10 +364,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 55,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "121-93",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "11/02",
@@ -378,10 +378,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "109-136",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -392,10 +392,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 55,
-        "status": "PENDING",
+        "status": "WON",
         "score": "122-116",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -406,10 +406,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "111-123",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -420,10 +420,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "133-109",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -434,10 +434,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "102-105",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "11/02",
@@ -448,10 +448,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "95-113",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "11/02",
@@ -462,10 +462,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "138-89",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -476,10 +476,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 55,
-        "status": "PENDING",
+        "status": "WON",
         "score": "110-115",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -490,10 +490,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 55,
-        "status": "PENDING",
+        "status": "WON",
         "score": "124-105",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -504,10 +504,10 @@
         "selection": "São Paulo ou Empate",
         "odd": 1.35,
         "prob": 75,
-        "status": "PENDING",
+        "status": "WON",
         "score": "2-0",
-        "profit": "...",
-        "badge": "🛡️ EV SHIELD"
+        "profit": "+35%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -518,10 +518,10 @@
         "selection": "Vasco ou Empate",
         "odd": 1.35,
         "prob": 75,
-        "status": "PENDING",
+        "status": "WON",
         "score": "1-0",
-        "profit": "...",
-        "badge": "🛡️ EV SHIELD"
+        "profit": "+35%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -532,10 +532,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "108-116",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -546,10 +546,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "WON",
         "score": "138-113",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "+90%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -560,10 +560,10 @@
         "selection": "Over (Mais de 220 pts)",
         "odd": 1.9,
         "prob": 59,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "110-107",
-        "profit": "...",
-        "badge": "🤖 AI PICK"
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "11/02",
@@ -574,10 +574,10 @@
         "selection": "Atlético-MG ou Empate",
         "odd": 1.35,
         "prob": 75,
-        "status": "PENDING",
+        "status": "WON",
         "score": "3-3",
         "profit": "+35%",
-        "badge": "🛡️ EV SHIELD"
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -588,10 +588,10 @@
         "selection": "Chapecoense ou Empate",
         "odd": 1.35,
         "prob": 75,
-        "status": "PENDING",
+        "status": "WON",
         "score": "3-3",
         "profit": "+35%",
-        "badge": "🛡️ EV SHIELD"
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
@@ -602,10 +602,10 @@
         "selection": "Mirassol ou Empate",
         "odd": 1.35,
         "prob": 75,
-        "status": "PENDING",
+        "status": "WON",
         "score": "2-2",
         "profit": "+35%",
-        "badge": "🛡️ EV SHIELD"
+        "badge": "✅ GREEN"
     },
     {
         "date": "11/02",
