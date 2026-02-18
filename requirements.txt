@@ -1,0 +1,13 @@
+
+Flask==3.0.0
+Flask-Login
+Flask-SQLAlchemy
+requests==2.31.0
+numpy==1.26.0
+python-dotenv==1.0.0
+gunicorn==21.2.0
+beautifulsoup4==4.12.2
+werkzeug==3.0.1
+mercadopago>=2.1.0
+greenlet>=3.0.0
+sqlalchemy>=2.0.0

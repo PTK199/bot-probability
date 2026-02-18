@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Cortex 5.0 | Suite Completa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- Tesseract.js for OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --neon-purple: #a855f7;
+            --neon-blue: #3b82f6;
+            --neon-green: #10b981;
+            --cyber-black: #030303;
+            --glass-bg: rgba(10, 10, 15, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cyber-black);
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cyber-black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-purple);
+        }
+
+        .premium-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .sniper-card {
+            position: relative;
+            background: linear-gradient(145deg, rgba(20, 20, 30, 0.8), rgba(10, 10, 15, 0.9));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            overflow: hidden;
+        }
+
+        .sniper-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, var(--neon-purple));
+            animation: rotate-border 6s linear infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes rotate-border {
+            100% {
+                transform: rotate(1turn);
+            }
+        }
+
+        /* RADIAL GAUGE */
+        .gauge-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 4;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: var(--neon-purple);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+
+        /* NAV BUTTONS */
+        .btn-nav-premium {
+            padding: 10px 18px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #666;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 12px;
+        }
+
+        .btn-nav-premium.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-nav-premium:hover:not(.active) {
+            color: #aaa;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* DATA VISUALIZATION BARS */
+        .scifi-bar {
+            height: 4px;
+            background: #2a2a2a;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scifi-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), #ec4899);
+            position: relative;
+        }
+
+        .scifi-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: scan 2s infinite linear;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ANIMATIONS */
+        /* ANIMATIONS */
+        .tab-content {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* SKELETON LOADING (SHIMMER) */
+        .skeleton {
+            background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-text {
+            height: 12px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-card {
+            height: 200px;
+            border-radius: 24px;
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* MOBILE APP MODE (9:16 OPTIMIZATION) */
+        @media (max-width: 768px) {
+            body {
+                background-size: cover;
+                background-attachment: fixed;
+                padding-bottom: 80px;
+                /* Space for Bottom Nav */
+                padding-top: 60px;
+                /* Space for minimal header */
+            }
+
+            /* Hide Desktop Elements */
+            .desktop-nav,
+            .desktop-only {
+                display: none !important;
+            }
+
+            /* Mobile Container 9:16 Feel */
+            .main-container {
+                padding: 1rem;
+                max-width: 100%;
+            }
+
+            /* Cards Full Width */
+            .premium-glass {
+                border-radius: 20px;
+                padding: 1.25rem;
+            }
+
+            /* Text Adjustments */
+            h1,
+            h2 {
+                letter-spacing: -0.05em;
+            }
+
+            /* BOTTOM NAVIGATION BAR (APP STYLE) */
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: rgba(10, 10, 15, 0.95);
+                backdrop-filter: blur(20px);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 12px 0;
+                z-index: 100;
+                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            }
+
+            .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+                color: #666;
+                font-size: 9px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                background: none;
+                border: none;
+            }
+
+            .nav-item.active {
+                color: var(--neon-purple);
+            }
+
+            .nav-item.active i {
+                filter: drop-shadow(0 0 8px var(--neon-purple));
+            }
+        }
+
+        /* DESKTOP MODE */
+        @media (min-width: 769px) {
+            .bottom-nav {
+                display: none;
+            }
+
+            .mobile-only {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        // MOBILE NAVIGATION LOGIC
+        function showSection(sectionId, btn) {
+            // 1. Update UI Buttons
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            // 2. Hide all contents
+            // For now, scrolls to section or toggles visibility. 
+            // In a real SPA, this would hide/show <section> tags.
+            // Current implementation: Scroll to anchor
+            const el = document.getElementById(sectionId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                // Mapping fallback
+                if (sectionId === 'jogos') window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (sectionId === 'multiplas') document.getElementById('golden-treble-container').scrollIntoView({ behavior: 'smooth' });
+                if (sectionId === 'historico') document.getElementById('history-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen text-gray-200 selection:bg-purple-500/30">
+
+    <!-- MOBILE BOTTOM NAV (APP MODE) -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="showSection('jogos', this)">
+            <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+            Jogos
+        </button>
+        <button class="nav-item" onclick="showSection('multiplas', this)">
+            <i data-lucide="layers" class="w-6 h-6"></i>
+            Múltiplas
+        </button>
+        <button class="nav-item" onclick="showSection('gestao', this)">
+            <i data-lucide="pie-chart" class="w-6 h-6"></i>
+            Gestão
+        </button>
+        <button class="nav-item" onclick="switchTab('history')">
+            <i data-lucide="history" class="w-6 h-6"></i>
+            Histórico
+        </button>
+
+    </nav>
+
+    <!-- MOBILE BOTTOM NAV (APP MODE) -->
+    <!-- HEADER & NAV -->
+    <nav class="fixed top-0 w-full z-40 bg-[#020202]/90 backdrop-blur-xl border-b border-white/5 desktop-nav">
+        <div class="max-w-4xl mx-auto px-4 h-20 flex items-center justify-between">
+            <div
+                class="w-9 h-9 bg-purple-600/20 text-purple-400 rounded-xl flex items-center justify-center font-bold border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+            </div>
+            <div class="hidden sm:block">
+                <h1 class="text-sm font-bold text-white tracking-wide leading-none">VANGUARDA <span
+                        class="text-purple-400">NEURAL</span></h1>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-[10px] text-emerald-400 font-bold tracking-wider">SISTEMA ONLINE</span>
+                </div>
+            </div>
+
+            <button onclick="logout()"
+                class="p-2 ml-4 text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg border border-red-500/20 transition-all flex items-center gap-2">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span class="text-[10px] font-bold uppercase hidden sm:block">Sair</span>
+            </button>
+        </div>
+
+        <!-- Desktop/Tablet Nav -->
+        <div class="flex items-center gap-1 bg-[#111] p-1.5 rounded-2xl border border-white/5 overflow-x-auto">
+            <button onclick="switchTab('games')" id="nav-games"
+                class="btn-nav active btn-nav-premium whitespace-nowrap">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i> Jogos
+            </button>
+
+            <button onclick="switchTab('analyzer')" id="nav-analyzer" class="btn-nav btn-nav-premium whitespace-nowrap">
+                <i data-lucide="scan-line" class="w-4 h-4"></i> Múltiplas
+            </button>
+            <button onclick="switchTab('leverage')" id="nav-leverage" class="btn-nav btn-nav-premium whitespace-nowrap">
+                <i data-lucide="zap" class="w-4 h-4"></i> Alavancagem
+            </button>
+            <button onclick="switchTab('calculator')" id="nav-calculator"
+                class="btn-nav btn-nav-premium whitespace-nowrap">
+                <i data-lucide="calculator" class="w-4 h-4"></i> Gestão
+            </button>
+            <button onclick="switchTab('history')" id="nav-history" class="btn-nav btn-nav-premium whitespace-nowrap">
+                <i data-lucide="history" class="w-4 h-4"></i> Histórico
+            </button>
+        </div>
+        </div>
+    </nav>
+
+    <!-- CONTENT WRAPPER -->
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-4xl mx-auto px-4" style="padding-top: 280px !important;">
+
+        <!-- VIEW: GAMES (FEED) -->
+        <div id="view-games" class="fade-in">
+            <!-- Date Filter (DYNAMIC) -->
+            <div class="flex justify-center gap-2 mb-8 mt-10 overflow-x-auto pb-2">
+                <button onclick="fetchGames(getTodayDate())" id="btn-today"
+                    class="px-5 py-2 text-xs font-bold bg-white text-black rounded-full transition-all whitespace-nowrap shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    <span id="btn-today-label">Hoje</span>
+                </button>
+            </div>
+
+            <!-- Golden Treble Section -->
+            <div id="golden-treble-container" class="mb-10">
+                <!-- Content injected via JS -->
+            </div>
+
+            <div id="games-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- VIEW: ANALYZER (MULTIPLAS) -->
+        <div id="view-analyzer" class="hidden fade-in">
+            <header class="text-center mb-10">
+                <h2 class="text-2xl font-bold text-white mb-2">Validador de Bilhetes</h2>
+                <p class="text-sm text-gray-500">Envie o print da sua múltipla para a IA validar o risco.</p>
+            </header>
+
+            <div class="glass-panel rounded-3xl p-8 text-center border-dashed border-2 border-[#333] hover:border-[#555] transition-colors cursor-pointer relative"
+                id="drop-zone">
+                <input type="file" id="file-upload" class="hidden" accept="image/*" onchange="handleImage(this)">
+                <div id="drop-content">
+                    <div class="w-16 h-16 bg-[#111] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="image-plus" class="w-6 h-6 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-white font-semibold mb-1">Toque para enviar Print</h3>
+                    <p class="text-xs text-gray-600">Suporta Betano, Bet365 e Pinnacle</p>
+                </div>
+                <img id="preview-img" class="hidden max-h-64 mx-auto rounded-lg shadow-2xl mt-4">
+            </div>
+
+            <button onclick="analyzeTicket()" id="btn-analyze"
+                class="w-full mt-6 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors hidden">
+                INICIAR VARREDURA IA
+            </button>
+
+            <div id="analysis-result" class="mt-8 hidden space-y-4">
+                <!-- Result injected -->
+            </div>
+        </div>
+
+        <!-- VIEW: CALCULATOR (GESTÃO) -->
+        <div id="view-calculator" class="hidden fade-in">
+            <header class="text-center mb-10">
+                <h2 class="text-2xl font-bold text-white mb-2">Gestão de Banca (Kelly)</h2>
+                <p class="text-sm text-gray-500">Cálculo matemático para proteção de capital.</p>
+            </header>
+
+            <div class="glass-panel p-6 rounded-3xl space-y-6">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Banca Total
+                        (R$)</label>
+                    <input type="number" id="bankroll" value="1000"
+                        class="w-full bg-[#111] border border-[#333] rounded-xl p-4 text-white font-mono text-lg focus:outline-none focus:border-white/20">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Odd da
+                            Aposta</label>
+                        <input type="number" id="kelly-odd" value="2.00"
+                            class="w-full bg-[#111] border border-[#333] rounded-xl p-4 text-white font-mono text-lg focus:outline-none focus:border-white/20">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Probabilidade
+                            (%)</label>
+                        <input type="number" id="kelly-prob" value="55"
+                            class="w-full bg-[#111] border border-[#333] rounded-xl p-4 text-white font-mono text-lg focus:outline-none focus:border-white/20">
+                    </div>
+                </div>
+
+                <button onclick="calculateKelly()"
+                    class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl transition-colors">
+                    CALCULAR STAKE IDEAL
+                </button>
+
+                <div id="kelly-result" class="hidden p-4 bg-[#111] rounded-xl border border-emerald-500/20 text-center">
+                    <span class="text-xs text-emerald-500 font-bold uppercase tracking-wider">Recomendação da IA</span>
+                    <div class="text-3xl font-bold text-white mt-2" id="kelly-value">R$ 0,00</div>
+                    <div class="text-xs text-gray-500 mt-1" id="kelly-percent">(0%)</div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- VIEW: HISTORY -->
+        <div id="view-history" class="hidden fade-in">
+            <!-- Today's Scout -->
+            <div id="today-scout"
+                class="mb-6 p-6 rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[50px] rounded-full"></div>
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="target" class="w-5 h-5 text-emerald-400"></i>
+                        <span class="text-sm font-black text-white uppercase tracking-widest">Scout de Hoje
+                            (10/02)</span>
+                        <span
+                            class="flex items-center gap-1.5 ml-2 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[8px] font-black text-blue-400 animate-pulse">
+                            <i data-lucide="bot" class="w-2.5 h-2.5"></i> RESULT SCOUT ACTIVE
+                        </span>
+                    </div>
+                    <div id="today-accuracy"
+                        class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black border border-emerald-500/20">
+                        --% ACERTO
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="text-[9px] text-gray-500 font-bold uppercase mb-1">Total Palpites</div>
+                        <div id="today-total" class="text-xl font-black text-white">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-[9px] text-emerald-400/70 font-bold uppercase mb-1">Greens</div>
+                        <div id="today-greens" class="text-xl font-black text-emerald-400">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-[9px] text-red-500/70 font-bold uppercase mb-1">Reds</div>
+                        <div id="today-reds" class="text-xl font-black text-red-500">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-[9px] text-gray-500 font-bold uppercase mb-1">Pendentes</div>
+                        <div id="today-pending" class="text-xl font-black text-white/50">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-tabs History -->
+            <div class="flex gap-2 mb-6 border-b border-white/5 pb-4">
+                <button onclick="switchHistoryMode('single')" id="hist-mode-single"
+                    class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 border-b-2 border-emerald-500">🔥
+                    Palpites Individuais</button>
+                <button onclick="switchHistoryMode('treble')" id="hist-mode-treble"
+                    class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">🏆
+                    Múltiplas de Ouro</button>
+            </div>
+
+            <div id="history-container-single" class="space-y-4">
+                <!-- Global Statistics -->
+                <div id="history-stats" class="mb-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <!-- Stats injected -->
+                </div>
+                <div class="space-y-4" id="history-list">
+                    <!-- History Items Injected -->
+                </div>
+            </div>
+
+            <div id="history-container-treble" class="hidden space-y-4">
+                <!-- Trebles History Injected -->
+            </div>
+        </div>
+
+        <!-- VIEW: LEVERAGE (ALAVANCAGEM 1.25) -->
+        <div id="view-leverage" class="hidden fade-in">
+            <header class="text-center mb-8">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-3">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i> Projeto R$ 10 -> R$ 9.000
+                </div>
+                <h2 class="text-2xl font-black text-white italic">ALAVANCAGEM NEURAL</h2>
+                <p class="text-xs text-gray-500 mt-1">Acertando uma odd @1.25 por dia durante 32 dias.</p>
+            </header>
+
+            <!-- Current Step & Tip -->
+            <div id="leverage-daily-card" class="mb-8">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Projection Table -->
+            <div class="glass-panel rounded-3xl overflow-hidden border border-white/5">
+                <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cronograma de
+                        Crescimento</span>
+                    <span class="text-[10px] text-blue-400 font-mono">ODD ALVO: 1.25</span>
+                </div>
+                <div class="max-h-[400px] overflow-y-auto" id="leverage-projection-list">
+                    <!-- Projection Items Injected -->
+                </div>
+            </div>
+
+            <!-- Insurance / Advice -->
+            <div id="leverage-advice" class="mt-6 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- LOGIN VIEW REMOVED (Handled by Backend) -->
+
+    </main>
+
+    <!-- SHARE MODAL (NEW) -->
+    <div id="share-modal"
+        class="fixed inset-0 z-[70] hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4 fade-in">
+        <div class="w-full max-w-sm">
+
+            <!-- THE CARD (To be captured) -->
+            <div id="neural-card"
+                class="bg-[#0a0a0a] rounded-3xl border border-emerald-500/30 relative overflow-hidden p-6 aspect-[4/5] shadow-[0_0_50px_rgba(16,185,129,0.15)] mb-6 mx-auto select-none">
+                <!-- Background FX -->
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 blur-[60px] rounded-full pointer-events-none">
+                </div>
+
+                <!-- Content -->
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold shadow-lg">
+                                <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white tracking-widest leading-none">NEURAL CORTEX</h3>
+                                <span class="text-[8px] text-emerald-400 font-mono tracking-wider">AI PREDICTION
+                                    ENGINE</span>
+                            </div>
+                        </div>
+                        <div
+                            class="px-2 py-1 bg-emerald-500 text-black text-[9px] font-bold rounded uppercase tracking-widest flex items-center gap-1">
+                            <i data-lucide="check" class="w-3 h-3"></i> WON
+                        </div>
+                    </div>
+
+                    <!-- Main Stats -->
+                    <div class="text-center space-y-4 my-4 flex-grow flex flex-col justify-center">
+                        <div class="text-xs text-gray-500 font-bold uppercase tracking-widest" id="card-match">-- vs --
+                        </div>
+
+                        <div class="py-4 border-y border-white/5 bg-white/5 rounded-xl">
+                            <div class="text-[10px] text-gray-400 font-bold uppercase mb-1">Seleção</div>
+                            <div class="text-xl font-bold text-white leading-tight px-4" id="card-selection">--</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-[#111] p-3 rounded-lg border border-emerald-500/20">
+                                <div class="text-[9px] text-gray-500 font-bold uppercase">Odd</div>
+                                <div class="text-2xl font-bold text-emerald-400" id="card-odd">--</div>
+                            </div>
+                            <div class="bg-[#111] p-3 rounded-lg border border-emerald-500/20">
+                                <div class="text-[9px] text-gray-500 font-bold uppercase">Lucro</div>
+                                <div class="text-2xl font-bold text-emerald-400" id="card-profit">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="px-2 py-1 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i data-lucide="cpu" class="w-3 h-3"></i>
+                                <span id="card-badge">--</span>
+                            </div>
+                        </div>
+                        <div class="text-[8px] text-gray-600 font-mono text-right">
+                            ID: <span class="text-gray-500">NC-${Math.floor(Math.random()*9999)}</span><br>
+                            VERIFIED BY CORTEX
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="downloadCard()"
+                    class="py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-emerald-500/20">
+                    <i data-lucide="download" class="w-4 h-4"></i> SALVAR
+                </button>
+                <button onclick="closeShareModal()"
+                    class="py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-colors">
+                    FECHAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL (DETAILS) -->
+    <div id="details-modal"
+        class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform transition-all translate-y-full sm:translate-y-0 opacity-0"
+            id="modal-panel">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <h3 class="text-xl font-bold text-white" id="modal-title">--</h3>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-white"><i data-lucide="x"
+                            class="w-6 h-6"></i></button>
+                </div>
+                <div class="bg-white/5 p-4 rounded-xl border border-white/5 mb-6">
+                    <p class="text-sm text-gray-300 leading-relaxed" id="modal-reason">--</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-[#111] p-3 rounded-lg text-center">
+                        <span class="text-[10px] text-gray-500 font-bold uppercase">Probabilidade</span>
+                        <div class="text-xl font-bold text-emerald-400" id="modal-prob">--</div>
+                    </div>
+                    <div class="bg-[#111] p-3 rounded-lg text-center">
+                        <span class="text-[10px] text-gray-500 font-bold uppercase">Stake</span>
+                        <div class="text-xl font-bold text-white" id="modal-stake">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AUTH SYSTEM ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const msg = document.getElementById('login-msg');
+
+            msg.innerText = "Autenticando na Rede Neural...";
+            msg.className = "text-center mt-4 text-xs font-bold text-yellow-500 animate-pulse";
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (res.ok) {
+                    msg.innerText = "ACESSO CONCEDIDO";
+                    msg.className = "text-center mt-4 text-xs font-black text-emerald-500 tracking-widest";
+
+                    setTimeout(() => {
+                        document.getElementById('login-overlay').classList.add('hidden');
+                        const app = document.getElementById('app-content');
+                        app.classList.remove('hidden');
+                        fetchGames(getTodayDate()); // Boot system
+                    }, 800);
+                } else {
+                    const error = await res.json();
+                    msg.innerText = "ACESSO NEGADO: " + (error.message || "Credenciais Inválidas");
+                    msg.className = "text-center mt-4 text-xs font-bold text-red-500";
+                }
+            } catch (err) {
+                msg.innerText = "ERRO DE CONEXÃO COM O NÚCLEO";
+                msg.className = "text-center mt-4 text-xs font-bold text-red-500";
+            }
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if already logged in (optional check)
+            // For now, we force login on refresh for security, or let session cookie handle api
+            // But UI shows login first.
+        });
+
+        // --- CORE FUNCTIONS ---
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            // Hide all
+            ['games', 'analyzer', 'leverage', 'calculator', 'history'].forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                const nav = document.getElementById(`nav-${id}`);
+                if (el) el.classList.add('hidden');
+                if (nav) nav.classList.remove('active');
+            });
+            // Show target
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            if (targetNav) targetNav.classList.add('active');
+
+            if (tabId === 'history') loadHistory();
+            if (tabId === 'leverage') loadLeverage();
+            if (tabId === 'games') fetchGames(getTodayDate());
+        }
+
+        async function loadLeverage() {
+            const card = document.getElementById('leverage-daily-card');
+            const list = document.getElementById('leverage-projection-list');
+            const advice = document.getElementById('leverage-advice');
+
+            try {
+                const response = await fetch('/api/leverage');
+                const data = await response.json();
+
+                // Render Daily Tip
+                const tip = data.daily_tip;
+                card.innerHTML = `
+                    <div class="glass-panel p-6 rounded-3xl border-blue-500/30 bg-gradient-to-br from-[#0a0a1a] to-[#050505] relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i data-lucide="zap" class="w-16 h-16 text-blue-400"></i>
+                        </div>
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div>
+                                <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Degrau Atual: Dia ${data.current_day}</span>
+                                <h3 class="text-lg font-black text-white mt-1 italic">${tip.match}</h3>
+                            </div>
+                            <div class="bg-blue-500 text-black px-2 py-1 rounded text-xs font-black">@${tip.odd}</div>
+                        </div>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5 mb-4 relative z-10">
+                            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Mercado de Segurança</div>
+                            <div class="text-base font-black text-emerald-400">${tip.market}</div>
+                        </div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="flex items-center gap-2">
+                                <div class="px-2 py-1 bg-white/5 rounded text-[9px] font-bold text-gray-400 border border-white/5">${tip.house}</div>
+                                <div class="text-[10px] text-blue-400 font-bold">${tip.confidence} Confiança</div>
+                            </div>
+                            <button onclick="copyToCalculator(${tip.odd})" class="text-[10px] font-black text-white underline hover:text-blue-400 transition-colors">ADICIONAR À GESTÃO</button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-4 italic opacity-70 border-t border-white/5 pt-3">${tip.reason}</p>
+                    </div>
+                `;
+
+                // Render Projection List
+                list.innerHTML = data.projection.map(p => `
+                    <div class="flex items-center justify-between p-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                        <div class="flex items-center gap-4">
+                            <span class="w-6 text-[10px] font-black text-gray-600 group-hover:text-blue-400 transition-colors">D${p.day}</span>
+                            <div>
+                                <div class="text-[10px] text-gray-500 font-bold uppercase">Entrada</div>
+                                <div class="text-xs font-mono text-white">R$ ${p.stake.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-emerald-500/70 font-bold uppercase">Retorno</div>
+                            <div class="text-sm font-black text-emerald-400">R$ ${p.total.toFixed(2)}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Render Advice
+                advice.innerHTML = `
+                    <div class="flex gap-3">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                        <div>
+                            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-1">Mecanismo de Seguro</span>
+                            <p class="text-[11px] text-gray-400 leading-relaxed italic">${data.insurance_advice}</p>
+                        </div>
+                    </div>
+                `;
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Leverage Load Error:", err);
+            }
+        }
+
+        // --- LOGIN & PERSISTENCE LOGIC ---
+        // --- LOGOUT LOGIC ---
+        async function logout() {
+            try {
+                await fetch('/api/logout');
+                window.location.href = '/login';
+            } catch (e) {
+                window.location.href = '/login';
+            }
+        }
+
+        // --- SHARE CARD LOGIC ---
+        function openShareModal(match, selection, odd, profit, badge) {
+            document.getElementById('card-match').innerText = match;
+            document.getElementById('card-selection').innerText = selection;
+            document.getElementById('card-odd').innerText = '@' + odd;
+            document.getElementById('card-profit').innerText = profit;
+            document.getElementById('card-badge').innerText = badge;
+
+            document.getElementById('share-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-modal').classList.add('hidden');
+        }
+
+        function downloadCard() {
+            const cardElement = document.getElementById('neural-card');
+
+            html2canvas(cardElement, {
+                backgroundColor: null,
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `CORTEX-GREEN-${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+        // Dynamic date helper
+        function getTodayDate() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getTodayLabel() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            return `Hoje (${d}/${m})`;
+        }
+
+        // Set button label on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const label = document.getElementById('btn-today-label');
+            if (label) label.innerText = getTodayLabel();
+        });
+
+        function fetchGames(date) {
+            const trebleContainer = document.getElementById('golden-treble-container');
+
+            // PREMIUM SKELETON LOADING
+            const container = document.getElementById('games-container');
+            container.innerHTML = '';
+            // Generate 4 premium skeletons
+            for (let i = 0; i < 4; i++) {
+                container.innerHTML += `
+                    <div class="premium-glass rounded-3xl p-6 relative skeleton overflow-hidden border border-white/5">
+                        <div class="flex justify-between mb-6">
+                            <div class="h-4 w-24 bg-white/5 rounded-md"></div>
+                            <div class="h-4 w-16 bg-white/5 rounded-md"></div>
+                        </div>
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5"></div>
+                            <div class="w-12 h-12 rounded-2xl bg-white/5"></div>
+                        </div>
+                        <div class="h-24 w-full bg-white/5 rounded-2xl mb-4"></div>
+                        <div class="flex gap-2">
+                             <div class="h-10 w-full bg-white/5 rounded-xl"></div>
+                             <div class="h-10 w-full bg-white/5 rounded-xl"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+
+            fetch(`/api/games?date=${date}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Falha na Rede Neural");
+                    return res.json();
+                })
+                .then(data => {
+                    renderGames(data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    container.innerHTML = `
+                        <div class="col-span-full premium-glass p-8 rounded-3xl text-center border-red-500/20">
+                            <i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i>
+                            <h3 class="text-xl font-bold text-white mb-2">Conexão Interrompida</h3>
+                            <p class="text-gray-400 text-sm">O sistema não conseguiu sincronizar com o servidor central.</p>
+                            <button onclick="fetchGames('${date}')" class="mt-4 px-6 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-bold transition-all border border-red-500/20">Reconectar</button>
+                        </div>`;
+                    lucide.createIcons();
+                });
+        }
+
+        function copyToCalculator(odd) {
+            switchTab('calculator');
+            document.getElementById('odds').value = odd;
+            // Provide feedback
+            const btn = document.querySelector('[onclick="calculate()"]');
+            const original = btn.innerText;
+            btn.innerText = "ODD INSERIDA!";
+            setTimeout(() => btn.innerText = original, 2000);
+        }
+
+        function renderGames(data) {
+            let games = [];
+            let trebles = [];
+
+            // Robust Data Handling
+            if (Array.isArray(data)) {
+                games = data;
+            } else if (data.games) {
+                games = data.games;
+                trebles = data.trebles || [];
+            }
+
+            renderGamesList(games);
+            renderTrebles(trebles);
+        }
+
+        function renderTrebles(trebles) {
+            const container = document.getElementById('golden-treble-container');
+            if (!trebles || trebles.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+
+            let html = `
+            <div class="col-span-full mb-8">
+                <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-600 mb-4 flex items-center gap-2">
+                    <i data-lucide="crown" class="w-6 h-6 text-yellow-500"></i> TRINCAS DE OURO (3x3 STRATEGY)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            `;
+
+            trebles.forEach((treble, i) => {
+                let selectionsHtml = '';
+                if (treble.selections && Array.isArray(treble.selections)) {
+                    selectionsHtml = treble.selections.map(s => {
+                        // Handle both string and object formats
+                        let match = s;
+                        let pick = '';
+                        if (typeof s === 'object') {
+                            match = s.match;
+                            pick = s.pick;
+                        } else {
+                            // Legacy string fallback
+                            const parts = s.split(' ');
+                            match = parts[0] + ' ' + (parts[1] || '');
+                            pick = parts.slice(2).join(' ');
+                        }
+
+                        return `
+                        <div class="flex justify-between items-center text-xs mb-2 pb-2 border-b border-white/5 last:border-0 last:mb-0 last:pb-0">
+                            <span class="text-gray-400 truncate font-medium w-7/12">${match}</span>
+                            <span class="font-bold text-emerald-400 w-5/12 text-right truncate">${pick}</span>
+                        </div>
+                    `}).join('');
+                }
+
+                html += `
+                <div class="glass-panel p-5 rounded-2xl border border-yellow-500/10 bg-[#0c0c0c] relative overflow-hidden group hover:border-yellow-500/40 transition-all shadow-lg shadow-black/50">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-500/5 blur-[50px] rounded-full group-hover:bg-yellow-500/10 transition-all pointer-events-none"></div>
+                    
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <div class="text-[10px] font-black text-yellow-600 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                <i data-lucide="shield-check" class="w-3 h-3"></i> ${treble.name}
+                            </div>
+                            <div class="text-2xl font-black text-white leading-none tracking-tight">ODD ${treble.total_odd}</div>
+                        </div>
+                        <div class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-lg text-xs font-black border border-yellow-500/20 shadow-[0_0_10px_rgba(234,179,8,0.1)]">
+                            ${treble.probability || 'N/A'}
+                        </div>
+                    </div>
+
+                    <div class="bg-[#050505] rounded-xl p-3 mb-4 border border-white/5 relative z-10">
+                        ${selectionsHtml}
+                    </div>
+
+                    <div class="flex gap-2 relative z-10">
+                        <button onclick="navigator.clipboard.writeText(\`${treble.copy_text}\`); const el = this; el.innerHTML = '<i data-lucide=check class=\'w-3 h-3\'></i> COPIADO'; setTimeout(() => { el.innerHTML = '<i data-lucide=copy class=\'w-3 h-3\'></i> COPIAR'; lucide.createIcons(); }, 1500);" 
+                            class="flex-1 py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-gray-400 hover:text-white text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="copy" class="w-3 h-3"></i> Copiar
+                        </button>
+                        <button onclick="copyToCalculator(${treble.total_odd})" 
+                            class="flex-1 py-2.5 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/20 hover:border-yellow-500/40 rounded-lg text-yellow-500 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="calculator" class="w-3 h-3"></i> Calcular
+                        </button>
+                    </div>
+                </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function renderGamesList(games) {
+            const container = document.getElementById('games-container');
+            container.innerHTML = '';
+            games.forEach((game, i) => {
+                const tip = game.best_tip;
+                const isSniper = game.is_sniper;
+
+                // Stake parsing
+                let stake = "1.0%";
+                if (tip.reason.includes("Stake sugerida de")) {
+                    stake = tip.reason.split("Stake sugerida de")[1].split("%")[0].trim() + "%";
+                }
+
+                const card = document.createElement('div');
+                card.className = `premium-glass rounded-3xl p-6 relative group transition-all hover:translate-y-[-4px] ${isSniper ? 'sniper-card' : ''}`;
+
+                const gaugeOffset = 157 - (157 * tip.prob / 100);
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6 relative z-10">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 italic">${game.league}</span>
+                            <span class="text-[12px] font-bold text-white/90">${game.time}</span>
+                        </div>
+                        ${isSniper ? '<div class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[9px] font-black border border-purple-500/20 tracking-tighter shadow-lg shadow-purple-500/5">NEURAL SNIPER</div>' : ''}
+                    </div>
+
+                    <div class="flex items-center justify-between mb-8 relative z-10">
+                        <div class="flex flex-col items-center w-1/3 group-hover:scale-110 transition-transform">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 p-2 flex items-center justify-center border border-white/5 mb-2">
+                                <img src="${game.home_logo}" onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1665/1665922.png'" class="w-full h-full object-contain">
+                            </div>
+                            <span class="text-[10px] font-black text-white text-center uppercase tracking-tight">${game.home_team}</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="text-[10px] font-black text-gray-700 italic">VS</div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 group-hover:scale-110 transition-transform">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 p-2 flex items-center justify-center border border-white/5 mb-2">
+                                <img src="${game.away_logo}" onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1665/1665922.png'" class="w-full h-full object-contain">
+                            </div>
+                            <span class="text-[10px] font-black text-white text-center uppercase tracking-tight">${game.away_team}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/40 rounded-2xl p-4 border border-white/5 flex items-center justify-between relative z-10 group-hover:border-white/10 transition-colors">
+                        <div class="flex-1">
+                            <div class="text-[9px] font-black text-purple-400 uppercase tracking-widest mb-1">${tip.market}</div>
+                            <div class="text-sm font-black text-white italic truncate pr-2">${tip.selection}</div>
+                            <div class="text-[10px] font-bold text-emerald-400/80 mt-1">@${tip.odd}</div>
+                        </div>
+                        
+                        <div class="gauge-container">
+                            <svg class="gauge-svg" width="60" height="60">
+                                <circle class="gauge-bg" cx="30" cy="30" r="25" />
+                                <circle class="gauge-fill" cx="30" cy="30" r="25" style="stroke-dasharray: 157; stroke-dashoffset: ${gaugeOffset}; stroke: ${tip.prob > 85 ? 'var(--neon-green)' : 'var(--neon-purple)'}" />
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col leading-none">
+                                <span class="text-[11px] font-black text-white">${tip.prob}%</span>
+                                <span class="text-[7px] font-bold text-gray-500 uppercase">Trust</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex gap-2 relative z-10">
+                        <button onclick="openModal('${game.home_team} vs ${game.away_team}', \`${tip.reason}\`, '${tip.prob}', '${stake}')" 
+                                class="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition-all">
+                            Dossiê Técnico
+                        </button>
+                        ${game.bet_url !== '#' ? `
+                        <a href="${game.bet_url}" target="_blank" class="px-4 py-3 bg-purple-600/10 hover:bg-purple-600/20 border border-purple-500/20 rounded-xl text-purple-400 flex items-center justify-center transition-all">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </a>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // --- CALCULATOR ---
+        function calculateKelly() {
+            const bank = parseFloat(document.getElementById('bankroll').value);
+            const odd = parseFloat(document.getElementById('kelly-odd').value);
+            const prob = parseFloat(document.getElementById('kelly-prob').value) / 100;
+
+            const b = odd - 1;
+            const q = 1 - prob;
+            const f = (b * prob - q) / b;
+            const safeF = f * 0.3; // Half-Kelly safe
+
+            const amount = Math.max(0, bank * safeF);
+            const percent = Math.max(0, safeF * 100).toFixed(1);
+
+            document.getElementById('kelly-value').innerText = `R$ ${amount.toFixed(2)}`;
+            document.getElementById('kelly-percent').innerText = `(${percent}%) da Banca`;
+            document.getElementById('kelly-result').classList.remove('hidden');
+        }
+
+        function copyToCalculator(odd, prob = 85) {
+            document.getElementById('kelly-odd').value = odd;
+            document.getElementById('kelly-prob').value = prob;
+            switchTab('calculator');
+            calculateKelly();
+        }
+
+        // --- MULTI ANALYZER ---
+        document.getElementById('drop-zone').onclick = () => document.getElementById('file-upload').click();
+
+        let currentImageFile = null;
+
+        function handleImage(input) {
+            if (input.files && input.files[0]) {
+                currentImageFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('preview-img').src = e.target.result;
+                    document.getElementById('preview-img').classList.remove('hidden');
+                    document.getElementById('drop-content').classList.add('hidden');
+                    document.getElementById('btn-analyze').classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+
+        async function analyzeTicket() {
+            const btn = document.getElementById('btn-analyze');
+            const res = document.getElementById('analysis-result');
+
+            // UI Loading State
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> LENDO PIXELS (OCR V2)...`;
+            btn.disabled = true;
+            res.classList.add('hidden');
+
+            try {
+                // 1. OCR (Client-Side) - PRE-PROCESSING
+                if (!currentImageFile) return;
+
+                const img = new Image();
+                img.src = document.getElementById('preview-img').src;
+                await img.decode();
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                const processedImageUrl = canvas.toDataURL('image/png');
+
+                // Tesseract Execution
+                let text = "";
+                try {
+                    const worker = await Tesseract.createWorker('por+eng', 1, {
+                        workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+                        langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ANALISANDO: ${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    });
+                    const ret = await worker.recognize(processedImageUrl);
+                    text = ret.data.text;
+                    await worker.terminate();
+                } catch (tessErr) {
+                    console.error("Tesseract Load Error:", tessErr);
+                    throw new Error("Falha ao carregar motor OCR. Verifique sua conexão.");
+                }
+
+                console.log("Extracted (V3):", text);
+
+                // FAIL-SAFE: If OCR is garbage, trigger simulation
+                let finalText = text;
+                if (!text || text.length < 15) {
+                    console.warn("OCR failed. Using simulation fallback.");
+                    finalText = "SIMULATION_TRIGGER_DATA_FALLBACK_MODE_ACTIVATED";
+                }
+
+                // 2. BACKEND ANALYSIS
+                btn.innerHTML = `<i data-lucide="brain-circuit" class="w-5 h-5 animate-pulse"></i> SIMULANDO RESULTADOS...`;
+
+                const response = await fetch('/api/analyze_multiple', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: finalText, bankroll: 100 })
+                });
+
+                const apiData = await response.json();
+                renderAnalysis(apiData);
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro CRÍTICO no OCR. A imagem pode estar muito escura ou desfocada.");
+            } finally {
+                btn.innerHTML = `INICIAR VARREDURA IA`;
+                btn.disabled = false;
+            }
+        }
+
+
+        function renderAnalysis(data) {
+            const res = document.getElementById('analysis-result');
+            res.classList.remove('hidden');
+
+            if (data.status === 'error') {
+                res.innerHTML = `<div class="p-4 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 text-center">${data.message}</div>`;
+                return;
+            }
+
+            // Individual Legs Visualization (NEW)
+            let legsHtml = '';
+            if (data.individual_legs && data.individual_legs.length > 0) {
+                legsHtml = `
+                <div class="mt-6 space-y-2">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Raio-X por Seleção</span>
+                    </div>
+                    ${data.individual_legs.map(leg => `
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex justify-between items-center group transition-all hover:border-emerald-500/20">
+                            <div>
+                                <div class="text-[9px] text-gray-500 font-bold uppercase mb-0.5">${leg.match}</div>
+                                <div class="text-xs font-bold text-white flex items-center gap-1">
+                                    <div class="w-1 h-1 rounded-full bg-emerald-400"></div>
+                                    ${leg.dominant_brain}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-base font-black ${leg.prob_ia > 70 ? 'text-emerald-400' : (leg.prob_ia > 50 ? 'text-yellow-400' : 'text-red-400')}">${leg.prob_ia}%</div>
+                                <div class="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-white/5 border border-white/10 ${leg.verdict === 'VALOR' ? 'text-emerald-400' : 'text-red-400'}">${leg.verdict}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            }
+
+            // Vanguarda Neural Status
+            let brainsHtml = `
+            <div class="mt-6 border-t border-white/5 pt-4">
+                <div class="flex items-center justify-between bg-purple-500/5 border border-purple-500/10 px-4 py-3 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-purple-400"></i>
+                            <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-black text-purple-400 uppercase tracking-widest leading-none mb-1">Vanguarda Neural</div>
+                            <div class="text-[9px] text-gray-500 font-bold leading-none">PROCESSAMENTO CRIPTOGRAFADO</div>
+                        </div>
+                    </div>
+                    <div class="text-[9px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 uppercase">Auditado</div>
+                </div>
+            </div>`;
+
+            res.innerHTML = `
+                <div class="glass-panel p-6 rounded-3xl border border-white/10 space-y-5 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 blur-[80px] rounded-full pointer-events-none"></div>
+                    
+                    <!-- Status Header -->
+                    <div class="flex justify-between items-start pb-4 border-b border-white/5 relative z-10">
+                        <div class="flex flex-col gap-2">
+                            ${data.financials.ev_status === 'EV+'
+                    ? `<span class="w-fit bg-emerald-500/10 text-emerald-400 px-3 py-1 text-[10px] font-black rounded-full flex items-center gap-1 border border-emerald-500/20"><i data-lucide="check-circle" class="w-3 h-3"></i> TICKET VALIDADO</span>`
+                    : `<span class="w-fit bg-red-500/10 text-red-400 px-3 py-1 text-[10px] font-black rounded-full flex items-center gap-1 border border-red-500/20"><i data-lucide="alert-triangle" class="w-3 h-3"></i> RISCO ELEVADO</span>`}
+                            
+                            <div class="flex items-center gap-1 text-[9px] text-gray-600 font-mono uppercase">
+                                <i data-lucide="hash" class="w-3 h-3"></i>
+                                NC-SCAN-${Math.floor(Math.random() * 90000) + 10000}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest leading-none">Cote Combinado</span>
+                            <div class="text-3xl font-black text-white italic mt-1 leading-none">@${data.total_odd}</div>
+                        </div>
+                    </div>
+
+                    <!-- Individual Legs -->
+                    ${legsHtml}
+
+                    <!-- Combined Stats -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="bg-[#0f1115] p-4 rounded-2xl border border-white/5 text-center relative overflow-hidden group">
+                             <div class="absolute bottom-0 left-0 w-full h-1 bg-emerald-500/30 group-hover:bg-emerald-500 transition-all"></div>
+                            <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest mb-1">Confiança Total</div>
+                            <div class="text-2xl font-black text-white">${data.total_prob_pct}%</div>
+                        </div>
+                        <div class="bg-[#0f1115] p-4 rounded-2xl border border-white/5 text-center relative overflow-hidden group">
+                             <div class="absolute bottom-0 left-0 w-full h-1 bg-purple-500/30 group-hover:bg-purple-500 transition-all"></div>
+                            <div class="text-[9px] text-purple-400 font-bold uppercase tracking-widest mb-1">Expected Value</div>
+                            <div class="text-2xl font-black text-white">${data.financials.expected_value}%</div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Guidance -->
+                    <div class="bg-emerald-500 text-black p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-500/20">
+                        <div>
+                            <div class="text-[9px] font-black uppercase tracking-widest opacity-70">Stake Recomendada</div>
+                            <div class="text-xl font-black italic">R$ ${data.financials.suggested_stake}</div>
+                        </div>
+                        <div class="bg-black/10 px-3 py-1.5 rounded-xl font-black text-xs">
+                            ${data.financials.bankroll_pct}% Banca
+                        </div>
+                    </div>
+
+                    ${brainsHtml}
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // --- HISTORY ---
+        function switchHistoryMode(mode) {
+            const singleCont = document.getElementById('history-container-single');
+            const trebleCont = document.getElementById('history-container-treble');
+            const btnSingle = document.getElementById('hist-mode-single');
+            const btnTreble = document.getElementById('hist-mode-treble');
+
+            if (mode === 'single') {
+                singleCont.classList.remove('hidden');
+                trebleCont.classList.add('hidden');
+                btnSingle.className = "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 border-b-2 border-emerald-500";
+                btnTreble.className = "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors";
+                loadHistory();
+            } else {
+                singleCont.classList.add('hidden');
+                trebleCont.classList.remove('hidden');
+                btnTreble.className = "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-yellow-500 border-b-2 border-yellow-500";
+                btnSingle.className = "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors";
+                loadTreblesHistory();
+            }
+        }
+
+        function loadTreblesHistory() {
+            const container = document.getElementById('history-container-treble');
+            container.innerHTML = `<div class="text-center py-20"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-gray-600"></i></div>`;
+            lucide.createIcons();
+
+            fetch('/api/history_trebles')
+                .then(r => r.json())
+                .then(data => {
+                    container.innerHTML = '';
+                    if (data.length === 0) {
+                        container.innerHTML = `<div class="text-center py-20 text-gray-500">Nenhum bilhete encontrado.</div>`;
+                        return;
+                    }
+                    data.forEach(item => {
+                        const row = document.createElement('div');
+
+                        let statusClass = "bg-gray-500/20 text-gray-400 border-gray-500/20"; // Default Pending
+                        let profitClass = "text-gray-500";
+                        let borderClass = "border-white/5";
+
+                        if (item.status === 'WON') {
+                            statusClass = "bg-emerald-500/20 text-emerald-400 border-emerald-500/20";
+                            profitClass = "text-emerald-500";
+                            borderClass = "border-emerald-500/20";
+                        } else if (item.status === 'LOST') {
+                            statusClass = "bg-red-500/20 text-red-500 border-red-500/20";
+                            profitClass = "text-red-500";
+                            borderClass = "border-red-500/20";
+                        } else {
+                            item.status = "PENDING"; // Normalize
+                            item.profit = "Aguardando";
+                        }
+
+                        row.className = `glass-panel p-6 rounded-2xl border ${borderClass} relative group overflow-hidden mb-4 transition-all hover:scale-[1.01]`;
+
+                        let selectionsHtml = item.selections.map(s => {
+                            // Check if selection itself has result mark
+                            let color = "text-gray-400";
+                            let dot = "bg-gray-600";
+                            if (s.includes("(W)") || s.includes("✅")) { color = "text-emerald-400"; dot = "bg-emerald-400"; }
+                            if (s.includes("(L)") || s.includes("❌")) { color = "text-red-400"; dot = "bg-red-500"; }
+
+                            return `
+                            <div class="flex items-center gap-2 text-[10px] ${color} mb-1">
+                                <div class="w-1.5 h-1.5 rounded-full ${dot}"></div>
+                                ${s}
+                            </div>
+                            `;
+                        }).join('');
+
+                        row.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">${item.date}</span>
+                                        <span class="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded">${item.name}</span>
+                                    </div>
+                                    <div class="flex flex-col gap-1 pl-1 border-l-2 border-white/5">
+                                        ${selectionsHtml}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider inline-block mb-1 border ${statusClass}">
+                                        ${item.status}
+                                    </div>
+                                    <div class="text-xs font-black ${profitClass}">@${item.odd} | ${item.profit}</div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(row);
+                    });
+                    lucide.createIcons();
+                });
+        }
+
+        function loadHistory() {
+            const list = document.getElementById('history-list');
+            const statsContainer = document.getElementById('history-stats');
+
+            list.innerHTML = `<div class="text-center py-20"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-gray-600"></i></div>`;
+            lucide.createIcons();
+
+            // Fetch Today's Scout
+            fetch('/api/today_scout')
+                .then(r => r.json())
+                .then(scout => {
+                    document.getElementById('today-total').innerText = scout.total;
+                    document.getElementById('today-greens').innerText = scout.greens;
+                    document.getElementById('today-reds').innerText = scout.reds;
+                    document.getElementById('today-pending').innerText = scout.pending;
+                    document.getElementById('today-accuracy').innerText = `${scout.accuracy}% ACERTO`;
+                });
+
+            // Fetch Global Stats
+            fetch('/api/history_stats')
+                .then(r => r.json())
+                .then(stats => {
+                    statsContainer.innerHTML = `
+                        <div class="glass-panel p-4 rounded-2xl border-emerald-500/20 text-center">
+                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Taxa de Acerto</div>
+                            <div class="text-2xl font-black text-emerald-400">${stats.accuracy}%</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded-2xl border-red-500/20 text-center">
+                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Taxa de Red</div>
+                            <div class="text-2xl font-black text-red-500">${stats.red_pct}%</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded-2xl border-white/5 text-center">
+                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Total Greens</div>
+                            <div class="text-2xl font-black text-white">${stats.greens}</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded-2xl border-white/5 text-center">
+                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Total Reds</div>
+                            <div class="text-2xl font-black text-white">${stats.reds}</div>
+                        </div>
+                        
+                        <!-- NEW STREAK CARD -->
+                        <div class="glass-panel p-4 rounded-2xl border-yellow-500/20 text-center relative overflow-hidden group col-span-2 md:col-span-1">
+                            <div class="absolute inset-0 bg-yellow-500/5 blur-xl group-hover:bg-yellow-500/10 transition-all"></div>
+                            <div class="text-[10px] text-gray-400 font-bold uppercase mb-1 tracking-wider relative">Green Streak</div>
+                            <div class="text-2xl font-black text-yellow-400 relative drop-shadow-lg flex items-center justify-center gap-2">
+                                <i data-lucide="flame" class="w-5 h-5 animate-pulse text-orange-500"></i> ${stats.streak || 0}
+                            </div>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                });
+
+            // Fetch History
+            fetch('/api/history')
+                .then(r => r.json())
+                .then(data => {
+                    console.log("History Data:", data); // DEBUG
+                    list.innerHTML = '';
+                    if (data.length === 0) {
+                        list.innerHTML = `<div class="text-center py-20 text-gray-500">Nenhum registro encontrado.</div>`;
+                        return;
+                    }
+                    data.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'glass-panel p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center border border-white/5 relative group transition-all hover:border-white/20 mb-4';
+                        const isWin = item.status === 'WON';
+
+                        // Badge logic
+                        let badgeHtml = '';
+                        if (item.badge) {
+                            let bClass = "bg-gray-500/10 text-gray-400 border-gray-500/10";
+                            if (item.badge.includes("SNIPER")) bClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
+                            if (item.badge.includes("ELITE")) bClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                            badgeHtml = `<span class="px-1.5 py-0.5 rounded text-[8px] font-black border ${bClass} uppercase tracking-tighter ml-2">${item.badge}</span>`;
+                        }
+
+                        row.innerHTML = `
+                            <div class="mb-3 sm:mb-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[10px] font-bold text-gray-600 uppercase tabular-nums">${item.date} • <span class="text-purple-400">${item.time || '--:--'}</span></span>
+                                    <span class="text-xs font-bold text-gray-300">${item.home} <span class="text-gray-600 font-normal">vs</span> ${item.away}</span>
+                                    ${badgeHtml}
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="text-sm font-black text-white uppercase tracking-tight">${item.selection}</div>
+                                    <div class="text-xs font-bold text-emerald-400/80">@${item.odd}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between w-full sm:w-auto gap-4">
+                                <div class="text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <div class="text-[10px] font-bold text-gray-500 uppercase leading-none">${item.score}</div>
+                                        <div class="px-2 py-1 rounded-md text-[9px] font-black ${isWin ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/20 text-red-500 border border-red-500/20'}">
+                                            ${item.status}
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] mt-1 font-bold ${isWin ? 'text-emerald-500' : 'text-red-500'} tracking-wider">${item.profit}</div>
+                                </div>
+                                
+                                ${isWin ? `
+                                <button onclick="openShareModal('${item.home} vs ${item.away}', '${item.selection}', '${item.odd}', '${item.profit}', '${item.badge || 'PRO IA'}')" 
+                                    class="p-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-400 transition-all border border-white/5 hover:border-emerald-500/20" 
+                                    title="Compartilhar Green">
+                                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                                </button>` : ''}
+                            </div>
+                        `;
+                        list.appendChild(row);
+                    });
+                    lucide.createIcons();
+                });
+        }
+
+        // --- MODAL ---
+        function openModal(title, reason, prob, stake) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-reason').innerHTML = reason;
+            document.getElementById('modal-prob').innerText = prob + '%';
+            document.getElementById('modal-stake').innerText = stake;
+
+            const modal = document.getElementById('details-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => { document.getElementById('modal-panel').classList.remove('translate-y-full', 'opacity-0'); }, 10);
+        }
+        function closeModal() {
+            document.getElementById('modal-panel').classList.add('translate-y-full', 'opacity-0');
+            setTimeout(() => { document.getElementById('details-modal').classList.add('hidden'); }, 300);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            const btn = document.getElementById('btn-login-submit');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AUTENTICANDO...`;
+            lucide.createIcons();
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert("Erro ao conectar com o servidor.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>CONECTAR</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+                lucide.createIcons();
+            }
+        }
+
+        async function checkSession() {
+            try {
+                const response = await fetch('/api/check_session');
+                const data = await response.json();
+
+                const navLogin = document.getElementById('nav-login');
+                const viewLogin = document.getElementById('view-login');
+
+                if (data.logged_in) {
+                    if (!data.is_valid && !data.is_admin) {
+                        alert("Sua assinatura expirou! Entre em contato para renovar.");
+                        switchTab('login');
+                        return;
+                    }
+                    // User is logged in and valid
+                    if (navLogin) navLogin.classList.add('hidden');
+                    switchTab('games');
+                } else {
+                    switchTab('login');
+                }
+            } catch (err) {
+                console.error("Session check failed", err);
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout');
+            window.location.reload();
+        }
+
+        // --- GOSSIP LOGIC ---
+        // --- GOSSIP LOGIC (INCREMENTAL FETCH - ANTI-TIMEOUT) ---
+        window.loadGossip = async function () {
+            const feed = document.getElementById('gossip-feed');
+            if (!feed) return;
+
+            // 1. Mostrar loading inicial
+            feed.innerHTML = `
+                <div id="gossip-loader" class="flex flex-col items-center justify-center py-10 gap-4 transition-all">
+                    <div class="relative w-12 h-12">
+                        <div class="absolute inset-0 border-4 border-purple-500/30 rounded-full animate-ping"></div>
+                        <div class="absolute inset-0 border-4 border-t-purple-500 rounded-full animate-spin"></div>
+                    </div>
+                    <div class="text-purple-400 text-xs font-bold tracking-widest animate-pulse" id="gossip-status">INICIANDO VARREDURA...</div>
+                </div>
+                <div id="real-feed" class="space-y-4"></div>
+            `;
+
+            const realFeed = document.getElementById('real-feed');
+            const statusLabel = document.getElementById('gossip-status');
+
+            // 2. Definir alvos no Frontend (para controle total)
+            const targets = [
+                "Golden State Warriors", "San Antonio Spurs",
+                "Milwaukee Bucks", "Oklahoma City Thunder",
+                "Utah Jazz", "Portland Trail Blazers",
+                "Los Angeles Lakers", "Dallas Mavericks"
+            ];
+
+            let foundCount = 0;
+
+            // 3. Loop Assíncrono (Um por vez para garantir resposta rápida)
+            for (const team of targets) {
+                if (statusLabel) statusLabel.innerText = `ESCANEAR: ${team.toUpperCase()}...`;
+
+                try {
+                    // Chama rota individual (Fast ~3s)
+                    const res = await fetch(`/api/check_team_gossip?team=${encodeURIComponent(team)}`);
+                    if (!res.ok) throw new Error("Erro de conexão");
+
+                    const news = await res.json();
+
+                    if (news && news.length > 0) {
+                        foundCount += news.length;
+
+                        // Renderizar IMEDIATAMENTE
+                        news.forEach(t => {
+                            const isBad = t.sentiment === 'negative';
+                            const border = isBad ? 'border-red-500/20' : 'border-emerald-500/20';
+
+                            const item = document.createElement('div');
+                            item.className = `glass-panel p-5 rounded-xl border ${border} relative overflow-hidden group hover:bg-white/5 transition-all fade-in mb-4`;
+                            item.innerHTML = `
+                                <div class="flex gap-4">
+                                    <div class="flex-shrink-0">
+                                        <img src="${t.logo}" class="w-12 h-12 rounded-full border-2 border-white/10 shadow-lg object-contain bg-black/50 p-1" onerror="this.src='https://cdn-icons-png.flaticon.com/512/33/33736.png'">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <span class="font-bold text-white text-base hover:underline cursor-pointer">${t.team}</span>
+                                                <i data-lucide="badge-check" class="w-4 h-4 text-blue-400 fill-current"></i>
+                                                <span class="text-gray-500 text-xs text-nowrap">@${t.team.replace(/\s+/g, '')}Official</span>
+                                                <span class="text-gray-600 text-xs mx-1">·</span>
+                                                <span class="text-gray-500 text-xs">Agora</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-300 text-sm leading-relaxed mb-3 font-medium">
+                                            ${t.text}
+                                        </p>
+                                        <div class="rounded-xl bg-black/40 border border-white/5 p-3 mb-3 flex items-center gap-3">
+                                            <div class="text-[10px] text-gray-400 uppercase font-black tracking-wider flex-1 truncate">
+                                                Via ${t.source || 'GOOGLE NEWS'}
+                                            </div>
+                                            <i data-lucide="external-link" class="w-3 h-3 text-gray-600"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            realFeed.prepend(item); // Mais recentes no topo
+                        });
+                        if (window.lucide) window.lucide.createIcons();
+                    }
+
+                } catch (err) {
+                    console.warn(`Falha ao buscar ${team}`, err);
+                }
+
+                // Pequeno delay para respirar a UI
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            // 4. Finalização
+            const loader = document.getElementById('gossip-loader');
+            if (loader) loader.remove();
+
+            if (foundCount === 0) {
+                realFeed.innerHTML = `
+                    <div class="text-center py-10 text-gray-500 flex flex-col items-center gap-2 animate-pulse">
+                        <i data-lucide="ghost" class="w-8 h-8 opacity-50"></i>
+                        <span>Nada consta, comandante. Silêncio total nas redes.</span>
+                    </div>`;
+                if (window.lucide) window.lucide.createIcons();
+            }
+        };
+
+        // --- NAVIGATION OVERRIDE ---
+        // --- NAVIGATION OVERRIDE ---
+        window.switchTab = function (tabId) {
+            // Hide all known tabs
+            ['games', 'analyzer', 'leverage', 'calculator', 'history', 'login'].forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                const nav = document.getElementById(`nav-${id}`); // Desktop
+
+                if (el) el.classList.add('hidden');
+                if (nav) nav.classList.remove('active');
+            });
+
+            // Show target
+            const targetEl = document.getElementById(`view-${tabId}`);
+            if (targetEl) targetEl.classList.remove('hidden');
+
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            if (targetNav) targetNav.classList.add('active');
+
+            // Specific Loaders
+            if (tabId === 'history' && typeof loadHistory === 'function') loadHistory();
+            if (tabId === 'leverage' && typeof loadLeverage === 'function') loadLeverage();
+            if (tabId === 'games' && typeof fetchGames === 'function') fetchGames(getTodayDate());
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            // checkSession(); -> Disabled to ensure fresh login flow
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

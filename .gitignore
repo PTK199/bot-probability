@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+venv/
+.env
+.DS_Store
+node_modules/
+database.db
+users.db
+instance/
+.vscode/
+.aios/
+.synapse/
+.codex/
+.aios-core/
+.gemini/

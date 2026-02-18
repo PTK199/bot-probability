@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTEX ACCESS | VANGUARDA NEURAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #a855f7;
+            --cyber-black: #030303;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cyber-black);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Background Animation */
+        .bg-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: linear-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: grid-move 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes grid-move {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px);
+            }
+
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px);
+            }
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .glow-input:focus {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen relative">
+
+    <div class="bg-grid"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#020202] via-transparent to-[#020202]"></div>
+
+    <div class="w-full max-w-md p-8 glass-card rounded-3xl relative z-10 mx-4 animate-[fadeInUp_0.8s_ease-out]">
+        <div class="flex gap-4 mb-6 p-1 bg-white/5 rounded-2xl">
+            <button onclick="toggleMode('login')" id="loginTab"
+                class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all bg-purple-600 text-white">Acesso</button>
+            <button onclick="toggleMode('register')" id="registerTab"
+                class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all text-gray-500 hover:text-white">Registro</button>
+        </div>
+
+        <form id="authForm" class="space-y-5">
+            <div>
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Identificação</label>
+                <div class="relative">
+                    <i data-lucide="user" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
+                    <input type="email" id="email"
+                        class="w-full bg-[#0a0a0f] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white font-bold focus:outline-none glow-input transition-all placeholder-gray-700"
+                        placeholder="Agente Neural" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Chave de Segurança</label>
+                <div class="relative">
+                    <i data-lucide="lock" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
+                    <input type="password" id="password"
+                        class="w-full bg-[#0a0a0f] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white font-bold focus:outline-none glow-input transition-all placeholder-gray-700"
+                        placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" id="mainBtn"
+                class="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white font-black rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.2)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.02] uppercase tracking-widest text-xs flex items-center justify-center gap-2 group">
+                <i data-lucide="unlock" class="w-4 h-4 group-hover:text-white transition-colors"></i>
+                <span id="btnText">Desbloquear Sistema</span>
+            </button>
+        </form>
+
+        <div id="msg" class="text-center mt-6 h-4 text-xs font-bold text-red-500 opacity-0 transition-opacity"></div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let mode = 'login';
+
+        function toggleMode(newMode) {
+            mode = newMode;
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const btnText = document.getElementById('btnText');
+            const mainBtn = document.getElementById('mainBtn');
+            const msg = document.getElementById('msg');
+            msg.opacity = 0;
+
+            if (mode === 'login') {
+                loginTab.classList.add('bg-purple-600', 'text-white');
+                loginTab.classList.remove('text-gray-500');
+                registerTab.classList.remove('bg-purple-600', 'text-white');
+                registerTab.classList.add('text-gray-500');
+                btnText.innerText = 'Desbloquear Sistema';
+            } else {
+                registerTab.classList.add('bg-purple-600', 'text-white');
+                registerTab.classList.remove('text-gray-500');
+                loginTab.classList.remove('bg-purple-600', 'text-white');
+                loginTab.classList.add('text-gray-500');
+                btnText.innerText = 'Criar Conta Neural';
+            }
+        }
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const msg = document.getElementById('msg');
+            const btn = document.getElementById('mainBtn');
+
+            // Loading State
+            const originalBtnHTML = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> PROCESSANDO...';
+            lucide.createIcons();
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+
+            const endpoint = mode === 'login' ? '/api/login' : '/api/register';
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    msg.className = "text-center mt-6 text-xs font-black text-emerald-400 tracking-widest opacity-100";
+                    msg.innerText = mode === 'login' ? "ACESSO AUTORIZADO. REDIRECIONANDO..." : "CONTA CRIADA! ACESSANDO...";
+                    setTimeout(() => window.location.href = '/', 1000);
+                } else {
+                    throw new Error(data.message || "Erro no Processamento");
+                }
+            } catch (err) {
+                msg.className = "text-center mt-6 text-xs font-bold text-red-500 opacity-100";
+                msg.innerText = err.message.toUpperCase();
+                // Reset Button
+                btn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+            }
+        });
+    </script>
+</body>
+
+</html>
