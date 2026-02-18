@@ -177,6 +177,68 @@ def debug_endpoint():
 
 # --- ROUTES ---
 
+# --- ADMIN ROUTES ---
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    # Role check
+    if getattr(current_user, 'role', 'user') != 'admin':
+        return "Acesso Negado: Requer privilégios de Administrador.", 403
+        
+    users = User.query.all()
+    active_count = 0
+    expired_count = 0
+    
+    # Process user data for template
+    processed_users = []
+    now = datetime.datetime.utcnow()
+    
+    for u in users:
+        is_active = False
+        days_left = 0
+        
+        if u.role == 'admin':
+            is_active = True
+            days_left = 9999
+        elif u.subscription_end and u.subscription_end > now:
+            is_active = True
+            delta = u.subscription_end - now
+            days_left = delta.days
+        else:
+            is_active = False
+            days_left = 0
+            
+        if is_active:
+            active_count += 1
+        else:
+            expired_count += 1
+            
+        # Attach temporary attributes for template rendering
+        # (We can't modify the SQLAlch object directly easily, so we use a wrapper or just setattr if it allows)
+        setattr(u, 'is_active', is_active)
+        setattr(u, 'days_left', days_left)
+        processed_users.append(u)
+        
+    return render_template('admin.html', users=processed_users, active_count=active_count, expired_count=expired_count)
+
+@app.route('/admin/renew/<int:user_id>', methods=['POST'])
+@login_required
+def admin_renew_user(user_id):
+    if getattr(current_user, 'role', 'user') != 'admin':
+        return "Acesso Negado", 403
+        
+    user = User.query.get(user_id)
+    if not user:
+        return "Usuário não encontrado", 404
+        
+    # Renew for 7 days from NOW
+    user.subscription_end = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    db.session.commit()
+    
+    return redirect('/admin')
+
+
 @app.route('/')
 @login_required # Protect Home
 def home():
