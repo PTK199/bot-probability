@@ -454,18 +454,7 @@ def apply_calibration(prob, odd, league):
     
     return max(30, min(95, prob + adjustment))
 
-import os
-import json
-import time
-# Assuming CACHE_DIR is defined globally or imported, e.g.:
-# CACHE_DIR = "cache" 
-# If not, define it here for the snippet to be self-contained.
-# For this response, I'll assume it's defined elsewhere or will be handled by the user.
-# If it's not defined, the code will raise a NameError.
-# For a complete, runnable example, it should be defined.
-# Let's define a placeholder for CACHE_DIR to make the snippet syntactically correct.
-CACHE_DIR = "cache" # Placeholder, ensure this is defined appropriately in the actual file.
-os.makedirs(CACHE_DIR, exist_ok=True) # Ensure cache directory exists
+
 
 def get_games_for_date(target_date, skip_history=False, force_refresh=False):
     """
