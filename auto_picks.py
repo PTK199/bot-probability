@@ -30,14 +30,20 @@ except:
 # ══════════════════════════════════════════════
 
 NBA_POWER = {
-    "Pistons": 98, "Celtics": 93, "Knicks": 92, "Cavaliers": 91,
-    "Thunder": 93, "Rockets": 90, "Raptors": 89, "Sixers": 87,
-    "Nuggets": 86, "Timberwolves": 85, "Magic": 84, "Clippers": 82,
-    "Warriors": 81, "Suns": 80, "Mavericks": 78, "Heat": 79,
-    "Kings": 78, "Grizzlies": 80, "Lakers": 77, "Hawks": 76,
-    "Hornets": 75, "Spurs": 74, "Bulls": 74, "Pelicans": 72,
-    "Bucks": 71, "Jazz": 69, "Blazers": 67, "Nets": 65,
-    "Pacers": 62, "Wizards": 61
+    # === TIER S (Elite, 90+) ===
+    "Thunder": 95, "Cavaliers": 93, "Celtics": 92,
+    # === TIER A (Contenders, 85-89) ===
+    "Rockets": 88, "Nuggets": 87, "Knicks": 87, "Timberwolves": 86,
+    "Grizzlies": 85, "Warriors": 85,
+    # === TIER B (Playoff, 78-84) ===
+    "Bucks": 84, "Suns": 83, "Mavericks": 82, "Pacers": 82,
+    "Magic": 81, "Clippers": 80, "Lakers": 80, "Heat": 79,
+    "Kings": 79, "Sixers": 78,
+    # === TIER C (Play-in / Lower, 70-77) ===
+    "Hawks": 75, "Spurs": 74, "Bulls": 73, "Pistons": 72,
+    "Pelicans": 71, "Raptors": 70, "Hornets": 69,
+    # === TIER D (Lottery, <70) ===
+    "Blazers": 66, "Jazz": 65, "Nets": 63, "Wizards": 60
 }
 
 FOOTBALL_POWER = {
@@ -523,20 +529,57 @@ def get_auto_games(target_date):
     """
     print(f"[AUTO-ENGINE] 🤖 Gerando picks automáticos para {target_date}...")
 
+    # ══════════════════════════════════════════════
+    # IMPORT ALL SPECIALIST MODULES (THE FULL FUNNEL)
+    # ══════════════════════════════════════════════
+    try:
+        from ai_engine import (
+            ensemble_prediction_model,
+            trap_hunter_funnel,
+            calculate_expected_value,
+        )
+        FUNNEL_ACTIVE = True
+        print("[AUTO-ENGINE] ✅ AI Engine CONNECTED (Ensemble + Trap Hunter + EV)")
+    except Exception as e:
+        print(f"[AUTO-ENGINE] ⚠️ AI Engine not available: {e}")
+        FUNNEL_ACTIVE = False
+
+    try:
+        from knowledge_base import SPORTS_KNOWLEDGE
+        KB_ACTIVE = True
+        print(f"[AUTO-ENGINE] ✅ Knowledge Base CONNECTED ({len(SPORTS_KNOWLEDGE)} teams)")
+    except Exception as e:
+        SPORTS_KNOWLEDGE = {}
+        KB_ACTIVE = False
+        print(f"[AUTO-ENGINE] ⚠️ Knowledge Base not available: {e}")
+
+    try:
+        from data_fetcher import apply_calibration
+        CALIBRATION_ACTIVE = True
+        print("[AUTO-ENGINE] ✅ Self-Calibration Engine CONNECTED")
+    except Exception as e:
+        CALIBRATION_ACTIVE = False
+        print(f"[AUTO-ENGINE] ⚠️ Calibration not available: {e}")
+
     # 1. Busca jogos na ESPN
     raw_games = fetch_espn_schedule(target_date)
     if not raw_games:
         print("[AUTO-ENGINE] ⚠️ Nenhum jogo encontrado na ESPN")
         return {"games": [], "trebles": []}
 
-    # 2. Gera tips para cada jogo
+    print(f"[AUTO-ENGINE] 📡 {len(raw_games)} jogos encontrados. Processando no FUNIL COMPLETO...")
+
+    # 2. Gera tips para cada jogo — FULL FUNNEL PIPELINE
     processed = []
     for game in raw_games:
         try:
             sport = game["sport"]
             home = game["home"]
             away = game["away"]
+            league = game["league"]
+            funnel_notes = []
 
+            # ─── STAGE 1: RAW SIMULATION (Poisson / Monte Carlo) ───
             if sport == "basketball":
                 h_pow = NBA_POWER.get(home, 75)
                 a_pow = NBA_POWER.get(away, 75)
@@ -545,21 +588,128 @@ def get_auto_games(target_date):
             else:
                 h_pow = FOOTBALL_POWER.get(home, 70)
                 a_pow = FOOTBALL_POWER.get(away, 70)
-                # Home advantage factor: 1.20 (realistic, not inflated)
-                # Away factor: 1.15 (away teams score less but quality matters)
                 h_exp = 1.20 * (h_pow / 75)
                 a_exp = 1.15 * (a_pow / 75)
                 sim = poisson_football(h_exp, a_exp)
                 tip, is_sniper, oh, od, oa = generate_football_tip(game, sim)
 
-            # EV Gate
+            raw_prob = tip.get("prob", 50)
             tip_odd = float(tip.get("odd", 1.5))
+
+            # ─── STAGE 2: ENSEMBLE VOTING (3 models vote) ───
+            if FUNNEL_ACTIVE:
+                try:
+                    basic_probs = {
+                        "home_win": sim.get("home_prob", 40),
+                        "draw": sim.get("draw_prob", 25),
+                        "away_win": sim.get("away_prob", 35),
+                    }
+                    ensemble = ensemble_prediction_model(basic_probs)
+
+                    # Use ensemble-corrected probability for the selected outcome
+                    sel_lower = tip.get("selection", "").lower()
+                    if "vence" in sel_lower or "ml" in sel_lower:
+                        # Check if it's home or away pick
+                        if home.lower() in sel_lower or any(p in sel_lower for p in home.lower().split()):
+                            ensemble_prob = ensemble.get("home_win", raw_prob)
+                        else:
+                            ensemble_prob = ensemble.get("away_win", raw_prob)
+                    elif "ou empate" in sel_lower or "dupla chance" in tip.get("market", "").lower():
+                        if home.lower() in sel_lower or any(p in sel_lower for p in home.lower().split()):
+                            ensemble_prob = ensemble.get("home_win", 0) + ensemble.get("draw", 0)
+                        else:
+                            ensemble_prob = ensemble.get("away_win", 0) + ensemble.get("draw", 0)
+                    else:
+                        ensemble_prob = raw_prob  # Over/Under stays raw
+
+                    # Blend: 60% raw Poisson + 40% ensemble
+                    blended_prob = int(raw_prob * 0.6 + ensemble_prob * 0.4)
+                    if abs(blended_prob - raw_prob) > 3:
+                        funnel_notes.append(f"🗳️ ENSEMBLE: {raw_prob}% → {blended_prob}%")
+                    tip["prob"] = blended_prob
+                except Exception as e:
+                    funnel_notes.append(f"⚠️ Ensemble bypass: {e}")
+
+            # ─── STAGE 3: KNOWLEDGE BASE CONTEXT ───
+            if KB_ACTIVE:
+                try:
+                    # Look up team profiles for tactical context
+                    h_key = home.lower().split()[-1] if home else ""
+                    a_key = away.lower().split()[-1] if away else ""
+                    h_profile = SPORTS_KNOWLEDGE.get(h_key, {})
+                    a_profile = SPORTS_KNOWLEDGE.get(a_key, {})
+
+                    # Form-based adjustment
+                    h_phase = h_profile.get("phase", "").lower()
+                    a_phase = a_profile.get("phase", "").lower()
+
+                    # Boost if betting on a team in elite/dominant phase
+                    elite_tags = ["elite", "campeão", "dominan", "lethal", "firepower", "machine"]
+                    crisis_tags = ["rebuild", "crise", "struggling", "tanking"]
+
+                    sel_is_home = home.lower() in tip.get("selection", "").lower()
+
+                    if sel_is_home:
+                        if any(t in h_phase for t in elite_tags):
+                            tip["prob"] = min(95, tip["prob"] + 3)
+                            funnel_notes.append(f"📊 KB: {home} em fase ELITE")
+                        if any(t in a_phase for t in crisis_tags):
+                            tip["prob"] = min(95, tip["prob"] + 2)
+                            funnel_notes.append(f"📊 KB: {away} em CRISE")
+                        if any(t in h_phase for t in crisis_tags):
+                            tip["prob"] = max(30, tip["prob"] - 5)
+                            funnel_notes.append(f"⚠️ KB: {home} em fase NEGATIVA")
+                    else:
+                        if any(t in a_phase for t in elite_tags):
+                            tip["prob"] = min(95, tip["prob"] + 3)
+                            funnel_notes.append(f"📊 KB: {away} em fase ELITE")
+                        if any(t in h_phase for t in crisis_tags):
+                            tip["prob"] = min(95, tip["prob"] + 2)
+                            funnel_notes.append(f"📊 KB: {home} em CRISE")
+                        if any(t in a_phase for t in crisis_tags):
+                            tip["prob"] = max(30, tip["prob"] - 5)
+                            funnel_notes.append(f"⚠️ KB: {away} em fase NEGATIVA")
+                except Exception as e:
+                    pass  # KB is supplemental, don't block
+
+            # ─── STAGE 4: TRAP HUNTER (detect suspicious odds) ───
+            if FUNNEL_ACTIVE:
+                try:
+                    match_name = f"{home} vs {away}"
+                    traps = trap_hunter_funnel(tip["prob"], tip_odd, match_name)
+                    if traps:
+                        tip["prob"] = max(30, tip["prob"] - 8)
+                        tip["reason"] += f" | 🕵️ TRAP DETECTED"
+                        funnel_notes.append(traps[0])
+                except Exception:
+                    pass
+
+            # ─── STAGE 5: SELF-CALIBRATION (learn from history) ───
+            if CALIBRATION_ACTIVE:
+                try:
+                    calibrated = apply_calibration(tip["prob"], tip_odd, league)
+                    if calibrated != tip["prob"]:
+                        funnel_notes.append(f"📐 CALIBRAÇÃO: {tip['prob']}% → {calibrated}% (baseado em histórico)")
+                        tip["prob"] = calibrated
+                except Exception:
+                    pass
+
+            # ─── STAGE 6: FINAL EV GATE ───
             tip_prob = tip.get("prob", 50)
             implied = (1 / tip_odd) * 100 if tip_odd > 0 else 100
             ev_edge = tip_prob - implied
+            ev_pct = calculate_expected_value(tip_prob, tip_odd) if FUNNEL_ACTIVE else round((tip_prob / 100 * tip_odd - 1) * 100, 2)
+
             if ev_edge < 5:
                 tip["reason"] += f" | ⚠️ EV GATE: edge {ev_edge:.1f}%"
                 tip["badge"] = "⚠️ EV GATE"
+            elif ev_edge >= 15:
+                tip["badge"] = "💰 BANKER"
+                funnel_notes.append(f"💰 EV+{ev_edge:.0f}% — VALUE BET")
+
+            # Append funnel notes to reason
+            if funnel_notes:
+                tip["reason"] += " | " + " | ".join(funnel_notes[-3:])  # Max 3 notes
 
             processed.append({
                 "sport": sport,
