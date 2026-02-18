@@ -55,7 +55,7 @@ def add_header(response):
         cacheable_endpoints = ['/api/games', '/api/history', '/api/history_stats', 
                                '/api/today_scout', '/api/history_trebles', '/api/leverage']
         if any(request.path.startswith(ep) for ep in cacheable_endpoints) and request.method == 'GET':
-            response.headers['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=120'
+            response.headers['Cache-Control'] = 'public, max-age=300, stale-while-revalidate=600'
         else:
             response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     return response

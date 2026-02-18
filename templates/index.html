@@ -5,16 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neural Cortex 5.0 | Suite Completa</title>
-    <!-- TURBO: Preconnect to CDNs for faster resource loading -->
+    <!-- TURBO v3.0: Optimized resource loading -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <!-- Tailwind: must be synchronous (styles depend on it) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Non-critical scripts: DEFERRED (don't block render) -->
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- Font: swap prevents invisible text while loading -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <!-- TURBO: Tesseract.js loaded LAZILY only when user opens ticket analyzer -->
     <style>
         :root {
@@ -733,7 +736,7 @@
         // ═══════════════════════════════════════════
         const _clientCache = {};
         const _cacheTimestamps = {};
-        const CACHE_TTL = 5 * 60 * 1000; // 5 min client cache
+        const CACHE_TTL = 10 * 60 * 1000; // 10 min client cache
 
         function getCachedData(key) {
             if (_clientCache[key] && (Date.now() - (_cacheTimestamps[key] || 0)) < CACHE_TTL) {
@@ -750,11 +753,20 @@
             else { Object.keys(_clientCache).forEach(k => { delete _clientCache[k]; delete _cacheTimestamps[k]; }); }
         }
 
-        // Debounced icon renderer (prevents 10+ calls per second)
+        // Debounced icon renderer (handles deferred lucide loading)
         let _iconTimer = null;
+        let _iconRetries = 0;
         function refreshIcons() {
             if (_iconTimer) clearTimeout(_iconTimer);
-            _iconTimer = setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+            _iconTimer = setTimeout(() => {
+                if (window.lucide) {
+                    lucide.createIcons();
+                    _iconRetries = 0;
+                } else if (_iconRetries < 10) {
+                    _iconRetries++;
+                    setTimeout(refreshIcons, 200); // Retry until lucide loads
+                }
+            }, 50);
         }
 
         // Lazy Tesseract loader

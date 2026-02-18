@@ -496,9 +496,18 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
     Orchestrates the data fetching, prediction, and formatting process.
     Delegates to auto_picks engine which has the full ESPN → Simulation → Tips pipeline.
     
-    TURBO v2.0: Uses in-memory cache before file cache.
+    TURBO v3.0: 3-Tier Cache Strategy
+    1. In-memory cache (instant, 2h TTL)
+    2. File cache (fast read, 2h fresh)
+    3. STALE-WHILE-REVALIDATE: Always serve existing cache instantly,
+       then refresh in background — user NEVER waits 30+ seconds
     """
-    # 1. Check in-memory turbo cache (fastest)
+    import threading
+
+    CACHE_FRESH_TTL = 7200   # 2 hours fresh
+    CACHE_STALE_TTL = 86400  # 24h max stale
+
+    # 1. Check in-memory turbo cache (fastest — sub-millisecond)
     if TURBO_AVAILABLE and not force_refresh:
         mem_cached = get_cache().get(f"games_payload_{target_date}")
         if mem_cached is not None:
@@ -506,23 +515,50 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
     
     cache_file = os.path.join(CACHE_DIR, f"games_{target_date}.json")
     
-    # 2. Try file cache (if not forced)
-    if not force_refresh and os.path.exists(cache_file):
+    # 2. Try file cache
+    if os.path.exists(cache_file):
         try:
             file_mod_time = os.path.getmtime(cache_file)
-            if (time.time() - file_mod_time) < 900:  # 15 mins cache
-                with open(cache_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                # Also store in memory for next call
+            file_age = time.time() - file_mod_time
+            
+            with open(cache_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            if not force_refresh and file_age < CACHE_FRESH_TTL:
+                # FRESH cache — serve directly
                 if TURBO_AVAILABLE:
-                    get_cache().set(f"games_payload_{target_date}", data, ttl_seconds=900)
+                    get_cache().set(f"games_payload_{target_date}", data, ttl_seconds=CACHE_FRESH_TTL)
                 return data
+            
+            elif not force_refresh and file_age < CACHE_STALE_TTL:
+                # STALE cache — serve immediately, refresh in background
+                if TURBO_AVAILABLE:
+                    get_cache().set(f"games_payload_{target_date}", data, ttl_seconds=300)
+                
+                # Background refresh (non-blocking)
+                def _bg_refresh():
+                    try:
+                        import auto_picks
+                        fresh = auto_picks.get_auto_games(target_date)
+                        with open(cache_file, 'w', encoding='utf-8') as f:
+                            json.dump(fresh, f, ensure_ascii=False, indent=2)
+                        if TURBO_AVAILABLE:
+                            get_cache().set(f"games_payload_{target_date}", fresh, ttl_seconds=CACHE_FRESH_TTL)
+                        print(f"[CACHE] ✅ Background refresh complete for {target_date}")
+                    except Exception as e:
+                        print(f"[CACHE] ⚠️ Background refresh failed: {e}")
+                
+                t = threading.Thread(target=_bg_refresh, daemon=True)
+                t.start()
+                print(f"[CACHE] ⚡ Serving stale cache ({file_age:.0f}s old), refreshing in background...")
+                return data  # Return stale data INSTANTLY
+                
         except Exception as e:
             print(f"⚠️ Cache read error: {e}")
 
-    print(f"📡 Fetching FRESH games for {target_date}...")
+    print(f"📡 Fetching FRESH games for {target_date} (no cache available)...")
     
-    # 3. Use auto_picks engine (has the full working pipeline)
+    # 3. No cache at all — must fetch synchronously (first visit of the day)
     try:
         import auto_picks
         final_payload = auto_picks.get_auto_games(target_date)
@@ -535,7 +571,7 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
         with open(cache_file, 'w', encoding='utf-8') as f:
             json.dump(final_payload, f, ensure_ascii=False, indent=2)
         if TURBO_AVAILABLE:
-            get_cache().set(f"games_payload_{target_date}", final_payload, ttl_seconds=900)
+            get_cache().set(f"games_payload_{target_date}", final_payload, ttl_seconds=CACHE_FRESH_TTL)
     except:
         pass
         
