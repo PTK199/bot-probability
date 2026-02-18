@@ -8,6 +8,8 @@ import time
 import datetime
 import requests
 import traceback
+import threading
+import importlib
 # Payment System Integration
 from payment_system import init_payment_system, db, User, Payment, PaymentManager
 
@@ -60,6 +62,59 @@ def not_found(e):
 @app.errorhandler(500)
 def internal_error(e):
     return jsonify({"status": "critical_error", "message": "Falha no Núcleo de Processamento", "details": str(e)}), 500
+
+# --- JOB AUTOMATION ---
+
+def run_update_job():
+    """Runs the daily update in a background thread."""
+    print("⏳ Starting Background Update Job...")
+    try:
+        # Re-import to ensure fresh execution context
+        # We need to run the actual script logic.
+        # Ideally, we call data_fetcher directly to populate files
+        # AND THEN sync to cloud if needed.
+        
+        # HACK: Execute the existing script file as a subprocess or import logic
+        # Using import logic is safer for memory in this context but script relies on __main__
+        # Let's use data_fetcher directly to refresh cache
+        
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        print(f"🔄 Refreshing data for {today}...")
+        data_fetcher.get_games_for_date(today, force_refresh=True)
+        print("✅ Data Fetcher Complete.")
+        
+        # Trigger Scout
+        from data_fetcher import ResultScoutBot
+        bot = ResultScoutBot()
+        bot.scout_results_for_date(today)
+        print("✅ Scout Complete.")
+        
+        print("✅ Background Update Job All Done.")
+    except Exception as e:
+        print(f"❌ Background Update Job Failed: {e}")
+        traceback.print_exc()
+
+@app.route('/api/cron/update', methods=['GET', 'POST'])
+def cron_update():
+    """
+    Trigger this endpoint to start the daily update process asynchronously.
+    Perfect for cron-job.org or other schedulers.
+    """
+    key = request.args.get('key')
+    authorized_key = os.environ.get('CRON_KEY', 'update_secret_123')
+    
+    if key != authorized_key:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    # Run in thread to avoid timeout
+    thread = threading.Thread(target=run_update_job)
+    thread.start()
+    
+    return jsonify({
+        "status": "accepted", 
+        "message": "Update process started in background.", 
+        "timestamp": datetime.datetime.now().isoformat()
+    }), 202
 
 # --- ROUTES ---
 
