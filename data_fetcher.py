@@ -974,17 +974,32 @@ def get_today_scout():
     target_iso = now.strftime("%Y-%m-%d")
     
     # 1. Get all tips for today from the schedule to count PENDING correctly
-    all_day_data = get_games_for_date(target_iso, skip_history=True)
-    total_tips = len(all_day_data['games']) if 'games' in all_day_data else 0
+    try:
+        all_day_data = get_games_for_date(target_iso, skip_history=True)
+        # Ensure it's a dict
+        if isinstance(all_day_data, dict):
+            total_tips = len(all_day_data.get('games', []))
+        else:
+            total_tips = 0
+    except Exception as e:
+        print(f"⚠️ Error getting today games for scout: {e}")
+        total_tips = 0
     
     # 2. Get results from history
-    history = get_history_games()
-    today_results = [h for h in history if h['date'] == target_short]
+    try:
+        history = get_history_games()
+        if not history: history = []
+        today_results = [h for h in history if h.get('date') == target_short]
+        
+        greens = len([h for h in today_results if h.get('status') == 'WON'])
+        reds = len([h for h in today_results if h.get('status') == 'LOST'])
+    except Exception as e:
+        print(f"⚠️ Error processing history for scout: {e}")
+        greens = 0
+        reds = 0
+        today_results = []
     
-    greens = len([h for h in today_results if h['status'] == 'WON'])
-    reds = len([h for h in today_results if h['status'] == 'LOST'])
-    
-    # Pending = Total Scheduled - Total Resulted
+    # Pending = Total Scheduled - Total Resulted (approx)
     pending = total_tips - len(today_results)
     if pending < 0: pending = 0
     
