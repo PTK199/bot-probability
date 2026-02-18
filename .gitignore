@@ -13,3 +13,11 @@ instance/
 .codex/
 .aios-core/
 .gemini/
+
+# Cache files (ephemeral, regenerated automatically)
+cache/
+cache_games/
+temp_skills/
+
+# Learning state (auto-generated, not code)
+learning_state.json

@@ -569,6 +569,18 @@ def get_auto_games(target_date):
         SCORES365_ACTIVE = False
         print(f"[AUTO-ENGINE] ⚠️ 365Scores not available: {e}")
 
+    try:
+        from self_learning import apply_learning_correction, study_results, get_learning_summary
+        LEARNING_ACTIVE = True
+        # Study past results BEFORE generating new picks
+        study_results()
+        summary = get_learning_summary()
+        active_corrections = summary.get('corrections_active', 0)
+        print(f"[AUTO-ENGINE] ✅ Self-Learning Engine CONNECTED ({active_corrections} correções ativas)")
+    except Exception as e:
+        LEARNING_ACTIVE = False
+        print(f"[AUTO-ENGINE] ⚠️ Self-Learning not available: {e}")
+
     # 1. Busca jogos na ESPN
     raw_games = fetch_espn_schedule(target_date)
     if not raw_games:
@@ -739,6 +751,20 @@ def get_auto_games(target_date):
                     if calibrated != tip["prob"]:
                         funnel_notes.append(f"📐 CALIBRAÇÃO: {tip['prob']}% → {calibrated}% (baseado em histórico)")
                         tip["prob"] = calibrated
+                except Exception:
+                    pass
+
+            # ─── STAGE 5.5: SELF-LEARNING CORRECTIONS ───
+            if LEARNING_ACTIVE:
+                try:
+                    learned_prob, learn_notes = apply_learning_correction(
+                        tip["prob"], tip_odd, league, tip.get("selection", ""), home, away
+                    )
+                    if learned_prob != tip["prob"]:
+                        funnel_notes.append(f"🧠 AUTOCONHECIMENTO: {tip['prob']}% → {learned_prob}%")
+                        for ln in learn_notes:
+                            funnel_notes.append(ln)
+                        tip["prob"] = learned_prob
                 except Exception:
                     pass
 
