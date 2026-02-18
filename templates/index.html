@@ -5,12 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neural Cortex 5.0 | Suite Completa</title>
+    <!-- TURBO: Preconnect to CDNs for faster resource loading -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <!-- Tesseract.js for OCR -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- TURBO: Tesseract.js loaded LAZILY only when user opens ticket analyzer -->
     <style>
         :root {
             --neon-purple: #a855f7;
@@ -722,6 +727,48 @@
     </div>
 
     <script>
+        // ═══════════════════════════════════════════
+        // TURBO FRONTEND ENGINE v2.0
+        // Client-side cache + parallel fetches
+        // ═══════════════════════════════════════════
+        const _clientCache = {};
+        const _cacheTimestamps = {};
+        const CACHE_TTL = 5 * 60 * 1000; // 5 min client cache
+
+        function getCachedData(key) {
+            if (_clientCache[key] && (Date.now() - (_cacheTimestamps[key] || 0)) < CACHE_TTL) {
+                return _clientCache[key];
+            }
+            return null;
+        }
+        function setCachedData(key, data) {
+            _clientCache[key] = data;
+            _cacheTimestamps[key] = Date.now();
+        }
+        function invalidateCache(key) {
+            if (key) { delete _clientCache[key]; delete _cacheTimestamps[key]; }
+            else { Object.keys(_clientCache).forEach(k => { delete _clientCache[k]; delete _cacheTimestamps[k]; }); }
+        }
+
+        // Debounced icon renderer (prevents 10+ calls per second)
+        let _iconTimer = null;
+        function refreshIcons() {
+            if (_iconTimer) clearTimeout(_iconTimer);
+            _iconTimer = setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 50);
+        }
+
+        // Lazy Tesseract loader
+        let _tesseractLoaded = false;
+        async function ensureTesseract() {
+            if (_tesseractLoaded || window.Tesseract) { _tesseractLoaded = true; return; }
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+                s.onload = () => { _tesseractLoaded = true; resolve(); };
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        }
         // --- AUTH SYSTEM ---
         async function handleLogin(e) {
             e.preventDefault();
@@ -853,7 +900,7 @@
                     </div>
                 `;
 
-                lucide.createIcons();
+                refreshIcons();
             } catch (err) {
                 console.error("Leverage Load Error:", err);
             }
@@ -879,7 +926,7 @@
             document.getElementById('card-badge').innerText = badge;
 
             document.getElementById('share-modal').classList.remove('hidden');
-            lucide.createIcons();
+            refreshIcons();
         }
 
         function closeShareModal() {
@@ -921,10 +968,19 @@
             if (label) label.innerText = getTodayLabel();
         });
 
-        function fetchGames(date) {
-            const trebleContainer = document.getElementById('golden-treble-container');
+        function fetchGames(date, forceRefresh = false) {
+            // TURBO: Check client cache first
+            const cacheKey = `games_${date}`;
+            if (!forceRefresh) {
+                const cached = getCachedData(cacheKey);
+                if (cached) {
+                    console.log('[TURBO-UI] Games cache HIT');
+                    renderGames(cached);
+                    return;
+                }
+            }
 
-            // PREMIUM SKELETON LOADING
+            const trebleContainer = document.getElementById('golden-treble-container');
             const container = document.getElementById('games-container');
             container.innerHTML = '';
             // Generate 4 premium skeletons
@@ -947,7 +1003,7 @@
                     </div>
                 `;
             }
-            lucide.createIcons();
+            refreshIcons();
 
             fetch(`/api/games?date=${date}`)
                 .then(res => {
@@ -955,6 +1011,7 @@
                     return res.json();
                 })
                 .then(data => {
+                    setCachedData(cacheKey, data); // Cache for 5 min
                     renderGames(data);
                 })
                 .catch(err => {
@@ -964,9 +1021,9 @@
                             <i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i>
                             <h3 class="text-xl font-bold text-white mb-2">Conexão Interrompida</h3>
                             <p class="text-gray-400 text-sm">O sistema não conseguiu sincronizar com o servidor central.</p>
-                            <button onclick="fetchGames('${date}')" class="mt-4 px-6 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-bold transition-all border border-red-500/20">Reconectar</button>
+                            <button onclick="fetchGames('${date}', true)" class="mt-4 px-6 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-bold transition-all border border-red-500/20">Reconectar</button>
                         </div>`;
-                    lucide.createIcons();
+                    refreshIcons();
                 });
         }
 
@@ -1074,7 +1131,7 @@
 
             html += `</div></div>`;
             container.innerHTML = html;
-            lucide.createIcons();
+            refreshIcons();
         }
 
         function renderGamesList(games) {
@@ -1156,7 +1213,7 @@
                 `;
                 container.appendChild(card);
             });
-            lucide.createIcons();
+            refreshIcons();
         }
 
         // --- CALCULATOR ---
@@ -1210,11 +1267,15 @@
             const res = document.getElementById('analysis-result');
 
             // UI Loading State
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> LENDO PIXELS (OCR V2)...`;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> CARREGANDO OCR...`;
             btn.disabled = true;
             res.classList.add('hidden');
 
             try {
+                // TURBO: Lazy-load Tesseract only when needed (saves 2MB on initial load)
+                await ensureTesseract();
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> LENDO PIXELS (OCR V2)...`;
+
                 // 1. OCR (Client-Side) - PRE-PROCESSING
                 if (!currentImageFile) return;
 
@@ -1391,7 +1452,7 @@
                     ${brainsHtml}
                 </div>
             `;
-            lucide.createIcons();
+            refreshIcons();
         }
 
         // --- HISTORY ---
@@ -1419,7 +1480,7 @@
         function loadTreblesHistory() {
             const container = document.getElementById('history-container-treble');
             container.innerHTML = `<div class="text-center py-20"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-gray-600"></i></div>`;
-            lucide.createIcons();
+            refreshIcons();
 
             fetch('/api/history_trebles')
                 .then(r => r.json())
@@ -1487,129 +1548,148 @@
                         `;
                         container.appendChild(row);
                     });
-                    lucide.createIcons();
+                    refreshIcons();
                 });
         }
 
-        function loadHistory() {
+        function loadHistory(forceRefresh = false) {
             const list = document.getElementById('history-list');
             const statsContainer = document.getElementById('history-stats');
 
+            // TURBO: Check if we have cached data for all 3 endpoints
+            const cachedScout = getCachedData('today_scout');
+            const cachedStats = getCachedData('history_stats');
+            const cachedHistory = getCachedData('history_data');
+
+            if (!forceRefresh && cachedScout && cachedStats && cachedHistory) {
+                console.log('[TURBO-UI] History cache HIT (all 3)');
+                renderScout(cachedScout);
+                renderHistoryStats(cachedStats);
+                renderHistoryList(cachedHistory);
+                return;
+            }
+
             list.innerHTML = `<div class="text-center py-20"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-gray-600"></i></div>`;
-            lucide.createIcons();
+            refreshIcons();
 
-            // Fetch Today's Scout
-            fetch('/api/today_scout')
-                .then(r => r.json())
-                .then(scout => {
-                    document.getElementById('today-total').innerText = scout.total;
-                    document.getElementById('today-greens').innerText = scout.greens;
-                    document.getElementById('today-reds').innerText = scout.reds;
-                    document.getElementById('today-pending').innerText = scout.pending;
-                    document.getElementById('today-accuracy').innerText = `${scout.accuracy}% ACERTO`;
+            // TURBO: Fire ALL 3 API calls in PARALLEL (was sequential before)
+            Promise.all([
+                fetch('/api/today_scout').then(r => r.json()),
+                fetch('/api/history_stats').then(r => r.json()),
+                fetch('/api/history').then(r => r.json())
+            ]).then(([scout, stats, history]) => {
+                // Cache all responses
+                setCachedData('today_scout', scout);
+                setCachedData('history_stats', stats);
+                setCachedData('history_data', history);
 
-                    // Update Date
-                    const today = new Date();
-                    const dd = String(today.getDate()).padStart(2, '0');
-                    const mm = String(today.getMonth() + 1).padStart(2, '0');
-                    const dateEl = document.getElementById('scout-date');
-                    if (dateEl) dateEl.innerText = `(${dd}/${mm})`;
-                });
+                renderScout(scout);
+                renderHistoryStats(stats);
+                renderHistoryList(history);
+            }).catch(err => {
+                console.error('History load error:', err);
+                list.innerHTML = `<div class="text-center py-10 text-red-400">Erro ao carregar histórico</div>`;
+            });
+        }
 
-            // Fetch Global Stats
-            fetch('/api/history_stats')
-                .then(r => r.json())
-                .then(stats => {
-                    statsContainer.innerHTML = `
-                        <div class="glass-panel p-4 rounded-2xl border-emerald-500/20 text-center">
-                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Taxa de Acerto</div>
-                            <div class="text-2xl font-black text-emerald-400">${stats.accuracy}%</div>
+        function renderScout(scout) {
+            document.getElementById('today-total').innerText = scout.total;
+            document.getElementById('today-greens').innerText = scout.greens;
+            document.getElementById('today-reds').innerText = scout.reds;
+            document.getElementById('today-pending').innerText = scout.pending;
+            document.getElementById('today-accuracy').innerText = `${scout.accuracy}% ACERTO`;
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dateEl = document.getElementById('scout-date');
+            if (dateEl) dateEl.innerText = `(${dd}/${mm})`;
+        }
+
+        function renderHistoryStats(stats) {
+            const statsContainer = document.getElementById('history-stats');
+            statsContainer.innerHTML = `
+                <div class="glass-panel p-4 rounded-2xl border-emerald-500/20 text-center">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Taxa de Acerto</div>
+                    <div class="text-2xl font-black text-emerald-400">${stats.accuracy}%</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-red-500/20 text-center">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Taxa de Red</div>
+                    <div class="text-2xl font-black text-red-500">${stats.red_pct}%</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-white/5 text-center">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Total Greens</div>
+                    <div class="text-2xl font-black text-white">${stats.greens}</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-white/5 text-center">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Total Reds</div>
+                    <div class="text-2xl font-black text-white">${stats.reds}</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-yellow-500/20 text-center relative overflow-hidden group col-span-2 md:col-span-1">
+                    <div class="absolute inset-0 bg-yellow-500/5 blur-xl group-hover:bg-yellow-500/10 transition-all"></div>
+                    <div class="text-[10px] text-gray-400 font-bold uppercase mb-1 tracking-wider relative">Green Streak</div>
+                    <div class="text-2xl font-black text-yellow-400 relative drop-shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="flame" class="w-5 h-5 animate-pulse text-orange-500"></i> ${stats.streak || 0}
+                    </div>
+                </div>
+            `;
+            refreshIcons();
+        }
+
+        function renderHistoryList(data) {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            if (data.length === 0) {
+                list.innerHTML = `<div class="text-center py-20 text-gray-500">Nenhum registro encontrado.</div>`;
+                return;
+            }
+            data.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'glass-panel p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center border border-white/5 relative group transition-all hover:border-white/20 mb-4';
+                const isWin = item.status === 'WON';
+
+                let badgeHtml = '';
+                if (item.badge) {
+                    let bClass = "bg-gray-500/10 text-gray-400 border-gray-500/10";
+                    if (item.badge.includes("SNIPER")) bClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
+                    if (item.badge.includes("ELITE")) bClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                    badgeHtml = `<span class="px-1.5 py-0.5 rounded text-[8px] font-black border ${bClass} uppercase tracking-tighter ml-2">${item.badge}</span>`;
+                }
+
+                row.innerHTML = `
+                    <div class="mb-3 sm:mb-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] font-bold text-gray-600 uppercase tabular-nums">${item.date} • <span class="text-purple-400">${item.time || '--:--'}</span></span>
+                            <span class="text-xs font-bold text-gray-300">${item.home} <span class="text-gray-600 font-normal">vs</span> ${item.away}</span>
+                            ${badgeHtml}
                         </div>
-                        <div class="glass-panel p-4 rounded-2xl border-red-500/20 text-center">
-                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Taxa de Red</div>
-                            <div class="text-2xl font-black text-red-500">${stats.red_pct}%</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-sm font-black text-white uppercase tracking-tight">${item.selection}</div>
+                            <div class="text-xs font-bold text-emerald-400/80">@${item.odd}</div>
                         </div>
-                        <div class="glass-panel p-4 rounded-2xl border-white/5 text-center">
-                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Total Greens</div>
-                            <div class="text-2xl font-black text-white">${stats.greens}</div>
-                        </div>
-                        <div class="glass-panel p-4 rounded-2xl border-white/5 text-center">
-                            <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Total Reds</div>
-                            <div class="text-2xl font-black text-white">${stats.reds}</div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between w-full sm:w-auto gap-4">
+                        <div class="text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <div class="text-[10px] font-bold text-gray-500 uppercase leading-none">${item.score}</div>
+                                <div class="px-2 py-1 rounded-md text-[9px] font-black ${isWin ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/20 text-red-500 border border-red-500/20'}">
+                                    ${item.status}
+                                </div>
+                            </div>
+                            <div class="text-[10px] mt-1 font-bold ${isWin ? 'text-emerald-500' : 'text-red-500'} tracking-wider">${item.profit}</div>
                         </div>
                         
-                        <!-- NEW STREAK CARD -->
-                        <div class="glass-panel p-4 rounded-2xl border-yellow-500/20 text-center relative overflow-hidden group col-span-2 md:col-span-1">
-                            <div class="absolute inset-0 bg-yellow-500/5 blur-xl group-hover:bg-yellow-500/10 transition-all"></div>
-                            <div class="text-[10px] text-gray-400 font-bold uppercase mb-1 tracking-wider relative">Green Streak</div>
-                            <div class="text-2xl font-black text-yellow-400 relative drop-shadow-lg flex items-center justify-center gap-2">
-                                <i data-lucide="flame" class="w-5 h-5 animate-pulse text-orange-500"></i> ${stats.streak || 0}
-                            </div>
-                        </div>
-                    `;
-                    lucide.createIcons();
-                });
-
-            // Fetch History
-            fetch('/api/history')
-                .then(r => r.json())
-                .then(data => {
-                    console.log("History Data:", data); // DEBUG
-                    list.innerHTML = '';
-                    if (data.length === 0) {
-                        list.innerHTML = `<div class="text-center py-20 text-gray-500">Nenhum registro encontrado.</div>`;
-                        return;
-                    }
-                    data.forEach(item => {
-                        const row = document.createElement('div');
-                        row.className = 'glass-panel p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center border border-white/5 relative group transition-all hover:border-white/20 mb-4';
-                        const isWin = item.status === 'WON';
-
-                        // Badge logic
-                        let badgeHtml = '';
-                        if (item.badge) {
-                            let bClass = "bg-gray-500/10 text-gray-400 border-gray-500/10";
-                            if (item.badge.includes("SNIPER")) bClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
-                            if (item.badge.includes("ELITE")) bClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-                            badgeHtml = `<span class="px-1.5 py-0.5 rounded text-[8px] font-black border ${bClass} uppercase tracking-tighter ml-2">${item.badge}</span>`;
-                        }
-
-                        row.innerHTML = `
-                            <div class="mb-3 sm:mb-0">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] font-bold text-gray-600 uppercase tabular-nums">${item.date} • <span class="text-purple-400">${item.time || '--:--'}</span></span>
-                                    <span class="text-xs font-bold text-gray-300">${item.home} <span class="text-gray-600 font-normal">vs</span> ${item.away}</span>
-                                    ${badgeHtml}
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <div class="text-sm font-black text-white uppercase tracking-tight">${item.selection}</div>
-                                    <div class="text-xs font-bold text-emerald-400/80">@${item.odd}</div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center justify-between w-full sm:w-auto gap-4">
-                                <div class="text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <div class="text-[10px] font-bold text-gray-500 uppercase leading-none">${item.score}</div>
-                                        <div class="px-2 py-1 rounded-md text-[9px] font-black ${isWin ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/20 text-red-500 border border-red-500/20'}">
-                                            ${item.status}
-                                        </div>
-                                    </div>
-                                    <div class="text-[10px] mt-1 font-bold ${isWin ? 'text-emerald-500' : 'text-red-500'} tracking-wider">${item.profit}</div>
-                                </div>
-                                
-                                ${isWin ? `
-                                <button onclick="openShareModal('${item.home} vs ${item.away}', '${item.selection}', '${item.odd}', '${item.profit}', '${item.badge || 'PRO IA'}')" 
-                                    class="p-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-400 transition-all border border-white/5 hover:border-emerald-500/20" 
-                                    title="Compartilhar Green">
-                                    <i data-lucide="share-2" class="w-4 h-4"></i>
-                                </button>` : ''}
-                            </div>
-                        `;
-                        list.appendChild(row);
-                    });
-                    lucide.createIcons();
-                });
+                        ${isWin ? `
+                        <button onclick="openShareModal('${item.home} vs ${item.away}', '${item.selection}', '${item.odd}', '${item.profit}', '${item.badge || 'PRO IA'}')" 
+                            class="p-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-400 transition-all border border-white/5 hover:border-emerald-500/20" 
+                            title="Compartilhar Green">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                        </button>` : ''}
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+            refreshIcons();
         }
 
         // --- MODAL ---
@@ -1636,7 +1716,7 @@
 
             btn.disabled = true;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AUTENTICANDO...`;
-            lucide.createIcons();
+            refreshIcons();
 
             try {
                 const response = await fetch('/api/login', {
@@ -1656,7 +1736,7 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span>CONECTAR</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-                lucide.createIcons();
+                refreshIcons();
             }
         }
 
@@ -1771,7 +1851,7 @@
                             `;
                             realFeed.prepend(item); // Mais recentes no topo
                         });
-                        if (window.lucide) window.lucide.createIcons();
+                        if (window.refreshIcons) refreshIcons();
                     }
 
                 } catch (err) {
@@ -1792,7 +1872,7 @@
                         <i data-lucide="ghost" class="w-8 h-8 opacity-50"></i>
                         <span>Nada consta, comandante. Silêncio total nas redes.</span>
                     </div>`;
-                if (window.lucide) window.lucide.createIcons();
+                if (window.refreshIcons) refreshIcons();
             }
         };
 
@@ -1824,7 +1904,7 @@
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             // checkSession(); -> Disabled to ensure fresh login flow
-            lucide.createIcons();
+            refreshIcons();
         });
     </script>
 </body>

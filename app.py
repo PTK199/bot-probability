@@ -51,7 +51,13 @@ def add_header(response):
     diff = time.time() - g.start
     response.headers['X-Neural-Latency'] = f"{diff:.4f}s"
     if request.path.startswith('/api'):
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        # TURBO: Allow short browser caching for read-only data endpoints
+        cacheable_endpoints = ['/api/games', '/api/history', '/api/history_stats', 
+                               '/api/today_scout', '/api/history_trebles', '/api/leverage']
+        if any(request.path.startswith(ep) for ep in cacheable_endpoints) and request.method == 'GET':
+            response.headers['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=120'
+        else:
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     return response
 
 @app.errorhandler(404)
