@@ -7,6 +7,7 @@ import os
 import time
 import datetime
 import requests
+import traceback
 # Payment System Integration
 from payment_system import init_payment_system, db, User, Payment, PaymentManager
 
@@ -80,7 +81,7 @@ def login_page():
 def subscription_page():
     if current_user.is_active_subscriber:
         return redirect('/')
-    return render_template('subscribe.html') # Need to create this template
+    return render_template('subscribe.html')
 
 # --- API ENDPOINTS (DATA) ---
 
@@ -196,33 +197,55 @@ def check_session():
 @login_required
 def create_payment():
     try:
+        mp_token = os.getenv('MP_ACCESS_TOKEN', '')
+        if not mp_token or 'YOUR_' in mp_token:
+            raise Exception("MP_ACCESS_TOKEN is missing or invalid in environment")
+
+        print(f"💰 Creating preference for: {current_user.email}")
         preference = mp_manager.create_preference(current_user.email)
+        
+        # Check if Preference response is valid
+        if 'id' not in preference:
+             raise Exception(f"Invalid MP Response: {preference}")
+
         return jsonify({"status": "success", "preference_id": preference['id'], "init_point": preference['init_point']})
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print(f"❌ Payment Error: {e}")
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e), "trace": traceback.format_exc()}), 500
 
-@app.route('/webhook/mercadopago', methods=['POST'])
+@app.route('/webhook/mercadopago', methods=['POST', 'GET'], strict_slashes=False)
 def mp_webhook():
+    print(f"🔔 Webhook received: {request.method} {request.url}")
+    
     topic = request.args.get('topic') or request.args.get('type')
     p_id = request.args.get('id') or request.args.get('data.id')
 
     if topic == 'payment' and p_id:
-        payment_info = mp_manager.check_payment_status(p_id)
-        
-        if payment_info['status'] == 'approved':
-            payer_email = payment_info['payer']['email']
-            user = User.query.filter_by(email=payer_email).first()
-            if user:
-                # Add 7 days from NOW
-                user.subscription_end = datetime.datetime.utcnow() + datetime.timedelta(days=7)
-                db.session.commit()
-                print(f"Subscription ACTIVATED for {user.email}")
+        print(f"🔎 Checking payment {p_id}...")
+        try:
+            payment_info = mp_manager.check_payment_status(p_id)
+            print(f"💳 Status: {payment_info['status']}")
+            
+            if payment_info['status'] == 'approved':
+                payer_email = payment_info['payer']['email']
+                # Try to match by email first
+                user = User.query.filter_by(email=payer_email).first()
+                if user:
+                    # Upgrade Subscription
+                    user.subscription_end = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+                    db.session.commit()
+                    print(f"✅ Subscription ACTIVATED for {user.email}")
+                else:
+                    print(f"⚠️ User not found for email {payer_email}")
+        except Exception as e:
+            print(f"❌ Webhook Processing Error: {e}")
+            return jsonify({"status": "error", "error": str(e)}), 500
                 
     return jsonify({"status": "ok"}), 200
 
 @app.route('/payment/success')
 def payment_success():
-    # Force refresh user from DB needed? Usually auto handles on next request
     return render_template('payment_success.html')
 
 @app.route('/payment/failure')
