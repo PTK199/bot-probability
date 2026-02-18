@@ -13,6 +13,13 @@ try:
 except ImportError:
     pass
 
+import time
+import hashlib
+
+CACHE_DIR = "cache_games"
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)
+
 THE_ODDS_API_KEY = os.environ.get("THE_ODDS_API_KEY", "")
 
 # --- REFACTORED IMPORTS (backward compatibility) ---
@@ -447,11 +454,38 @@ def apply_calibration(prob, odd, league):
     
     return max(30, min(95, prob + adjustment))
 
-def get_games_for_date(target_date, skip_history=False):
+import os
+import json
+import time
+# Assuming CACHE_DIR is defined globally or imported, e.g.:
+# CACHE_DIR = "cache" 
+# If not, define it here for the snippet to be self-contained.
+# For this response, I'll assume it's defined elsewhere or will be handled by the user.
+# If it's not defined, the code will raise a NameError.
+# For a complete, runnable example, it should be defined.
+# Let's define a placeholder for CACHE_DIR to make the snippet syntactically correct.
+CACHE_DIR = "cache" # Placeholder, ensure this is defined appropriately in the actual file.
+os.makedirs(CACHE_DIR, exist_ok=True) # Ensure cache directory exists
+
+def get_games_for_date(target_date, skip_history=False, force_refresh=False):
     """
-    Optimized for 'Expert Analyst' persona.
-    Prioritizes Real-Time Data if Target Date is Today.
+    Orchestrates the data fetching, prediction, and formatting process.
     """
+    cache_file = os.path.join(CACHE_DIR, f"games_{target_date}.json")
+    
+    # 1. Try Cache First (if not forced)
+    if not force_refresh and os.path.exists(cache_file):
+        try:
+            # Check file age (optional, e.g. 15 mins)
+            file_mod_time = os.path.getmtime(cache_file)
+            if (time.time() - file_mod_time) < 900: # 15 mins cache
+                # print(f"⚡ Loading cached games for {target_date}")
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"⚠️ Cache read error: {e}")
+
+    print(f"📡 Fetching FRESH games for {target_date}...")
     
     games_data = []
 
@@ -569,7 +603,16 @@ def get_games_for_date(target_date, skip_history=False):
             "copy_text": "⚖️ TRIPLA MISTA:\n" + "\n".join(pick_list) + f"\nOdd Total: {total_odd:.2f}"
         })
 
-    return {"games": processed_games, "trebles": trebles}
+    final_payload = {"games": processed_games, "trebles": trebles}
+    
+    # 3. Save to Cache
+    try:
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(final_payload, f, ensure_ascii=False, indent=2)
+    except:
+        pass
+        
+    return final_payload
 
 def fetch_from_espn_api(target_date=None):
     """
