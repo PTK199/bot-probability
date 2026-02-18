@@ -116,6 +116,46 @@ def cron_update():
         "timestamp": datetime.datetime.now().isoformat()
     }), 202
 
+# --- DEBUG ENDPOINT (TEMPORARY) ---
+@app.route('/api/debug')
+def debug_endpoint():
+    """Temporary endpoint to diagnose data_fetcher errors. Remove after fixing."""
+    results = {"status": "running", "checks": {}}
+    
+    # Check 1: Can we import data_fetcher?
+    try:
+        import data_fetcher as df
+        results["checks"]["import"] = "OK"
+    except Exception as e:
+        results["checks"]["import"] = f"FAIL: {e}"
+        return jsonify(results)
+    
+    # Check 2: Can we call get_games_for_date?
+    try:
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        data = df.get_games_for_date(today)
+        results["checks"]["get_games"] = f"OK - {len(data.get('games', []))} games found"
+        results["data_keys"] = list(data.keys()) if isinstance(data, dict) else str(type(data))
+    except Exception as e:
+        results["checks"]["get_games"] = f"FAIL: {e}"
+        results["traceback"] = traceback.format_exc()
+    
+    # Check 3: Can we call get_history_games?
+    try:
+        hist = df.get_history_games()
+        results["checks"]["history"] = f"OK - {len(hist)} entries"
+    except Exception as e:
+        results["checks"]["history"] = f"FAIL: {e}"
+    
+    # Check 4: Can we call get_today_scout?
+    try:
+        scout = df.get_today_scout()
+        results["checks"]["scout"] = f"OK - {scout}"
+    except Exception as e:
+        results["checks"]["scout"] = f"FAIL: {e}"
+    
+    return jsonify(results)
+
 # --- ROUTES ---
 
 @app.route('/')
