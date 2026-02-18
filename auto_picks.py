@@ -561,6 +561,14 @@ def get_auto_games(target_date):
         CALIBRATION_ACTIVE = False
         print(f"[AUTO-ENGINE] ⚠️ Calibration not available: {e}")
 
+    try:
+        from scores365 import get_lineup_intelligence
+        SCORES365_ACTIVE = True
+        print("[AUTO-ENGINE] ✅ 365Scores Intelligence CONNECTED (Lineups, Injuries, Formations)")
+    except Exception as e:
+        SCORES365_ACTIVE = False
+        print(f"[AUTO-ENGINE] ⚠️ 365Scores not available: {e}")
+
     # 1. Busca jogos na ESPN
     raw_games = fetch_espn_schedule(target_date)
     if not raw_games:
@@ -671,6 +679,45 @@ def get_auto_games(target_date):
                             funnel_notes.append(f"⚠️ KB: {away} em fase NEGATIVA")
                 except Exception as e:
                     pass  # KB is supplemental, don't block
+
+            # ─── STAGE 3.5: 365SCORES LINEUP INTELLIGENCE ───
+            if SCORES365_ACTIVE and sport == "football":
+                try:
+                    intel = get_lineup_intelligence(home, away, target_date)
+                    if intel:
+                        # Apply probability adjustment from injury analysis
+                        adj = intel.get("prob_adjustment", 0)
+                        if adj != 0:
+                            sel_lower = tip.get("selection", "").lower()
+                            # If betting on HOME and adj is positive (away more injured), good
+                            # If betting on AWAY and adj is negative (home more injured), good
+                            is_home_pick = home.lower() in sel_lower or any(p in sel_lower for p in home.lower().split() if len(p) > 3)
+                            if is_home_pick:
+                                tip["prob"] = max(30, min(95, tip["prob"] + adj))
+                            else:
+                                tip["prob"] = max(30, min(95, tip["prob"] - adj))
+                            funnel_notes.append(f"🏥 365S: adj {adj:+d}% (desfalques)")
+
+                        # Add formations to reason
+                        hf = intel.get("home_formation", "")
+                        af = intel.get("away_formation", "")
+                        if hf and af:
+                            funnel_notes.append(f"📋 {home} {hf} vs {away} {af}")
+
+                        # Enrich with public sentiment
+                        sentiment = intel.get("public_sentiment", {})
+                        if sentiment.get("total_votes", 0) > 500:
+                            h_vote = sentiment.get("home_pct", 0)
+                            a_vote = sentiment.get("away_pct", 0)
+                            funnel_notes.append(f"🗳️ Público: {home} {h_vote}% | {away} {a_vote}%")
+
+                        # Add key missing players info
+                        for fact in intel.get("key_facts", []):
+                            if fact.startswith("❌") or fact.startswith("⚠️"):
+                                funnel_notes.append(fact)
+                                break  # Just first injury note to avoid clutter
+                except Exception as e:
+                    print(f"[AUTO-ENGINE] ⚠️ 365Scores error for {home}: {e}")
 
             # ─── STAGE 4: TRAP HUNTER (detect suspicious odds) ───
             if FUNNEL_ACTIVE:
