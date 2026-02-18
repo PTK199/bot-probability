@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assinatura Premium - Probability Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --surface: #121212;
+            --surface-light: #1e1e1e;
+            --primary: #00ff88;
+            --primary-glow: rgba(0, 255, 136, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --danger: #ff4757;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .card {
+            background: linear-gradient(145deg, var(--surface), var(--surface-light));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ff88, #00ffee);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .plan-price {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary-glow);
+            margin: 1.5rem 0;
+        }
+
+        .plan-period {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .features {
+            text-align: left;
+            margin: 2rem 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .features li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            color: #ddd;
+        }
+
+        .features li span {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .btn-pay {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+            background: #00e67a;
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: #555;
+            color: #888;
+            box-shadow: none;
+        }
+
+        .logout-link {
+            display: block;
+            margin-top: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .logout-link:hover {
+            color: var(--primary);
+        }
+
+        #error-msg {
+            color: var(--danger);
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Acesso Premium</h1>
+            <p class="subtitle">Desbloqueie o poder máximo da IA Neural</p>
+
+            <div class="plan-price">
+                R$ 29,90<span class="plan-period">/semana</span>
+            </div>
+
+            <ul class="features">
+                <li><span>✓</span> Acesso Imediato ao Dashboard</li>
+                <li><span>✓</span> Previsões de Jogos em Tempo Real</li>
+                <li><span>✓</span> Triplas Diárias de Alta Precisão</li>
+                <li><span>✓</span> Análise Profunda com IA (GPT-4)</li>
+                <li><span>✓</span> Suporte Prioritário</li>
+            </ul>
+
+            <button id="pay-btn" class="btn-pay" onclick="createPayment()">
+                ASSINAR AGORA
+            </button>
+            <p id="error-msg"></p>
+
+            <a href="/api/logout" class="logout-link">Sair / Trocar Conta</a>
+        </div>
+    </div>
+
+    <script>
+        async function createPayment() {
+            const btn = document.getElementById('pay-btn');
+            const errorMsg = document.getElementById('error-msg');
+
+            btn.disabled = true;
+            btn.innerText = "PROCESSANDO...";
+            errorMsg.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/payment/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success' && data.init_point) {
+                    // Redirect to Mercado Pago Checkout
+                    window.location.href = data.init_point;
+                } else {
+                    throw new Error(data.message || 'Erro ao criar pagamento');
+                }
+
+            } catch (error) {
+                console.error("Payment Error:", error);
+                btn.disabled = false;
+                btn.innerText = "TENTAR NOVAMENTE";
+                errorMsg.innerText = "Erro ao conectar com gateway de pagamento. Tente novamente.";
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>
