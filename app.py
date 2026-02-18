@@ -146,8 +146,20 @@ def games():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     date = request.args.get('date', today)
-    updates = data_fetcher.get_games_for_date(date)
-    return jsonify(updates)
+    try:
+        updates = data_fetcher.get_games_for_date(date)
+        return jsonify(updates)
+    except Exception as e:
+        print(f"CRITICAL ERROR /api/games: {e}")
+        import traceback
+        traceback.print_exc()
+        # Return empty safe structure
+        return jsonify({
+            "games": [], 
+            "trebles": [], 
+            "status": "error", 
+            "message": str(e)
+        })
 
 @app.route('/api/history')
 @login_required
@@ -167,8 +179,14 @@ def history_stats():
 @login_required
 def today_scout():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
-    data = data_fetcher.get_today_scout()
-    return jsonify(data)
+    try:
+        scout = data_fetcher.get_today_scout()
+        return jsonify(scout)
+    except Exception as e:
+        print(f"CRITICAL ERROR /api/today_scout: {e}")
+        return jsonify({
+            "total": 0, "greens": 0, "reds": 0, "pending": 0, "accuracy": 0
+        })
 
 @app.route('/api/history_trebles')
 @login_required
