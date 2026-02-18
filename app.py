@@ -1,4 +1,5 @@
 import data_fetcher
+import result_checker
 import ai_engine
 # user_manager deprecated - replaced by payment_system
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for, g
@@ -83,11 +84,10 @@ def run_update_job():
         data_fetcher.get_games_for_date(today, force_refresh=True)
         print("✅ Data Fetcher Complete.")
         
-        # Trigger Scout
-        from data_fetcher import ResultScoutBot
-        bot = ResultScoutBot()
-        bot.scout_results_for_date(today)
-        print("✅ Scout Complete.")
+        # Auto-check results from ESPN
+        print("🔍 Checking game results via ESPN...")
+        result_summary = result_checker.check_and_update_results()
+        print(f"✅ Result Check Complete: {result_summary}")
         
         print("✅ Background Update Job All Done.")
     except Exception as e:
@@ -115,6 +115,19 @@ def cron_update():
         "message": "Update process started in background.", 
         "timestamp": datetime.datetime.now().isoformat()
     }), 202
+
+@app.route('/api/cron/results', methods=['GET', 'POST'])
+def cron_results():
+    """Dedicated endpoint to check & update game results from ESPN."""
+    key = request.args.get('key')
+    authorized_key = os.environ.get('CRON_KEY', 'update_secret_123')
+    if key != authorized_key:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        summary = result_checker.check_and_update_results()
+        return jsonify({"status": "ok", **summary})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # --- DEBUG ENDPOINT (TEMPORARY) ---
 @app.route('/api/debug')

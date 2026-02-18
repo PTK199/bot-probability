@@ -912,36 +912,28 @@ def get_history_trebles():
     # For now, returning a simulated history of trebles to populate the new tab
     return [
         {
-            "date": "10/02",
-            "name": "🛡️ TRIPLA DE OURO (MISTO)",
-            "odd": "3.20",
+            "date": "17/02",
+            "name": "🛡️ BUNKER (UCL + LIBERTADORES)",
+            "odd": "2.97",
             "status": "LOST",
             "profit": "-100%",
-            "selections": ["Flamengo Vence (W)", "Knicks Vence (L)", "Chelsea Vence (L)"]
+            "selections": ["Dortmund DC (✅)", "Galatasaray DC (✅)", "Benfica DC (❌)"]
         },
         {
-            "date": "09/02",
-            "name": "🛡️ TRIPLA BLINDADA",
-            "odd": "3.48",
-            "status": "WON",
-            "profit": "+248%",
-            "selections": ["Heat Win", "Thunder Win", "Sixers Win"]
-        },
-        {
-            "date": "09/02",
-            "name": "🔥 COMBO SNIPER LIVE",
-            "odd": "2.85",
-            "status": "WON",
-            "profit": "+185%",
-            "selections": ["Porto 1X", "Juve Vence", "Braga Vence"]
-        },
-        {
-            "date": "09/02",
-            "name": "🏀 TRIPLA NBA MADRUGADA",
-            "odd": "3.85",
+            "date": "17/02",
+            "name": "🔥 VALUE MIX (LIBERTADORES)",
+            "odd": "2.92",
             "status": "LOST",
             "profit": "-100%",
-            "selections": ["Bucks -4.5 (L)", "Thunder Win (W)", "Jazz Over (W)"]
+            "selections": ["Carabobo DC (✅)", "2 de Mayo DC (✅)", "Liverpool DC (❌)"]
+        },
+        {
+            "date": "17/02",
+            "name": "🎯 SUPER COMBO (UCL)",
+            "odd": "3.73",
+            "status": "LOST",
+            "profit": "-100%",
+            "selections": ["Dortmund DC (✅)", "Monaco DC (❌)", "Benfica DC (❌)"]
         }
     ]
 
