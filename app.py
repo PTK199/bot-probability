@@ -216,7 +216,7 @@ def admin_dashboard():
             
         # Attach temporary attributes for template rendering
         # (We can't modify the SQLAlch object directly easily, so we use a wrapper or just setattr if it allows)
-        setattr(u, 'is_active', is_active)
+        setattr(u, 'subscription_active', is_active)
         setattr(u, 'days_left', days_left)
         processed_users.append(u)
         
