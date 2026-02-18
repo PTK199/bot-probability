@@ -9,11 +9,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.71,
         "prob": 58,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "🏀 [MONTE CARLO 5K]: Suns (32-23) favorito com 58.6%. | ⚠️ EV GATE: edge -0.5%"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -25,11 +24,10 @@
         "market": "Dupla Chance",
         "odd": 1.43,
         "prob": 69,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC 2 de Mayo (70%) é o mais seguro. | ⚠️ EV GATE: edge -0.9%"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+43%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "17/02",
@@ -41,11 +39,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.9,
         "prob": 52,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "🏀 [MONTE CARLO 5K]: Wizards (14-39) leve favorito com 52.6%. | ⚠️ EV GATE: edge -0.6%"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -57,14 +54,13 @@
         "market": "Vencedor (ML)",
         "odd": 1.86,
         "prob": 53,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "🏀 [MONTE CARLO 5K]: 76ers (30-24) leve favorito com 53.9%. | ⚠️ EV GATE: edge -0.8%"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
-        "date": "17/02",
+        "date": "19/02",
         "time": "19:30",
         "home": "Athletico Paranaense",
         "away": "Corinthians",
@@ -76,8 +72,7 @@
         "status": "PENDING",
         "score": "0-0",
         "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Athletico Paranaense (69%) é o mais seguro. | ⚠️ EV GATE: edge -0.5%"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "17/02",
@@ -89,11 +84,10 @@
         "market": "Dupla Chance",
         "odd": 1.43,
         "prob": 69,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Carabobo (70%) é o mais seguro. | ⚠️ EV GATE: edge -0.9%"
+        "status": "WON",
+        "score": "1-0",
+        "profit": "+43%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "17/02",
@@ -105,11 +99,10 @@
         "market": "Dupla Chance",
         "odd": 1.45,
         "prob": 69,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Borussia Dortmund (69%) é o mais seguro. | ⚠️ EV GATE: edge 0.0%"
+        "status": "WON",
+        "score": "2-0",
+        "profit": "+45%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "17/02",
@@ -121,11 +114,10 @@
         "market": "Dupla Chance",
         "odd": 1.65,
         "prob": 60,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Benfica (61%) é o mais seguro. | ⚠️ EV GATE: edge -0.6%"
+        "status": "LOST",
+        "score": "0-1",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "17/02",
@@ -137,14 +129,13 @@
         "market": "Dupla Chance",
         "odd": 1.65,
         "prob": 60,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC AS Monaco (61%) é o mais seguro. | ⚠️ EV GATE: edge -0.6%"
+        "status": "LOST",
+        "score": "2-3",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
-        "date": "17/02",
+        "date": "18/02",
         "time": "17:00",
         "home": "Wolverhampton Wanderers",
         "away": "Arsenal",
@@ -156,11 +147,10 @@
         "status": "PENDING",
         "score": "0-0",
         "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Wolverhampton Wanderers (61%) é o mais seguro. | ⚠️ EV GATE: edge -0.3%"
+        "badge": "⚠️ EV GATE"
     },
     {
-        "date": "17/02",
+        "date": "20/02",
         "time": "16:45",
         "home": "Brest",
         "away": "Marseille",
@@ -172,11 +162,10 @@
         "status": "PENDING",
         "score": "0-0",
         "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Brest (66%) é o mais seguro. | ⚠️ EV GATE: edge -0.8%"
+        "badge": "⚠️ EV GATE"
     },
     {
-        "date": "17/02",
+        "date": "20/02",
         "time": "16:30",
         "home": "Mainz",
         "away": "Hamburg SV",
@@ -188,11 +177,10 @@
         "status": "PENDING",
         "score": "0-0",
         "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Mainz (70%) é o mais seguro. | ⚠️ EV GATE: edge -0.9%"
+        "badge": "⚠️ EV GATE"
     },
     {
-        "date": "17/02",
+        "date": "18/02",
         "time": "16:00",
         "home": "Levante",
         "away": "Villarreal",
@@ -204,8 +192,7 @@
         "status": "PENDING",
         "score": "0-0",
         "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Levante (67%) é o mais seguro. | ⚠️ EV GATE: edge -0.7%"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "17/02",
@@ -217,11 +204,10 @@
         "market": "Dupla Chance",
         "odd": 1.56,
         "prob": 64,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC Galatasaray (64%) é o mais seguro. | ⚠️ EV GATE: edge -0.1%"
+        "status": "WON",
+        "score": "5-2",
+        "profit": "+56%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "17/02",
@@ -233,11 +219,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.29,
         "prob": 77,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "🏀 [MONTE CARLO 5K]: Raptors (32-23) com 77.6% mesmo fora de casa. Bulls (24-31) muito inferior. | ⚠️ EV GATE: edge -0.5%"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -249,11 +234,10 @@
         "market": "Dupla Chance",
         "odd": 1.3,
         "prob": 76,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Dupla Chance Liverpool (77%). Segurança em casa. | ⚠️ EV GATE: edge -0.9%"
+        "status": "LOST",
+        "score": "1-2",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "17/02",
@@ -265,11 +249,10 @@
         "market": "Total de Pontos",
         "odd": 1.9,
         "prob": 82,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "🚀 OVER",
-        "reason": "🏀 [PACE]: Média simulada 262 pts > Linha 222.5. Edge 39.5 pts."
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -281,11 +264,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.04,
         "prob": 95,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "🏀 [MONTE CARLO 5K]: Cavaliers (34-21) com 95.8% de vitória. Nets (15-38) inferior em power rating. | ⚠️ EV GATE: edge -1.2%"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
         "date": "17/02",
@@ -297,14 +279,13 @@
         "market": "Vencedor (ML)",
         "odd": 1.29,
         "prob": 77,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "🏀 [MONTE CARLO 5K]: Rockets (33-20) com 77.3% mesmo fora de casa. Hornets (26-29) muito inferior. | ⚠️ EV GATE: edge -0.5%"
+        "status": "VOID",
+        "score": "N/A",
+        "profit": "REEMBOLSO (0%)",
+        "badge": "⚠️ ALL-STAR BREAK"
     },
     {
-        "date": "17/02",
+        "date": "18/02",
         "time": "16:45",
         "home": "AC Milan",
         "away": "Como",
@@ -316,8 +297,7 @@
         "status": "PENDING",
         "score": "0-0",
         "profit": "...",
-        "badge": "⚠️ EV GATE",
-        "reason": "⚽ [POISSON]: Jogo equilibrado. DC AC Milan (74%) é o mais seguro. | ⚠️ EV GATE: edge -0.5%"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "17/02",
