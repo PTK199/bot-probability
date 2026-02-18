@@ -615,19 +615,79 @@ def fetch_from_espn_api(target_date=None):
 
 class ResultScoutBot:
     """
-    NEURAL RESULT SCOUT BOT 🤖
-    Fetches real outcomes using ESPN Public API.
+    MULTI-SOURCE RESULT SCOUT BOT 🤖
+    Priority: 365Scores → ESPN → Google (fallback)
+    - 365Scores: NBA + International Football (real-time)
+    - ESPN: All leagues (public API)
+    - Google: Last resort for missing games
     """
     def __init__(self):
-        pass
+        self._365_available = False
+        try:
+            from scores365 import fetch_results_365scores, fetch_result_from_google
+            self._365_available = True
+            self._fetch_365 = fetch_results_365scores
+            self._fetch_google = fetch_result_from_google
+        except Exception as e:
+            print(f"[SCOUT] ⚠️ 365Scores results not available: {e}")
 
     def scout_results_for_date(self, target_date):
-        return fetch_from_espn_api(target_date)
+        """Fetch results from all sources, merging with priority."""
+        all_results = {}
+        
+        # ── SOURCE 1: 365Scores (NBA + Football) ──
+        if self._365_available:
+            try:
+                print(f"[SCOUT] 📡 Fonte 1: 365Scores (NBA + Futebol Internacional)...")
+                results_365 = self._fetch_365(target_date)
+                all_results.update(results_365)
+                print(f"[SCOUT] ✅ 365Scores: {len(results_365)} entradas")
+            except Exception as e:
+                print(f"[SCOUT] ⚠️ 365Scores falhou: {e}")
+        
+        # ── SOURCE 2: ESPN (complementa o que faltar) ──
+        try:
+            print(f"[SCOUT] 📡 Fonte 2: ESPN API...")
+            espn_results = fetch_from_espn_api(target_date)
+            # Only add ESPN results for teams NOT already in 365Scores
+            espn_added = 0
+            for team, res in espn_results.items():
+                if team not in all_results:
+                    all_results[team] = res
+                    espn_added += 1
+            print(f"[SCOUT] ✅ ESPN: +{espn_added} resultados novos")
+        except Exception as e:
+            print(f"[SCOUT] ⚠️ ESPN falhou: {e}")
+        
+        print(f"[SCOUT] 📊 Total combinado: {len(all_results)} entradas de resultado")
+        return all_results
+
+    def scout_with_google_fallback(self, target_date, pending_games):
+        """
+        For any game still without a result, try Google as last resort.
+        pending_games: list of (home, away) tuples
+        """
+        if not self._365_available:
+            return {}
+        
+        google_results = {}
+        for home, away in pending_games:
+            try:
+                print(f"[SCOUT] 🔍 Google fallback: {home} vs {away}...")
+                result = self._fetch_google(home, away)
+                if result:
+                    google_results[home] = result
+                    google_results[away] = result
+                    print(f"[SCOUT] ✅ Google: {home} {result['score']} ({result['status']})")
+            except Exception as e:
+                print(f"[SCOUT] ⚠️ Google falhou para {home}: {e}")
+        
+        return google_results
 
     def scout_today_results(self):
         now = datetime.datetime.now()
         today_str = now.strftime("%Y-%m-%d")
-        return fetch_from_espn_api(today_str)
+        return self.scout_results_for_date(today_str)
 
 def get_history_games():
     """
@@ -650,8 +710,8 @@ def get_history_games():
     # Get today's games from the fetcher
     today_games = get_games_for_date(today_str, skip_history=True)
     
-    # ACTIVATE RESULT SCOUT BOT 🤖
-    print(f"[BOT] Ativando Varredura de Resultados Reais para {today_str} (ESPN)...")
+    # ACTIVATE MULTI-SOURCE RESULT SCOUT BOT 🤖
+    print(f"[BOT] Ativando Varredura Multi-Fonte para {today_str} (365Scores → ESPN → Google)...")
     bot = ResultScoutBot()
     real_results = bot.scout_results_for_date(today_str)
     
@@ -773,6 +833,74 @@ def get_history_games():
             except Exception as e:
                 print(f"Error processing game: {repr(e)}")
                 continue
+
+    # ── GOOGLE FALLBACK: Check any remaining PENDING games ──
+    pending_games = []
+    for h in history:
+        if h.get('date') == today_short and h.get('status') == 'PENDING':
+            # Check if enough time has passed
+            try:
+                t_parts = h.get('time', '99:99').split(':')
+                g_hour = int(t_parts[0])
+                g_min = int(t_parts[1]) if len(t_parts) > 1 else 0
+                g_time = now.replace(hour=g_hour, minute=g_min, second=0)
+                if now > (g_time + datetime.timedelta(hours=2, minutes=30)):
+                    pending_games.append((h['home'], h['away']))
+            except:
+                pass
+    
+    if pending_games and hasattr(bot, 'scout_with_google_fallback'):
+        print(f"[BOT] 🔍 {len(pending_games)} jogos sem resultado. Tentando Google...")
+        google_results = bot.scout_with_google_fallback(today_str, pending_games)
+        
+        if google_results:
+            for i, h_entry in enumerate(history):
+                if h_entry.get('date') == today_short and h_entry.get('status') == 'PENDING':
+                    home_name = h_entry.get('home', '')
+                    if home_name in google_results:
+                        res = google_results[home_name]
+                        if res.get('completed'):
+                            h_val = int(res['home_val'])
+                            a_val = int(res['away_val'])
+                            sel = h_entry.get('selection', '').lower()
+                            
+                            # Determine status
+                            status = "PENDING"
+                            if "ou empate" in sel:
+                                team_in_sel = sel.split("ou empate")[0].strip()
+                                if h_val == a_val:
+                                    status = "WON"
+                                elif team_in_sel in home_name.lower() and h_val > a_val:
+                                    status = "WON"
+                                elif team_in_sel in h_entry.get('away','').lower() and a_val > h_val:
+                                    status = "WON"
+                                else:
+                                    status = "LOST"
+                            elif "vence" in sel:
+                                if h_val == a_val:
+                                    status = "LOST"
+                                elif home_name.lower() in sel:
+                                    status = "WON" if h_val > a_val else "LOST"
+                                else:
+                                    status = "WON" if a_val > h_val else "LOST"
+                            elif "over" in sel:
+                                try:
+                                    line = float(sel.split("over")[1].strip().split(" ")[0].replace("gols","").replace("pontos","").strip())
+                                    status = "WON" if (h_val + a_val) > line else "LOST"
+                                except: pass
+                            elif "under" in sel:
+                                try:
+                                    line = float(sel.split("under")[1].strip().split(" ")[0].replace("gols","").replace("pontos","").strip())
+                                    status = "WON" if (h_val + a_val) < line else "LOST"
+                                except: pass
+                            
+                            if status != "PENDING":
+                                odd_val = float(h_entry.get('odd', 1.5))
+                                history[i]['score'] = res['score']
+                                history[i]['status'] = status
+                                history[i]['profit'] = f"+{int((odd_val-1)*100)}%" if status == "WON" else "-100%"
+                                updated = True
+                                print(f"[BOT] ✅ Google: {home_name} → {res['score']} ({status})")
 
     # 3. Save if updated
     if updated:

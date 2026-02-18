@@ -562,6 +562,154 @@ def get_lineup_intelligence(home_team, away_team, target_date=None, sport="footb
 
 
 # ═══════════════════════════════════════
+# RESULT FETCHER: GET SCORES FROM 365SCORES
+# ═══════════════════════════════════════
+def fetch_results_365scores(target_date=None):
+    """
+    Fetches finished game results from 365Scores API.
+    Returns dict keyed by team name (multiple keys per game) with:
+        - score: "H-A"
+        - home_val, away_val: int scores
+        - status: status text
+        - completed: bool
+    Compatible with ESPN's fetch_from_espn_api format.
+    """
+    if not target_date:
+        target_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    
+    results = {}
+    
+    # Fetch both basketball AND football
+    for sport_name, sport_id in SPORT_IDS.items():
+        try:
+            games = get_games_today(target_date, sport_id=sport_id)
+            
+            for g in games:
+                # status_group: 1=live, 2=pre, 3=finished
+                h_score = g.get("home_score", -1)
+                a_score = g.get("away_score", -1)
+                is_live = g.get("status_group") == 1
+                is_finished = g.get("status_group") == 3
+                
+                if h_score < 0 or a_score < 0:
+                    continue  # No score yet
+                
+                if not is_live and not is_finished:
+                    continue  # Game hasn't started
+                
+                status_text = g.get("status", "")
+                if is_finished:
+                    status_text = "Encerrado"
+                elif is_live:
+                    status_text = "Ao Vivo"
+                
+                result_obj = {
+                    "score": f"{h_score}-{a_score}",
+                    "home_val": int(h_score),
+                    "away_val": int(a_score),
+                    "status": status_text,
+                    "completed": is_finished,
+                    "source": "365Scores"
+                }
+                
+                # Add multiple name keys for robust matching
+                home_names = [g["home"], g.get("home_long", "")]
+                away_names = [g["away"], g.get("away_long", "")]
+                
+                for name in home_names + away_names:
+                    if name:
+                        results[name] = result_obj
+                        # Also add short versions (e.g., "Golden State Warriors" → "Warriors")
+                        parts = name.split()
+                        if len(parts) > 1:
+                            results[parts[-1]] = result_obj  # Last word (e.g., "Warriors")
+                            if len(parts) > 2:
+                                results[parts[0]] = result_obj  # First word
+                        
+            print(f"[365-RESULTS] ✅ {sport_name}: {len(games)} jogos encontrados")
+        except Exception as e:
+            print(f"[365-RESULTS] ⚠️ Erro ao buscar {sport_name}: {e}")
+    
+    print(f"[365-RESULTS] 📊 Total: {len(results)} entradas de resultado")
+    return results
+
+
+# ═══════════════════════════════════════
+# GOOGLE RESULT SCRAPER (FALLBACK)
+# ═══════════════════════════════════════
+def fetch_result_from_google(home_team, away_team):
+    """
+    Last resort: Scrape Google search for game result.
+    Returns result_obj or None.
+    """
+    try:
+        query = f"{home_team} vs {away_team} placar resultado hoje"
+        url = f"https://www.google.com/search?q={requests.utils.quote(query)}&hl=pt-BR"
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        
+        resp = requests.get(url, headers=headers, timeout=8)
+        if resp.status_code != 200:
+            return None
+        
+        text = resp.text
+        
+        # Google shows scores in specific patterns
+        # Look for score patterns like "2 - 1" or "102 - 98" near team names
+        import re
+        
+        # Pattern 1: "TeamA N - N TeamB" or "N - N" near team names
+        # Google sports scores are in spans with specific classes
+        # Try to find scores in the raw HTML
+        score_patterns = [
+            # NBA/Football: "105" ... "98" in score divs
+            r'data-score="(\d+)"',
+            # General pattern: digit-digit
+            r'>(\d{1,3})\s*[-–]\s*(\d{1,3})<',
+            # Google sports card
+            r'"score":"(\d+)".*?"score":"(\d+)"',
+        ]
+        
+        for pattern in score_patterns:
+            matches = re.findall(pattern, text)
+            if matches:
+                if isinstance(matches[0], tuple) and len(matches[0]) == 2:
+                    h_score = int(matches[0][0])
+                    a_score = int(matches[0][1])
+                elif len(matches) >= 2:
+                    h_score = int(matches[0])
+                    a_score = int(matches[1])
+                else:
+                    continue
+                
+                # Sanity check
+                if h_score > 300 or a_score > 300:
+                    continue
+                
+                # Check if "encerrado" or "final" appears
+                is_finished = any(kw in text.lower() for kw in [
+                    "encerrado", "final", "finalizado", "ft", "full time",
+                    "resultado final", "fim de jogo"
+                ])
+                
+                return {
+                    "score": f"{h_score}-{a_score}",
+                    "home_val": h_score,
+                    "away_val": a_score,
+                    "status": "Encerrado" if is_finished else "Ao Vivo",
+                    "completed": is_finished,
+                    "source": "Google"
+                }
+        
+    except Exception as e:
+        print(f"[GOOGLE] ⚠️ Erro ao buscar resultado: {e}")
+    
+    return None
+
+
+# ═══════════════════════════════════════
 # TEST
 # ═══════════════════════════════════════
 if __name__ == "__main__":
