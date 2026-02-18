@@ -680,10 +680,11 @@ def get_auto_games(target_date):
                 except Exception as e:
                     pass  # KB is supplemental, don't block
 
-            # ─── STAGE 3.5: 365SCORES LINEUP INTELLIGENCE ───
-            if SCORES365_ACTIVE and sport == "football":
+            # ─── STAGE 3.5: 365SCORES LINEUP INTELLIGENCE (ALL SPORTS) ───
+            if SCORES365_ACTIVE:
                 try:
-                    intel = get_lineup_intelligence(home, away, target_date)
+                    sport_365 = "basketball" if sport == "basketball" else "football"
+                    intel = get_lineup_intelligence(home, away, target_date, sport=sport_365)
                     if intel:
                         # Apply probability adjustment from injury analysis
                         adj = intel.get("prob_adjustment", 0)
@@ -698,7 +699,7 @@ def get_auto_games(target_date):
                                 tip["prob"] = max(30, min(95, tip["prob"] - adj))
                             funnel_notes.append(f"🏥 365S: adj {adj:+d}% (desfalques)")
 
-                        # Add formations to reason
+                        # Add formations to reason (football only)
                         hf = intel.get("home_formation", "")
                         af = intel.get("away_formation", "")
                         if hf and af:

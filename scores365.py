@@ -34,6 +34,12 @@ PARAMS = {
     "userCountryId": "21",    # Brazil
 }
 
+# Sport IDs on 365Scores
+SPORT_IDS = {
+    "football": 1,
+    "basketball": 2,
+}
+
 # Competition IDs on 365Scores
 COMPETITION_MAP = {
     "Premier League": 7,
@@ -49,7 +55,7 @@ COMPETITION_MAP = {
     "Copa Libertadores": 102,
     "Copa do Brasil": 115,
     "Brasileirão": 113,
-    "NBA": 7, # NBA not on this API (use ESPN for NBA)
+    "NBA": 132,
 }
 
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")
@@ -74,7 +80,7 @@ def _get(endpoint, extra_params=None):
 # ═══════════════════════════════════════
 # FETCH GAMES FOR A DATE
 # ═══════════════════════════════════════
-def get_games_today(target_date=None, competitions=None):
+def get_games_today(target_date=None, competitions=None, sport_id=None):
     """
     Fetch all games for a date from 365Scores.
     Returns list of game dicts with IDs for further lookup.
@@ -82,6 +88,7 @@ def get_games_today(target_date=None, competitions=None):
     Args:
         target_date: "YYYY-MM-DD" format (default: today)
         competitions: list of competition IDs to filter (optional)
+        sport_id: 1=football, 2=basketball (optional filter)
     """
     if not target_date:
         target_date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -93,6 +100,8 @@ def get_games_today(target_date=None, competitions=None):
     extra = {"startDate": date_fmt, "endDate": date_fmt}
     if competitions:
         extra["competitions"] = ",".join(str(c) for c in competitions)
+    if sport_id:
+        extra["sports"] = str(sport_id)
     
     data = _get("games/", extra)
     if not data:
@@ -340,6 +349,38 @@ TEAM_ALIASES = {
     "red bull bragantino": ["bragantino", "rb bragantino"],
     # Other
     "paris fc": ["paris fc"],
+    # NBA Teams (ESPN name → 365Scores variants)
+    "warriors": ["golden state warriors", "golden state", "gs warriors"],
+    "celtics": ["boston celtics", "boston"],
+    "cavaliers": ["cleveland cavaliers", "cleveland", "cavs"],
+    "thunder": ["oklahoma city thunder", "oklahoma city", "okc"],
+    "rockets": ["houston rockets", "houston"],
+    "knicks": ["new york knicks", "ny knicks", "new york"],
+    "nuggets": ["denver nuggets", "denver"],
+    "clippers": ["los angeles clippers", "la clippers", "l.a. clippers"],
+    "lakers": ["los angeles lakers", "la lakers", "l.a. lakers"],
+    "suns": ["phoenix suns", "phoenix"],
+    "mavericks": ["dallas mavericks", "dallas", "mavs"],
+    "bucks": ["milwaukee bucks", "milwaukee"],
+    "heat": ["miami heat", "miami"],
+    "76ers": ["philadelphia 76ers", "philadelphia", "sixers", "phila"],
+    "sixers": ["philadelphia 76ers", "philadelphia", "76ers", "phila"],
+    "nets": ["brooklyn nets", "brooklyn"],
+    "hawks": ["atlanta hawks", "atlanta"],
+    "bulls": ["chicago bulls", "chicago"],
+    "pistons": ["detroit pistons", "detroit"],
+    "pacers": ["indiana pacers", "indiana"],
+    "grizzlies": ["memphis grizzlies", "memphis"],
+    "timberwolves": ["minnesota timberwolves", "minnesota", "wolves", "t-wolves"],
+    "pelicans": ["new orleans pelicans", "new orleans"],
+    "magic": ["orlando magic", "orlando"],
+    "kings": ["sacramento kings", "sacramento"],
+    "raptors": ["toronto raptors", "toronto"],
+    "jazz": ["utah jazz", "utah"],
+    "blazers": ["portland trail blazers", "portland", "trail blazers"],
+    "wizards": ["washington wizards", "washington"],
+    "hornets": ["charlotte hornets", "charlotte"],
+    "spurs": ["san antonio spurs", "san antonio"],
 }
 
 
@@ -356,13 +397,14 @@ def _normalize_name(name):
 # ═══════════════════════════════════════
 # INTELLIGENCE: ANALYZE GAME FOR PICKS
 # ═══════════════════════════════════════
-def get_lineup_intelligence(home_team, away_team, target_date=None):
+def get_lineup_intelligence(home_team, away_team, target_date=None, sport="football"):
     """
     Main entry point for auto_picks integration.
     Tries to find the game on 365Scores and extract intelligence.
+    Works for both football AND basketball (NBA).
     
     Returns dict with:
-        - formations
+        - formations (football)
         - missing_players impact
         - lineup_confidence_adjustment
         - public_sentiment
@@ -371,10 +413,12 @@ def get_lineup_intelligence(home_team, away_team, target_date=None):
     if not target_date:
         target_date = datetime.datetime.now().strftime("%Y-%m-%d")
     
-    print(f"[365] 🔍 Buscando lineup intel: {home_team} vs {away_team}")
+    sport_id = SPORT_IDS.get(sport, None)
+    sport_label = "🏀" if sport == "basketball" else "⚽"
+    print(f"[365] {sport_label} Buscando lineup intel: {home_team} vs {away_team}")
     
-    # Fetch only football games (sportId=1 to reduce noise)
-    games = get_games_today(target_date)
+    # Fetch games filtered by sport
+    games = get_games_today(target_date, sport_id=sport_id)
     game_id = None
     
     # Build alias sets for matching
