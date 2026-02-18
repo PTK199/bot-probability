@@ -462,16 +462,15 @@ def apply_calibration(prob, odd, league):
 def get_games_for_date(target_date, skip_history=False, force_refresh=False):
     """
     Orchestrates the data fetching, prediction, and formatting process.
+    Delegates to auto_picks engine which has the full ESPN → Simulation → Tips pipeline.
     """
     cache_file = os.path.join(CACHE_DIR, f"games_{target_date}.json")
     
     # 1. Try Cache First (if not forced)
     if not force_refresh and os.path.exists(cache_file):
         try:
-            # Check file age (optional, e.g. 15 mins)
             file_mod_time = os.path.getmtime(cache_file)
-            if (time.time() - file_mod_time) < 900: # 15 mins cache
-                # print(f"⚡ Loading cached games for {target_date}")
+            if (time.time() - file_mod_time) < 900:  # 15 mins cache
                 with open(cache_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
         except Exception as e:
@@ -479,123 +478,13 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
 
     print(f"📡 Fetching FRESH games for {target_date}...")
     
-    games_data = []
-
-    # --- REAL TIME INTEGRATION (NEURAL CORTEX OMEGA) ---
-    today_iso = datetime.datetime.now().strftime("%Y-%m-%d")
-    if target_date == today_iso or target_date > today_iso:
-        print(f"[CORTEX] Fetching real-time data for {target_date}...")
-        
-        # We fetch NBA and Brazil Soccer as priorities
-        real_nba = fetch_real_odds_from_api("basketball_nba")
-        real_br = fetch_real_odds_from_api("soccer_brazil_campeonato_paulista")
-        real_epl = fetch_real_odds_from_api("soccer_england_league_one") # Example
-        
-        all_real = real_nba + real_br + real_epl
-        
-        for r_game in all_real:
-            # Check if game date matches target_date
-            commence_time = r_game['commence_time'] # ISO format
-            game_date = commence_time.split('T')[0]
-            
-            if game_date == target_date:
-                game_time = commence_time.split('T')[1][:5]
-                sport = "basketball" if "basketball" in r_game['sport_key'] else "football"
-                
-                # Extract odds
-                h_odd, d_odd, a_odd = 2.0, 3.0, 2.0 # Defaults
-                if r_game['bookmakers']:
-                    # Use first bookmaker for simplicity in dashboard
-                    bk = r_game['bookmakers'][0]
-                    for mkt in bk['markets']:
-                        if mkt['key'] == 'h2h':
-                            for out in mkt['outcomes']:
-                                if out['name'] == r_game['home_team']: h_odd = out['price']
-                                elif out['name'] == r_game['away_team']: a_odd = out['price']
-                                elif out['name'] == 'Draw': d_odd = out['price']
-                
-                games_data.append({
-                    "home": r_game['home_team'],
-                    "away": r_game['away_team'],
-                    "league": r_game['sport_title'],
-                    "time": game_time,
-                    "sport": sport,
-                    "real_odds": {"home": h_odd, "draw": d_odd, "away": a_odd}
-                })
-
-        pass # Hardcoded fallbacks removed. System relies on API.
-        # --- DYNAMIC LOGIC ENGAGED (Hardcoded Dates Removed) ---
-    # --- DYNAMIC TREBLE GENERATOR (V2.0) ---
-    trebles = []
-    
-    # 1. Sort games by Safety (Prob) and Value (Odd)
-    safe_candidates = sorted(
-        [g for g in processed_games if g.get('best_tip', {}).get('prob', 0) >= 80], 
-        key=lambda x: x['best_tip']['prob'], 
-        reverse=True
-    )
-    
-    value_candidates = sorted(
-        [g for g in processed_games if 1.70 <= float(g.get('best_tip', {}).get('odd', 0)) <= 2.50], 
-        key=lambda x: float(x['best_tip']['odd']), 
-        reverse=True
-    )
-
-    # 2. Build Returns
-    # A) TRIPLA BLINDADA (Safety)
-    if len(safe_candidates) >= 3:
-        selection = safe_candidates[:3]
-        total_odd = 1.0
-        pick_list = []
-        for s in selection:
-            odd = float(s['best_tip']['odd'])
-            total_odd *= odd
-            pick_list.append(f"- {s['home_team']} vs {s['away_team']}: {s['best_tip']['selection']} (@{odd:.2f})")
-            
-        trebles.append({
-            "name": "🛡️ TRIPLA BLINDADA (IA)",
-            "total_odd": f"{total_odd:.2f}",
-            "probability": "85%",
-            "selections": [{"match": f"{s['home_team']}", "pick": f"{s['best_tip']['selection']} (@{s['best_tip']['odd']})" } for s in selection],
-            "copy_text": "🛡️ TRIPLA BLINDADA:\n" + "\n".join(pick_list) + f"\nOdd Total: {total_odd:.2f}"
-        })
-
-    # B) TRIPLA VALOR (Value)
-    if len(value_candidates) >= 3:
-        selection = value_candidates[:3]
-        total_odd = 1.0
-        pick_list = []
-        for s in selection:
-            odd = float(s['best_tip']['odd'])
-            total_odd *= odd
-            pick_list.append(f"- {s['home_team']} vs {s['away_team']}: {s['best_tip']['selection']} (@{odd:.2f})")
-
-        trebles.append({
-            "name": "🔥 TRIPLA VALOR (IA)",
-            "total_odd": f"{total_odd:.2f}",
-            "probability": "65%",
-            "selections": [{"match": f"{s['home_team']}", "pick": f"{s['best_tip']['selection']} (@{s['best_tip']['odd']})" } for s in selection],
-            "copy_text": "🔥 TRIPLA VALOR:\n" + "\n".join(pick_list) + f"\nOdd Total: {total_odd:.2f}"
-        })
-    elif len(value_candidates) >= 2 and len(safe_candidates) >= 1:
-        # Fallback Mix
-        selection = value_candidates[:2] + safe_candidates[:1]
-        total_odd = 1.0
-        pick_list = []
-        for s in selection:
-            odd = float(s['best_tip']['odd'])
-            total_odd *= odd
-            pick_list.append(f"- {s['home_team']} vs {s['away_team']}: {s['best_tip']['selection']} (@{odd:.2f})")
-
-        trebles.append({
-            "name": "⚖️ TRIPLA MISTA (IA)",
-            "total_odd": f"{total_odd:.2f}",
-            "probability": "75%",
-            "selections": [{"match": f"{s['home_team']}", "pick": f"{s['best_tip']['selection']} (@{s['best_tip']['odd']})" } for s in selection],
-            "copy_text": "⚖️ TRIPLA MISTA:\n" + "\n".join(pick_list) + f"\nOdd Total: {total_odd:.2f}"
-        })
-
-    final_payload = {"games": processed_games, "trebles": trebles}
+    # 2. Use auto_picks engine (has the full working pipeline)
+    try:
+        import auto_picks
+        final_payload = auto_picks.get_auto_games(target_date)
+    except Exception as e:
+        print(f"⚠️ auto_picks failed: {e}")
+        final_payload = {"games": [], "trebles": []}
     
     # 3. Save to Cache
     try:
