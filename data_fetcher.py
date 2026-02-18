@@ -239,6 +239,9 @@ def get_table_analysis(home, away, sport="football"):
     Fetches REAL-TIME League Table from ESPN API to calculate exact goal/point averages.
     Returns a structured analysis string.
     """
+    # DISABLED FOR PERFORMANCE ON FREE TIER (TIMEOUT FIX)
+    return "" 
+
     # Simulated Cache (Global dict would be better, but func is sufficient for now)
     # We fetch data based on valid sport/league assumption
     
