@@ -16,11 +16,43 @@ except ImportError:
 import time
 import hashlib
 
-CACHE_DIR = "cache_games"
-if not os.path.exists(CACHE_DIR):
-    os.makedirs(CACHE_DIR)
+# Import turbo parallel I/O
+try:
+    from turbo_fetcher import (
+        fetch_espn_results_parallel,
+        get_cached_history,
+        save_history as turbo_save_history,
+        calculate_stats_from_history,
+        calculate_today_scout,
+        apply_calibration_fast,
+        get_cache,
+    )
+    TURBO_AVAILABLE = True
+except ImportError:
+    TURBO_AVAILABLE = False
 
 THE_ODDS_API_KEY = os.environ.get("THE_ODDS_API_KEY", "")
+CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache_games")
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+try:
+    from self_learning import (
+        get_calibration_adjustments, apply_calibration
+    )
+except ImportError:
+    def get_calibration_adjustments(): return {"league": {}, "odds_range": {}}
+    def apply_calibration(p, o, l): return p
+
+try:
+    from espn_api import (
+        fetch_real_odds_from_api, fetch_real_scores_from_api,
+        fetch_from_espn_api, ResultScoutBot, fetch_standings_from_espn
+    )
+except ImportError:
+    pass
+
+
+# --- CONFIG & CONSTANTS ---
 
 # --- REFACTORED IMPORTS (backward compatibility) ---
 # These modules were extracted from this file for modularity.
@@ -463,22 +495,34 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
     """
     Orchestrates the data fetching, prediction, and formatting process.
     Delegates to auto_picks engine which has the full ESPN → Simulation → Tips pipeline.
+    
+    TURBO v2.0: Uses in-memory cache before file cache.
     """
+    # 1. Check in-memory turbo cache (fastest)
+    if TURBO_AVAILABLE and not force_refresh:
+        mem_cached = get_cache().get(f"games_payload_{target_date}")
+        if mem_cached is not None:
+            return mem_cached
+    
     cache_file = os.path.join(CACHE_DIR, f"games_{target_date}.json")
     
-    # 1. Try Cache First (if not forced)
+    # 2. Try file cache (if not forced)
     if not force_refresh and os.path.exists(cache_file):
         try:
             file_mod_time = os.path.getmtime(cache_file)
             if (time.time() - file_mod_time) < 900:  # 15 mins cache
                 with open(cache_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
+                    data = json.load(f)
+                # Also store in memory for next call
+                if TURBO_AVAILABLE:
+                    get_cache().set(f"games_payload_{target_date}", data, ttl_seconds=900)
+                return data
         except Exception as e:
             print(f"⚠️ Cache read error: {e}")
 
     print(f"📡 Fetching FRESH games for {target_date}...")
     
-    # 2. Use auto_picks engine (has the full working pipeline)
+    # 3. Use auto_picks engine (has the full working pipeline)
     try:
         import auto_picks
         final_payload = auto_picks.get_auto_games(target_date)
@@ -486,10 +530,12 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
         print(f"⚠️ auto_picks failed: {e}")
         final_payload = {"games": [], "trebles": []}
     
-    # 3. Save to Cache
+    # 4. Save to file cache + memory cache
     try:
         with open(cache_file, 'w', encoding='utf-8') as f:
             json.dump(final_payload, f, ensure_ascii=False, indent=2)
+        if TURBO_AVAILABLE:
+            get_cache().set(f"games_payload_{target_date}", final_payload, ttl_seconds=900)
     except:
         pass
         
@@ -498,119 +544,68 @@ def get_games_for_date(target_date, skip_history=False, force_refresh=False):
 def fetch_from_espn_api(target_date=None):
     """
     Fetches real-time scores from ESPN's public hidden API (JSON).
-    Now supports date-specific queries (?date=YYYYMMDD).
+    TURBO v2.0: Uses parallel fetching when available.
     """
-    results = {}
+    # Use turbo parallel version if available
+    if TURBO_AVAILABLE:
+        results = fetch_espn_results_parallel(target_date)
+    else:
+        results = {}
+        espn_date = target_date.replace("-", "") if target_date else ""
+        leagues = [
+            "basketball/nba", "soccer/bra.1", "soccer/eng.1", "soccer/esp.1",
+            "soccer/ita.1", "soccer/ger.1", "soccer/fra.1",
+            "soccer/uefa.champions", "soccer/conmebol.libertadores", "soccer/conmebol.sudamericana"
+        ]
+        base_url = "http://site.api.espn.com/apis/site/v2/sports/"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        
+        for l in leagues:
+            try:
+                url = f"{base_url}{l}/scoreboard"
+                if espn_date:
+                    url += f"?date={espn_date}"
+                r = requests.get(url, headers=headers, timeout=5)
+                data = r.json()
+                for event in data.get('events', []):
+                    try:
+                        status_type = event['status']['type']
+                        completed = status_type['completed']
+                        competitions = event.get('competitions', [])
+                        if not competitions: continue
+                        comp = competitions[0]
+                        competitors = comp.get('competitors', [])
+                        home_team = next((t for t in competitors if t['homeAway'] == 'home'), None)
+                        away_team = next((t for t in competitors if t['homeAway'] == 'away'), None)
+                        if not home_team or not away_team: continue
+                        h_name = home_team['team']['displayName']
+                        a_name = away_team['team']['displayName']
+                        h_score = int(home_team.get('score', 0))
+                        a_score = int(away_team.get('score', 0))
+                        h_short = home_team['team'].get('shortDisplayName', h_name)
+                        a_short = away_team['team'].get('shortDisplayName', a_name)
+                        h_nick = home_team['team'].get('name', h_name)
+                        a_nick = away_team['team'].get('name', a_name)
+                        result_obj = {
+                            "score": f"{h_score}-{a_score}",
+                            "home_val": h_score, "away_val": a_score,
+                            "status": status_type['description'], "completed": completed
+                        }
+                        for name in [h_name, a_name, h_short, a_short, h_nick, a_nick]:
+                            results[name] = result_obj
+                    except:
+                        continue
+            except Exception as e:
+                continue
     
-    # Format target_date for ESPN API (YYYYMMDD)
-    espn_date = ""
-    if target_date:
-        espn_date = target_date.replace("-", "")
-
-    # --- MANUAL OVERRIDES (USER CORRECTION) ---
+    # Apply manual overrides
     manual_overrides = {
         "Tottenham": {"score": "1-2", "home_val": 1, "away_val": 2, "completed": True, "status": "Encerrado"},
         "Newcastle": {"score": "1-2", "home_val": 1, "away_val": 2, "completed": True, "status": "Encerrado"},
-        "Vitória": {"score": "1-2", "home_val": 1, "away_val": 2, "completed": True, "status": "Encerrado"},
-        "Deportivo Táchira": {"score": "1-0", "home_val": 1, "away_val": 0, "completed": True, "status": "Encerrado"},
-        "Knicks": {"score": "134-137", "home_val": 134, "away_val": 137, "completed": True, "status": "Encerrado"},
-        "Rockets": {"score": "102-95", "home_val": 102, "away_val": 95, "completed": True, "status": "Encerrado"},
-        "Suns": {"score": "120-111", "home_val": 120, "away_val": 111, "completed": True, "status": "Encerrado"}
     }
-    
-    # Expanded Endpoints Map
-    leagues = [
-        "basketball/nba",
-        "soccer/bra.1",             # Brasileirão
-        "soccer/eng.1",             # Premier League
-        "soccer/esp.1",             # La Liga
-        "soccer/ita.1",             # Serie A
-        "soccer/ger.1",             # Bundesliga
-        "soccer/fra.1",             # Ligue 1
-        "soccer/uefa.champions",    # Champions League
-        "soccer/conmebol.libertadores", # Libertadores
-        "soccer/conmebol.sudamericana"  # Sudamericana
-    ]
-    
-    base_url = "http://site.api.espn.com/apis/site/v2/sports/"
-    endpoints = [f"{base_url}{l}/scoreboard" for l in leagues]
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-
-    print("[API-BOT] Conectando aos satélites de resultados (ESPN API)...")
-    
-    for url in endpoints:
-        try:
-            full_url = url
-            if espn_date:
-                full_url += f"?date={espn_date}"
-                
-            r = requests.get(full_url, headers=headers, timeout=5)
-            data = r.json()
-            
-            events = data.get('events', [])
-            
-            for event in events:
-                try:
-                    status_type = event['status']['type']
-                    completed = status_type['completed']
-                    
-                    # Competition Name
-                    # league_name = data.get('leagues', [{}])[0].get('name', 'Unknown')
-                    
-                    competitions = event.get('competitions', [])
-                    if not competitions: continue
-                    
-                    comp = competitions[0]
-                    competitors = comp.get('competitors', [])
-                    
-                    # 0 is usually home, 1 away in ESPN JSON? 
-                    # Actually check 'homeAway' attribute
-                    home_team = next((t for t in competitors if t['homeAway'] == 'home'), None)
-                    away_team = next((t for t in competitors if t['homeAway'] == 'away'), None)
-                    
-                    if not home_team or not away_team: continue
-                    
-                    h_name = home_team['team']['displayName']
-                    a_name = away_team['team']['displayName']
-                    h_score = int(home_team.get('score', 0))
-                    a_score = int(away_team.get('score', 0))
-                    
-                    # Extract Short Names/Nicknames for better matching
-                    h_short = home_team['team'].get('shortDisplayName', h_name)
-                    a_short = away_team['team'].get('shortDisplayName', a_name)
-                    h_nick = home_team['team'].get('name', h_name) # e.g. "Lakers"
-                    a_nick = away_team['team'].get('name', a_name)
-                    
-                    result_obj = {
-                        "score": f"{h_score}-{a_score}",
-                        "home_val": h_score,
-                        "away_val": a_score,
-                        "status": status_type['description'],
-                        "completed": completed
-                    }
-                    
-                    # Add multiple keys for robust lookup
-                    results[h_name] = result_obj
-                    results[a_name] = result_obj
-                    results[h_short] = result_obj
-                    results[a_short] = result_obj
-                    results[h_nick] = result_obj
-                    results[a_nick] = result_obj
-                    
-                except Exception as inner_e:
-                    continue
-                    
-        except Exception as e:
-            print(f"[API-BOT] Erro no endpoint {url}: {e}")
-            continue
-            
-    # Apply Overrides
     for team, data in manual_overrides.items():
         results[team] = data
-        
+    
     return results
 
 class ResultScoutBot:
@@ -912,9 +907,14 @@ def get_history_games():
 def get_history_stats():
     """
     Calculates statistics based on history.
+    TURBO v2.0: Uses pre-loaded history, no circular calls.
     """
-    history = get_history_games()
+    if TURBO_AVAILABLE:
+        history = get_cached_history()
+        return calculate_stats_from_history(history)
     
+    # Legacy fallback
+    history = get_history_games()
     if not history:
         return {"accuracy": 0, "red_pct": 0, "total": 0, "greens": 0, "reds": 0, "win_rate": "0%"}
     
@@ -923,42 +923,25 @@ def get_history_stats():
     reds = len([h for h in history if h['status'] == 'LOST'])
     voids = len([h for h in history if h['status'] == 'VOID'])
     pending = len([h for h in history if h['status'] == 'PENDING'])
-    
     resolved = greens + reds
     accuracy = round((greens / resolved) * 100, 1) if resolved > 0 else 0
     red_pct = round((reds / resolved) * 100, 1) if resolved > 0 else 0
     
-    # Streak calculation (Current Winning Streak)
-    # Iterating backwards to find the latest resolved games
     streak_val = 0
-    # Create a reversed copy to check latest first
-    msgs = history[::-1]
-    
-    for h in msgs:
+    for h in reversed(history):
         s = h.get('status', 'PENDING')
-        if s in ('PENDING', 'VOID'):
-            continue
-            
-        if s == 'WON':
-            streak_val += 1
-        else:
-            # Found a LOSS (or other non-win status), so streak of greens ends/resets
-            break
-            
-    streak_display = str(streak_val)
-
-    # Per-league breakdown
+        if s in ('PENDING', 'VOID'): continue
+        if s == 'WON': streak_val += 1
+        else: break
+    
     leagues = {}
     for h in history:
-        if h['status'] not in ('WON', 'LOST'):
-            continue
+        if h['status'] not in ('WON', 'LOST'): continue
         lg = h.get('league', 'Desconhecida')
         if lg not in leagues:
             leagues[lg] = {"greens": 0, "reds": 0}
-        if h['status'] == 'WON':
-            leagues[lg]["greens"] += 1
-        else:
-            leagues[lg]["reds"] += 1
+        if h['status'] == 'WON': leagues[lg]["greens"] += 1
+        else: leagues[lg]["reds"] += 1
     
     league_stats = []
     for lg, data in leagues.items():
@@ -968,69 +951,65 @@ def get_history_stats():
     league_stats.sort(key=lambda x: x["accuracy"], reverse=True)
 
     return {
-        "accuracy": accuracy,
-        "win_rate": f"{accuracy}%",
-        "red_pct": red_pct,
-        "total": total,
-        "greens": greens,
-        "reds": reds,
-        "voids": voids,
-        "pending": pending,
-        "resolved": resolved,
-        "streak": streak_display,
-        "league_breakdown": league_stats[:10]
+        "accuracy": accuracy, "win_rate": f"{accuracy}%", "red_pct": red_pct,
+        "total": total, "greens": greens, "reds": reds,
+        "voids": voids, "pending": pending, "resolved": resolved,
+        "streak": str(streak_val), "league_breakdown": league_stats[:10]
     }
 
 def get_today_scout():
     """
     Calculates stats for ALL tips issued for TODAY.
-    FIXED: Now uses dynamic date detection instead of hardcoded dates.
+    TURBO v2.0: Uses cached history — NO more circular calls.
     """
     now = datetime.datetime.now()
-    target_short = now.strftime("%d/%m")
     target_iso = now.strftime("%Y-%m-%d")
     
-    # 1. Get all tips for today from the schedule to count PENDING correctly
+    # Get total scheduled using in-memory cache
+    total_tips = 0
     try:
-        all_day_data = get_games_for_date(target_iso, skip_history=True)
-        # Ensure it's a dict
-        if isinstance(all_day_data, dict):
-            total_tips = len(all_day_data.get('games', []))
+        if TURBO_AVAILABLE:
+            cached_games = get_cache().get(f"games_payload_{target_iso}")
+            if cached_games:
+                total_tips = len(cached_games.get('games', []))
+            else:
+                all_day_data = get_games_for_date(target_iso, skip_history=True)
+                if isinstance(all_day_data, dict):
+                    total_tips = len(all_day_data.get('games', []))
         else:
-            total_tips = 0
+            all_day_data = get_games_for_date(target_iso, skip_history=True)
+            if isinstance(all_day_data, dict):
+                total_tips = len(all_day_data.get('games', []))
     except Exception as e:
         print(f"⚠️ Error getting today games for scout: {e}")
-        total_tips = 0
     
-    # 2. Get results from history
+    # Use cached history — NO re-calling get_history_games()
+    if TURBO_AVAILABLE:
+        history = get_cached_history()
+        return calculate_today_scout(history, total_tips)
+    
+    # Legacy fallback
     try:
         history = get_history_games()
         if not history: history = []
+        target_short = now.strftime("%d/%m")
         today_results = [h for h in history if h.get('date') == target_short]
-        
         greens = len([h for h in today_results if h.get('status') == 'WON'])
         reds = len([h for h in today_results if h.get('status') == 'LOST'])
     except Exception as e:
-        print(f"⚠️ Error processing history for scout: {e}")
         greens = 0
         reds = 0
         today_results = []
     
-    # Pending = Total Scheduled - Total Resulted (approx)
-    pending = total_tips - len(today_results)
-    if pending < 0: pending = 0
-    
-    # Accuracy based on resolved today
+    pending = max(0, total_tips - len(today_results))
     resolved = greens + reds
     daily_acc = round((greens / resolved) * 100, 1) if resolved > 0 else 0
     
     return {
         "total": total_tips,
-        "greens": greens,
-        "reds": reds,
-        "pending": pending,
-        "accuracy": daily_acc,
-        "date": target_short
+        "greens": greens, "reds": reds,
+        "pending": pending, "accuracy": daily_acc,
+        "date": now.strftime("%d/%m")
     }
 
 def get_history_trebles():

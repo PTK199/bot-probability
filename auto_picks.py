@@ -1,13 +1,15 @@
 """
-AUTO PICKS ENGINE v1.0 - Gerador Automático de Tips 🤖
-Substitui a necessidade de hardcodar picks por data.
+AUTO PICKS ENGINE v2.0 TURBO ⚡ - Gerador Automático de Tips 🤖
+Optimized with parallel I/O via turbo_fetcher.
 
 Pipeline:
-1. ESPN API → Busca jogos do dia (todas as ligas)
+1. ESPN API → Busca PARALELA em todas as ligas (~8s vs ~80s)
 2. Monte Carlo (NBA) / Poisson (Futebol) → Simula resultados
-3. Tip Generator → Seleciona melhor mercado por jogo
-4. EV Gate → Filtra tips sem valor
-5. Treble Builder → Monta combos automaticamente
+3. 365Scores Intelligence → PARALELO para todos os jogos
+4. News Agent → PARALELO para todos os times
+5. Ensemble + Trap Hunter + Calibration + Self-Learning
+6. EV Gate → Filtra tips sem valor
+7. Treble Builder → Monta combos automaticamente
 """
 
 import requests
@@ -15,6 +17,7 @@ import datetime
 import numpy as np
 import math
 import random
+import time as _time
 import sys
 import os
 
@@ -24,6 +27,20 @@ try:
     sys.stdout.reconfigure(encoding='utf-8')
 except:
     pass
+
+# Import turbo parallel fetcher
+try:
+    from turbo_fetcher import (
+        fetch_espn_schedule_parallel,
+        fetch_365_intelligence_parallel,
+        fetch_news_parallel,
+        apply_calibration_fast,
+        get_cache,
+    )
+    TURBO_ACTIVE = True
+except ImportError:
+    TURBO_ACTIVE = False
+    print("[AUTO-ENGINE] ⚠️ turbo_fetcher not found, falling back to sequential")
 
 # ══════════════════════════════════════════════
 # SECTION 1: POWER RATINGS (Source: ESPN Feb 11 2026)
@@ -106,10 +123,13 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 
 
 def fetch_espn_schedule(target_date):
-    """Busca todos os jogos agendados para uma data via ESPN API."""
+    """Busca jogos — usa TURBO (paralelo) se disponível, senão fallback sequencial."""
+    if TURBO_ACTIVE:
+        return fetch_espn_schedule_parallel(target_date)
+    
+    # --- FALLBACK SEQUENCIAL (legacy) ---
     games = []
     espn_date = target_date.replace("-", "")
-
     for league in LEAGUES:
         try:
             url = f"{ESPN_BASE}{league['endpoint']}/scoreboard?date={espn_date}"
@@ -117,28 +137,22 @@ def fetch_espn_schedule(target_date):
             if r.status_code != 200:
                 continue
             data = r.json()
-
             for event in data.get("events", []):
                 try:
                     status = event.get("status", {}).get("type", {})
                     if status.get("completed", False):
                         continue
-
                     comps = event.get("competitions", [])
                     if not comps:
                         continue
-
                     comp = comps[0]
                     competitors = comp.get("competitors", [])
                     home_c = next((c for c in competitors if c["homeAway"] == "home"), None)
                     away_c = next((c for c in competitors if c["homeAway"] == "away"), None)
                     if not home_c or not away_c:
                         continue
-
                     h_name = home_c["team"].get("name", home_c["team"]["displayName"])
                     a_name = away_c["team"].get("name", away_c["team"]["displayName"])
-
-                    # Parse time UTC -> BRT (UTC-3)
                     game_time = "TBD"
                     try:
                         raw = event.get("date", "")
@@ -147,15 +161,11 @@ def fetch_espn_schedule(target_date):
                         game_time = brt.strftime("%H:%M")
                     except:
                         pass
-
-                    # ESPN odds (spread, O/U)
                     espn_odds = {}
                     odds_data = comp.get("odds", [])
                     if odds_data:
                         espn_odds["spread"] = odds_data[0].get("details", "")
                         espn_odds["over_under"] = odds_data[0].get("overUnder", 0)
-
-                    # Records
                     h_record, a_record = "", ""
                     for c in competitors:
                         recs = c.get("records", [])
@@ -165,7 +175,6 @@ def fetch_espn_schedule(target_date):
                                 h_record = rec
                             else:
                                 a_record = rec
-
                     games.append({
                         "home": h_name, "away": a_name,
                         "league": league["name"], "sport": league["sport"],
@@ -177,7 +186,6 @@ def fetch_espn_schedule(target_date):
         except Exception as e:
             print(f"[AUTO] ESPN error {league['name']}: {e}")
             continue
-
     print(f"[AUTO-ENGINE] ESPN retornou {len(games)} jogos para {target_date}")
     return games
 
@@ -521,13 +529,26 @@ def build_trebles(processed_games):
 # SECTION 7: MAIN ENTRY POINT
 # ══════════════════════════════════════════════
 
+# ═══════════════════════════════════════════════════
+# THROTTLED LEARNING (max once per 10 min)
+# ═══════════════════════════════════════════════════
+_last_study_time = 0
+
 def get_auto_games(target_date):
     """
-    Entrada principal do Auto Engine.
-    Retorna {"games": [...], "trebles": [...]} no mesmo formato
-    que data_fetcher.get_games_for_date().
+    Entrada principal do Auto Engine v2.0 TURBO ⚡
+    Retorna {"games": [...], "trebles": [...]}.
+    
+    OTIMIZAÇÕES v2.0:
+    - ESPN fetch paralelo (10 ligas simultâneas)
+    - 365Scores intelligence paralelo (todos jogos simultâneos)
+    - News Agent paralelo (todos times simultâneos)
+    - study_results() com throttle (máx 1x/10min)
+    - Calibração cacheada
     """
-    print(f"[AUTO-ENGINE] 🤖 Gerando picks automáticos para {target_date}...")
+    global _last_study_time
+    t_total_start = _time.time()
+    print(f"[AUTO-ENGINE] 🤖⚡ Gerando picks TURBO para {target_date}...")
 
     # ══════════════════════════════════════════════
     # IMPORT ALL SPECIALIST MODULES (THE FULL FUNNEL)
@@ -539,7 +560,7 @@ def get_auto_games(target_date):
             calculate_expected_value,
         )
         FUNNEL_ACTIVE = True
-        print("[AUTO-ENGINE] ✅ AI Engine CONNECTED (Ensemble + Trap Hunter + EV)")
+        print("[AUTO-ENGINE] ✅ AI Engine CONNECTED")
     except Exception as e:
         print(f"[AUTO-ENGINE] ⚠️ AI Engine not available: {e}")
         FUNNEL_ACTIVE = False
@@ -551,43 +572,57 @@ def get_auto_games(target_date):
     except Exception as e:
         SPORTS_KNOWLEDGE = {}
         KB_ACTIVE = False
-        print(f"[AUTO-ENGINE] ⚠️ Knowledge Base not available: {e}")
 
-    try:
-        from data_fetcher import apply_calibration
-        CALIBRATION_ACTIVE = True
-        print("[AUTO-ENGINE] ✅ Self-Calibration Engine CONNECTED")
-    except Exception as e:
-        CALIBRATION_ACTIVE = False
-        print(f"[AUTO-ENGINE] ⚠️ Calibration not available: {e}")
+    CALIBRATION_ACTIVE = TURBO_ACTIVE  # Use turbo cached version
 
     try:
         from scores365 import get_lineup_intelligence
         SCORES365_ACTIVE = True
-        print("[AUTO-ENGINE] ✅ 365Scores Intelligence CONNECTED (Lineups, Injuries, Formations)")
+        print("[AUTO-ENGINE] ✅ 365Scores Intelligence CONNECTED")
     except Exception as e:
         SCORES365_ACTIVE = False
+        get_lineup_intelligence = None
         print(f"[AUTO-ENGINE] ⚠️ 365Scores not available: {e}")
 
     try:
         from self_learning import apply_learning_correction, study_results, get_learning_summary
         LEARNING_ACTIVE = True
-        # Study past results BEFORE generating new picks
-        study_results()
-        summary = get_learning_summary()
-        active_corrections = summary.get('corrections_active', 0)
-        print(f"[AUTO-ENGINE] ✅ Self-Learning Engine CONNECTED ({active_corrections} correções ativas)")
+        # THROTTLED: Only study once per 10 minutes
+        now = _time.time()
+        if (now - _last_study_time) > 600:
+            study_results()
+            _last_study_time = now
+            summary = get_learning_summary()
+            print(f"[AUTO-ENGINE] ✅ Self-Learning: {summary.get('corrections_active', 0)} correções")
+        else:
+            print(f"[AUTO-ENGINE] ✅ Self-Learning CACHED (last study {int(now - _last_study_time)}s ago)")
     except Exception as e:
         LEARNING_ACTIVE = False
         print(f"[AUTO-ENGINE] ⚠️ Self-Learning not available: {e}")
 
-    # 1. Busca jogos na ESPN
+    # ══════════════════════════════════════════════
+    # STAGE 0: PARALLEL DATA FETCH (All I/O at once)
+    # ══════════════════════════════════════════════
+    t0 = _time.time()
+    
+    # 1. Busca jogos na ESPN (PARALELO)
     raw_games = fetch_espn_schedule(target_date)
     if not raw_games:
         print("[AUTO-ENGINE] ⚠️ Nenhum jogo encontrado na ESPN")
         return {"games": [], "trebles": []}
+    
+    t_espn = _time.time() - t0
+    print(f"[AUTO-ENGINE] ⚡ ESPN: {len(raw_games)} games in {t_espn:.1f}s")
 
-    print(f"[AUTO-ENGINE] 📡 {len(raw_games)} jogos encontrados. Processando no FUNIL COMPLETO...")
+    # 2. Pre-fetch 365Scores intelligence for ALL games in PARALLEL
+    intel_map = {}
+    if SCORES365_ACTIVE and TURBO_ACTIVE and get_lineup_intelligence:
+        try:
+            intel_map = fetch_365_intelligence_parallel(raw_games, target_date, get_lineup_intelligence)
+        except Exception as e:
+            print(f"[AUTO-ENGINE] ⚠️ Parallel 365S failed: {e}")
+    
+    print(f"[AUTO-ENGINE] 📡 {len(raw_games)} jogos. Processando FUNIL TURBO...")
 
     # 2. Gera tips para cada jogo — FULL FUNNEL PIPELINE
     processed = []
@@ -692,18 +727,19 @@ def get_auto_games(target_date):
                 except Exception as e:
                     pass  # KB is supplemental, don't block
 
-            # ─── STAGE 3.5: 365SCORES LINEUP INTELLIGENCE (ALL SPORTS) ───
+            # ─── STAGE 3.5: 365SCORES LINEUP INTELLIGENCE (PRE-FETCHED) ───
             if SCORES365_ACTIVE:
                 try:
-                    sport_365 = "basketball" if sport == "basketball" else "football"
-                    intel = get_lineup_intelligence(home, away, target_date, sport=sport_365)
+                    # Use pre-fetched data from parallel batch (or fetch single if not turbo)
+                    intel = intel_map.get(home)
+                    if not intel and not TURBO_ACTIVE and get_lineup_intelligence:
+                        sport_365 = "basketball" if sport == "basketball" else "football"
+                        intel = get_lineup_intelligence(home, away, target_date, sport=sport_365)
+                    
                     if intel:
-                        # Apply probability adjustment from injury analysis
                         adj = intel.get("prob_adjustment", 0)
                         if adj != 0:
                             sel_lower = tip.get("selection", "").lower()
-                            # If betting on HOME and adj is positive (away more injured), good
-                            # If betting on AWAY and adj is negative (home more injured), good
                             is_home_pick = home.lower() in sel_lower or any(p in sel_lower for p in home.lower().split() if len(p) > 3)
                             if is_home_pick:
                                 tip["prob"] = max(30, min(95, tip["prob"] + adj))
@@ -711,24 +747,21 @@ def get_auto_games(target_date):
                                 tip["prob"] = max(30, min(95, tip["prob"] - adj))
                             funnel_notes.append(f"🏥 365S: adj {adj:+d}% (desfalques)")
 
-                        # Add formations to reason (football only)
                         hf = intel.get("home_formation", "")
                         af = intel.get("away_formation", "")
                         if hf and af:
                             funnel_notes.append(f"📋 {home} {hf} vs {away} {af}")
 
-                        # Enrich with public sentiment
                         sentiment = intel.get("public_sentiment", {})
                         if sentiment.get("total_votes", 0) > 500:
                             h_vote = sentiment.get("home_pct", 0)
                             a_vote = sentiment.get("away_pct", 0)
                             funnel_notes.append(f"🗳️ Público: {home} {h_vote}% | {away} {a_vote}%")
 
-                        # Add key missing players info
                         for fact in intel.get("key_facts", []):
                             if fact.startswith("❌") or fact.startswith("⚠️"):
                                 funnel_notes.append(fact)
-                                break  # Just first injury note to avoid clutter
+                                break
                 except Exception as e:
                     print(f"[AUTO-ENGINE] ⚠️ 365Scores error for {home}: {e}")
 
@@ -744,10 +777,10 @@ def get_auto_games(target_date):
                 except Exception:
                     pass
 
-            # ─── STAGE 5: SELF-CALIBRATION (learn from history) ───
+            # ─── STAGE 5: SELF-CALIBRATION (CACHED — no file re-read) ───
             if CALIBRATION_ACTIVE:
                 try:
-                    calibrated = apply_calibration(tip["prob"], tip_odd, league)
+                    calibrated = apply_calibration_fast(tip["prob"], tip_odd, league)
                     if calibrated != tip["prob"]:
                         funnel_notes.append(f"📐 CALIBRAÇÃO: {tip['prob']}% → {calibrated}% (baseado em histórico)")
                         tip["prob"] = calibrated
@@ -806,33 +839,45 @@ def get_auto_games(target_date):
     # Sort: snipers primeiro, depois por horário
     processed.sort(key=lambda x: (not x.get("is_sniper", False), x["time"]))
 
-    # --- 🕵️ REAL NEWS AGENT (GOOGLE INTELLIGENCE) ---
-    print("[AUTO-ENGINE] 🕵️ [NEWS AGENT] Escutando conversas de vestiário (Google News)...")
+    # --- 🕵️ REAL NEWS AGENT (PARALLEL GOOGLE INTELLIGENCE) ---
+    print("[AUTO-ENGINE] 🕵️ [NEWS AGENT] Escutando conversas de vestiário...")
     
     try:
         import real_news
         
-        # Scan top 5 (or all snipers)
+        # Build list of teams to scan (top 5 or all snipers)
+        teams_to_scan = []
         scan_limit = 5
         scanned = 0
+        scan_games = []
         
         for game in processed:
             if scanned >= scan_limit and not game.get('is_sniper'):
                 break
-                
-            # Busca News (Retorna String)
-            h_news = real_news.search_team_news(game['home_team'], game['sport'])
-            a_news = real_news.search_team_news(game['away_team'], game['sport'])
+            teams_to_scan.append((game['home_team'], game['sport']))
+            teams_to_scan.append((game['away_team'], game['sport']))
+            scan_games.append(game)
+            scanned += 1
+        
+        # PARALLEL news fetch for all teams at once
+        if TURBO_ACTIVE and teams_to_scan:
+            news_map = fetch_news_parallel(teams_to_scan, real_news.search_team_news)
+        else:
+            news_map = {}
+            for team, sport in teams_to_scan:
+                news_map[team] = real_news.search_team_news(team, sport)
+        
+        # Apply news to processed games
+        for game in scan_games:
+            h_news = news_map.get(game['home_team'], "")
+            a_news = news_map.get(game['away_team'], "")
             
-            # Simple Sentiment Analysis
-            h_bad = "lesão" in h_news.lower() or "fora" in h_news.lower() or "dúvida" in h_news.lower()
-            a_bad = "lesão" in a_news.lower() or "fora" in a_news.lower() or "dúvida" in a_news.lower()
+            h_bad = any(kw in h_news.lower() for kw in ["lesão", "fora", "dúvida"])
+            a_bad = any(kw in a_news.lower() for kw in ["lesão", "fora", "dúvida"])
             
-            # Adjust Probability based on News
             tip = game['best_tip']
             sel = tip['selection'].lower()
             
-            # Logic: If betting on Home and Home has bad news, reduce confidence
             if "casa" in sel or game['home_team'].lower() in sel:
                 if h_bad:
                     tip['prob'] = max(30, tip['prob'] - 5)
@@ -840,39 +885,31 @@ def get_auto_games(target_date):
                 if a_bad:
                     tip['prob'] = min(99, tip['prob'] + 3)
                     tip['reason'] += f" | 🗞️ INFO: Rival com problemas."
-
             elif "fora" in sel or game['away_team'].lower() in sel:
                 if a_bad:
                     tip['prob'] = max(30, tip['prob'] - 5)
                     tip['reason'] += f" | ⚠️ ALERTA: {a_news[:50]}..."
                 if h_bad:
                     tip['prob'] = min(99, tip['prob'] + 3)
-                    
-            scanned += 1
-            
     except Exception as e:
         print(f"[AUTO-ENGINE] ⚠️ Erro no News Agent: {e}")
 
     # 3. Builds trebles
     trebles = build_trebles(processed)
 
-    # --- CLOUD SYNC AUTOMATION ---
+    # --- CLOUD SYNC AUTOMATION (non-blocking) ---
     try:
         from supabase_client import log_match_prediction, get_supabase
         
-        # 1. Save Predictions (Games)
-        # Note: log_match_prediction handles insertion. User needs 'predictions' table.
         for g in processed:
              log_match_prediction(g['home_team'], g['away_team'], g['best_tip'])
 
-        # 2. Save Trebles to 'trebles' table
         client = get_supabase()
         if client:
             d_obj = datetime.datetime.strptime(target_date, "%Y-%m-%d")
             date_fmt = d_obj.strftime("%d/%m")
             
             for t in trebles:
-                 # Avoid duplicates: verify if (name, date) exists
                  existing = client.table("trebles").select("*", eq_field="name", eq_value=t['name'])
                  is_dup = False
                  if existing:
@@ -896,5 +933,6 @@ def get_auto_games(target_date):
     except Exception as e:
         print(f"[AUTO-ENGINE] ⚠️ Erro no Cloud Sync: {e}")
 
-    print(f"[AUTO-ENGINE] ✅ {len(processed)} picks + {len(trebles)} combos gerados")
+    t_total = _time.time() - t_total_start
+    print(f"[AUTO-ENGINE] ⚡ TURBO COMPLETE: {len(processed)} picks + {len(trebles)} combos em {t_total:.1f}s")
     return {"games": processed, "trebles": trebles}
