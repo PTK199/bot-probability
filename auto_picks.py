@@ -45,11 +45,14 @@ FOOTBALL_POWER = {
     "Liverpool": 93, "Arsenal": 91, "Man City": 90, "Manchester City": 90,
     "Chelsea": 82, "Tottenham": 80, "Tottenham Hotspur": 80,
     "Newcastle": 79, "Newcastle United": 79, "Man United": 75, "Manchester United": 75,
-    "Aston Villa": 78, "Brighton": 77, "Bournemouth": 74, "Fulham": 73,
-    "West Ham": 72, "Crystal Palace": 71, "Brentford": 70, "Wolves": 68,
-    "Nottingham Forest": 72, "Everton": 66, "Leicester": 65, "Ipswich": 60,
+    "Aston Villa": 78, "Brighton": 77, "Brighton & Hove Albion": 77,
+    "Bournemouth": 74, "AFC Bournemouth": 74, "Fulham": 73,
+    "West Ham": 72, "West Ham United": 72, "Crystal Palace": 71, "Brentford": 70,
+    "Wolves": 68, "Wolverhampton Wanderers": 68, "Wolverhampton": 68,
+    "Nottingham Forest": 72, "Everton": 66, "Leicester": 65, "Leicester City": 65,
+    "Ipswich": 60, "Ipswich Town": 60,
     "Southampton": 58, "Leeds": 70, "Leeds United": 70,
-    "Burnley": 63, "Sheffield United": 60, "Luton": 58, "Sunderland": 68,
+    "Burnley": 63, "Sheffield United": 60, "Luton": 58, "Luton Town": 58, "Sunderland": 68,
     # La Liga
     "Barcelona": 92, "Real Madrid": 93, "Atletico Madrid": 85,
     "Athletic Club": 80, "Villarreal": 78, "Real Sociedad": 77, "Betis": 75,
@@ -63,9 +66,15 @@ FOOTBALL_POWER = {
     "Paris Saint-Germain": 93, "PSG": 93, "Monaco": 82, "Marseille": 80, "Lille": 79,
     # Brasileirão
     "Palmeiras": 88, "Botafogo": 85, "Flamengo": 84, "Fortaleza": 82,
-    "Internacional": 80, "São Paulo": 79, "Cruzeiro": 77, "Atlético-MG": 76,
-    "Grêmio": 75, "Bahia": 74, "Vasco": 72, "Corinthians": 73,
+    "Internacional": 80, "São Paulo": 79, "Cruzeiro": 77,
+    "Atlético-MG": 76, "Atletico Mineiro": 76,
+    "Athletico Paranaense": 76, "Athletico-PR": 76, "CAP": 76,
+    "Grêmio": 75, "Bahia": 74, "Corinthians": 78,
+    "Vasco": 72, "Vasco da Gama": 72,
     "Fluminense": 71, "Vitória": 65, "Santos": 70,
+    "Red Bull Bragantino": 72, "Bragantino": 72,
+    "Juventude": 65, "Cuiabá": 63, "Goiás": 64,
+    "Coritiba": 66, "Chapecoense": 60, "Mirassol": 62,
 }
 
 # ══════════════════════════════════════════════
@@ -293,7 +302,11 @@ def generate_nba_tip(game, sim):
 
 
 def generate_football_tip(game, sim):
-    """Gera melhor tip para jogo de futebol baseado em Poisson."""
+    """
+    Gera melhor tip para jogo de futebol baseado em Poisson.
+    CORRIGIDO: Agora considera o favorito REAL (não sempre o mandante).
+    Compara power ratings e probs para escolher o melhor pick.
+    """
     home, away = game["home"], game["away"]
     hp = sim["home_prob"]
     dp = sim["draw_prob"]
@@ -304,47 +317,92 @@ def generate_football_tip(game, sim):
     odd_d = prob_to_odd(dp)
     odd_a = prob_to_odd(ap)
 
-    # Double Chance if strong
-    dc_home = hp + dp  # Home or Draw
+    # Double Chance for BOTH sides
+    dc_home = hp + dp   # Home or Draw
+    dc_away = ap + dp   # Away or Draw
 
+    # Get power ratings to understand who the REAL favorite is
+    h_pow = FOOTBALL_POWER.get(home, 70)
+    a_pow = FOOTBALL_POWER.get(away, 70)
+    power_gap = a_pow - h_pow  # Positive = away is stronger
+
+    # ─── TIER 1: Clear Home Favorite (home prob >= 60%) ───
     if hp >= 60:
         tip = {
             "market": "Vencedor", "selection": f"{home} Vence",
             "prob": int(hp), "odd": odd_h,
-            "reason": f"⚽ [POISSON]: {home} com {hp}% em casa. Domínio estatístico claro.",
+            "reason": f"⚽ [POISSON]: {home} ({h_pow}pw) com {hp:.0f}% em casa. Domínio estatístico.",
             "badge": "💰 BANKER" if hp >= 72 else "🎯 SNIPER",
         }
+
+    # ─── TIER 2: Clear Away Favorite (away prob >= 45% AND stronger power) ───
+    elif ap >= 45 and power_gap >= 10:
+        tip = {
+            "market": "Vencedor", "selection": f"{away} Vence",
+            "prob": int(ap), "odd": odd_a,
+            "reason": f"⚽ [POISSON]: {away} ({a_pow}pw) favorito fora com {ap:.0f}%. Qualidade superior (gap +{power_gap}pw).",
+            "badge": "🎯 SNIPER",
+        }
+
+    # ─── TIER 3: Strong Away ML (>= 55% prob regardless of power) ───
     elif ap >= 55:
         tip = {
             "market": "Vencedor", "selection": f"{away} Vence",
             "prob": int(ap), "odd": odd_a,
-            "reason": f"⚽ [POISSON]: {away} favorito fora com {ap}%. Superior em qualidade.",
+            "reason": f"⚽ [POISSON]: {away} ({a_pow}pw) favorito com {ap:.0f}% mesmo fora de casa.",
             "badge": "🎯 SNIPER",
         }
-    elif dc_home >= 75:
+
+    # ─── TIER 4: DC on the STRONGER team ───
+    elif dc_away >= 75 and power_gap >= 8:
+        # Away team is much stronger → DC Away is safer
+        dc_odd = prob_to_odd(dc_away)
+        tip = {
+            "market": "Dupla Chance", "selection": f"{away} ou Empate",
+            "prob": int(dc_away), "odd": dc_odd,
+            "reason": f"⚽ [POISSON]: {away} ({a_pow}pw) é o favorito. DC {away} ({dc_away:.0f}%) é o mais seguro.",
+            "badge": "🛡️ SAFE",
+        }
+
+    elif dc_home >= 75 and power_gap <= 5:
+        # Home team is equal or stronger → DC Home is safer
         dc_odd = prob_to_odd(dc_home)
         tip = {
             "market": "Dupla Chance", "selection": f"{home} ou Empate",
             "prob": int(dc_home), "odd": dc_odd,
-            "reason": f"⚽ [POISSON]: Dupla Chance {home} ({dc_home:.0f}%). Segurança em casa.",
+            "reason": f"⚽ [POISSON]: {home} ({h_pow}pw) em casa. DC {home} ({dc_home:.0f}%) seguro.",
             "badge": "🛡️ SAFE",
         }
+
+    # ─── TIER 5: Over 2.5 ───
     elif o25 >= 65:
         tip = {
             "market": "Gols", "selection": "Over 2.5 Gols",
             "prob": int(o25), "odd": prob_to_odd(o25),
-            "reason": f"⚽ [POISSON]: {o25}% para Over 2.5. Total esperado: {sim['expected_total']:.1f} gols.",
+            "reason": f"⚽ [POISSON]: {o25:.0f}% para Over 2.5. Total esperado: {sim['expected_total']:.1f} gols.",
             "badge": "🚀 OVER",
         }
+
+    # ─── TIER 6: Fallback — DC on the team with HIGHER probability ───
     else:
-        # Safest option: DC home
-        dc_odd = prob_to_odd(dc_home)
-        tip = {
-            "market": "Dupla Chance", "selection": f"{home} ou Empate",
-            "prob": int(dc_home), "odd": dc_odd,
-            "reason": f"⚽ [POISSON]: Jogo equilibrado. DC {home} ({dc_home:.0f}%) é o mais seguro.",
-            "badge": "🛡️ SAFE",
-        }
+        if dc_away > dc_home and power_gap >= 5:
+            # Away is stronger — pick DC Away
+            dc_odd = prob_to_odd(dc_away)
+            tip = {
+                "market": "Dupla Chance", "selection": f"{away} ou Empate",
+                "prob": int(dc_away), "odd": dc_odd,
+                "reason": f"⚽ [POISSON]: {away} ({a_pow}pw) favorito. DC {away} ({dc_away:.0f}%) mais seguro.",
+                "badge": "🛡️ SAFE",
+            }
+        else:
+            # Home or balanced — pick DC Home (home advantage applies)
+            dc_odd = prob_to_odd(dc_home)
+            tip = {
+                "market": "Dupla Chance", "selection": f"{home} ou Empate",
+                "prob": int(dc_home), "odd": dc_odd,
+                "reason": f"⚽ [POISSON]: Jogo equilibrado. DC {home} ({dc_home:.0f}%) com fator casa.",
+                "badge": "🛡️ SAFE",
+            }
 
     is_sniper = tip["prob"] >= 70
     return tip, is_sniper, odd_h, odd_d, odd_a
@@ -487,8 +545,10 @@ def get_auto_games(target_date):
             else:
                 h_pow = FOOTBALL_POWER.get(home, 70)
                 a_pow = FOOTBALL_POWER.get(away, 70)
-                h_exp = 1.35 * (h_pow / 75)
-                a_exp = 1.10 * (a_pow / 75)
+                # Home advantage factor: 1.20 (realistic, not inflated)
+                # Away factor: 1.15 (away teams score less but quality matters)
+                h_exp = 1.20 * (h_pow / 75)
+                a_exp = 1.15 * (a_pow / 75)
                 sim = poisson_football(h_exp, a_exp)
                 tip, is_sniper, oh, od, oa = generate_football_tip(game, sim)
 
