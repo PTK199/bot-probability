@@ -20,6 +20,7 @@ import random
 import time as _time
 import sys
 import os
+import json
 
 # Fix encoding for Windows terminals
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -1349,6 +1350,66 @@ def get_auto_games(target_date):
 
     # 3. Builds trebles
     trebles = build_trebles(processed)
+
+    # [-NEW-] Local Persistence for Trebles (JSON)
+    try:
+        local_hist_file = "history_trebles.json"
+        
+        # Load existing
+        if os.path.exists(local_hist_file):
+            with open(local_hist_file, "r", encoding="utf-8") as f:
+                existing_trebles = json.load(f)
+        else:
+            existing_trebles = []
+        
+        # Prepare date
+        d_obj = datetime.datetime.strptime(target_date, "%Y-%m-%d")
+        date_fmt = d_obj.strftime("%d/%m")
+
+        # Append new unique trebles
+        added_count = 0
+        for t in trebles:
+            # Check for duplicates (same name AND same date)
+            is_dup = False
+            for old in existing_trebles:
+                if old.get("name") == t["name"] and old.get("date") == date_fmt:
+                    is_dup = True
+                    break
+            
+            if not is_dup:
+                # Structure for saving
+                new_t = {
+                    "created_at": datetime.datetime.now().isoformat(),
+                    "date": date_fmt,
+                    "name": t["name"],
+                    "odd": t["total_odd"], # Using 'odd' to match frontend expectation
+                    "total_odd": t["total_odd"],
+                    "status": "PENDING",
+                    "profit": "---", 
+                    "selections": [s["pick"] for s in t["selections"]], # Visual strings
+                    "components": [] # Structured for updates
+                }
+
+                # Populate components for components-level tracking
+                for s in t["selections"]:
+                    new_t["components"].append({
+                        "match": s["match"],
+                        "pick": s["pick"],
+                        "prob": s.get("prob", 0),
+                        "status": "PENDING"
+                    })
+                
+                existing_trebles.insert(0, new_t) # Newest first
+                added_count += 1
+        
+        # Save back
+        if added_count > 0:
+            with open(local_hist_file, "w", encoding="utf-8") as f:
+                json.dump(existing_trebles, f, indent=4, ensure_ascii=False)
+            print(f"[AUTO-ENGINE] 💾 Persisted {added_count} new trebles to {local_hist_file}")
+            
+    except Exception as e:
+        print(f"[AUTO-ENGINE] ⚠️ Error saving local treble history: {e}")
 
     # --- CLOUD SYNC AUTOMATION (non-blocking) ---
     try:

@@ -1050,35 +1050,242 @@ def get_today_scout():
 
 def get_history_trebles():
     """
-    Returns history of Golden Trebles.
+    Returns history of Golden Trebles with auto-update logic.
+    Reads from history_trebles.json and updates based on real results.
     """
-    # For now, returning a simulated history of trebles to populate the new tab
-    return [
-        {
-            "date": "17/02",
-            "name": "🛡️ BUNKER (UCL + LIBERTADORES)",
-            "odd": "2.97",
-            "status": "LOST",
-            "profit": "-100%",
-            "selections": ["Dortmund DC (✅)", "Galatasaray DC (✅)", "Benfica DC (❌)"]
-        },
-        {
-            "date": "17/02",
-            "name": "🔥 VALUE MIX (LIBERTADORES)",
-            "odd": "2.92",
-            "status": "LOST",
-            "profit": "-100%",
-            "selections": ["Carabobo DC (✅)", "2 de Mayo DC (✅)", "Liverpool DC (❌)"]
-        },
-        {
-            "date": "17/02",
-            "name": "🎯 SUPER COMBO (UCL)",
-            "odd": "3.73",
-            "status": "LOST",
-            "profit": "-100%",
-            "selections": ["Dortmund DC (✅)", "Monaco DC (❌)", "Benfica DC (❌)"]
-        }
-    ]
+    history_file = 'history_trebles.json'
+    
+    # 1. Load History
+    if os.path.exists(history_file):
+        try:
+            with open(history_file, 'r', encoding='utf-8') as f:
+                history = json.load(f)
+        except:
+            history = []
+    else:
+        return []
+
+    # 2. Check for updates
+    updated = False
+    
+    # Identify pending items
+    pending_items = [h for h in history if h.get('status') == 'PENDING']
+    
+    if pending_items:
+        try:
+            # Initialize Bot
+            bot = ResultScoutBot()
+            
+            # Smart Date Fetching: Check Today + Any other needed dates
+            now = datetime.datetime.now()
+            today_str = now.strftime("%Y-%m-%d")
+            
+            # Fetch today's results
+            real_results = bot.scout_results_for_date(today_str)
+            
+            # Check unique dates in pending items to see if we need past results
+            unique_dates = set(h.get('date') for h in pending_items)
+            current_year = now.year
+            
+            for d_chk in unique_dates:
+                # Format is "DD/MM". We assume current year.
+                try:
+                    if "/" in d_chk:
+                        day, month = map(int, d_chk.split('/'))
+                        # Heuristic: if month is Dec and we are in Jan, use last year
+                        check_year = current_year
+                        if month == 12 and now.month == 1:
+                            check_year -= 1
+                        
+                        check_date = now.replace(year=check_year, month=month, day=day)
+                        check_str = check_date.strftime("%Y-%m-%d")
+                        
+                        if check_str != today_str:
+                            # Avoid fetching deep past if not needed, but for pending we just check
+                            # print(f"[TREBLE-UPDATE] Checking past results for {check_str}...")
+                            past_results = bot.scout_results_for_date(check_str)
+                            real_results.update(past_results)
+                except:
+                    continue
+            
+            # Update Logic
+            for h in history:
+                if h.get('status') != 'PENDING':
+                    continue
+                
+                components = h.get('components', [])
+                if not components:
+                    continue
+                
+                all_won = True
+                any_lost = False
+                pending_legs = False
+                component_updated = False
+                
+                new_selections_display = []
+                
+                for comp in components:
+                    # comp keys: match, pick, status
+                    c_status = comp.get('status', 'PENDING')
+                    c_pick = comp.get('pick', '')       # e.g. "Lakers ML (@1.80)"
+                    c_match = comp.get('match', '')     # e.g. "Lakers @ Celtics"
+                    
+                    # Only check if pending
+                    if c_status == 'PENDING':
+                        try:
+                            # Parse teams
+                            if "@" in c_match:
+                                parts = c_match.split("@")
+                                away_t = parts[0].strip()
+                                home_t = parts[1].strip()
+                            else:
+                                home_t = c_match
+                                away_t = "" # Unknown
+                            
+                            # Find result
+                            res = real_results.get(home_t) or real_results.get(away_t)
+                            
+                            if res and res.get('completed'):
+                                h_val = int(res.get('home_val', 0))
+                                a_val = int(res.get('away_val', 0))
+                                
+                                # Evaluate Win/Loss
+                                sel_lower = c_pick.lower()
+                                is_win = False
+                                is_lost = False
+                                
+                                # --- Evaluation Logic (Subset of data_fetcher) ---
+                                if "vence" in sel_lower or "ml" in sel_lower:
+                                    if h_val == a_val:
+                                        is_lost = True # ML usually loses on draw unless push
+                                    elif home_t.lower() in sel_lower:
+                                        is_win = (h_val > a_val)
+                                        is_lost = not is_win
+                                    elif away_t.lower() in sel_lower:
+                                        is_win = (a_val > h_val)
+                                        is_lost = not is_win
+                                    else:
+                                        # Fallback if team name not clear in pick string
+                                        # Try to infer from "Time A" vs "Time B"
+                                        # If pick is just "Vence (@...)" we have a problem. 
+                                        # But usually auto_picks puts "Lakers ML"
+                                        pass
+
+                                elif "ou empate" in sel_lower or "dc" in sel_lower or "1x" in sel_lower or "x2" in sel_lower:
+                                    # Double Chance
+                                    if h_val == a_val:
+                                        is_win = True
+                                    elif home_t.lower() in sel_lower: # Home or Draw
+                                        is_win = (h_val >= a_val)
+                                        is_lost = not is_win
+                                    elif away_t.lower() in sel_lower: # Away or Draw
+                                        is_win = (a_val >= h_val)
+                                        is_lost = not is_win
+                                
+                                elif "over" in sel_lower:
+                                    try:
+                                        # Extract number: "Over 220.5"
+                                        import re
+                                        nums = re.findall(r"[-+]?\d*\.\d+|\d+", c_pick)
+                                        if nums:
+                                            # Find the one that looks like the line
+                                            # Skip odd if possible (e.g. 1.90)
+                                            # This is hard. Usually line is first number? "Over 210.5 (@1.90)"
+                                            line = float(nums[0]) 
+                                            is_win = (h_val + a_val) > line
+                                            is_lost = not is_win
+                                    except: pass
+                                    
+                                elif "under" in sel_lower:
+                                    try:
+                                        import re
+                                        nums = re.findall(r"[-+]?\d*\.\d+|\d+", c_pick)
+                                        if nums:
+                                            line = float(nums[0])
+                                            is_win = (h_val + a_val) < line
+                                            is_lost = not is_win
+                                    except: pass
+
+                                # Default check: if not detected, maybe check if team won matches exact name?
+                                if not is_win and not is_lost:
+                                    # Safe fallback: assume pending if logic fails? 
+                                    # Or aggressive loss? Let's keep pending.
+                                    pass
+                                
+                                if is_win: 
+                                    c_status = "WON"
+                                    comp['status'] = "WON"
+                                    component_updated = True
+                                    updated = True
+                                elif is_lost: 
+                                    c_status = "LOST"
+                                    comp['status'] = "LOST"
+                                    component_updated = True
+                                    updated = True
+                        
+                        except Exception as e:
+                            print(f"[TREBLE-CHECK-ERR] {e}")
+
+                    # Accumulate status
+                    if c_status == 'WON':
+                        pass
+                    elif c_status == 'LOST':
+                        any_lost = True
+                    elif c_status == 'VOID':
+                        pass # Ignore for loss check?
+                    else:
+                        pending_legs = True
+                        all_won = False
+                    
+                    # Build display string
+                    # Clean previous icon if exists logic omitted for simplicity, assumes clean pick string
+                    # But pick string comes from JSON. 
+                    # Does pick string have icon? In auto_picks we saved raw pick string.
+                    display_pick = c_pick.split('(')[0].strip() # "Team ML"
+                    odds_part = ""
+                    if "(@" in c_pick:
+                         odds_part = " (" + c_pick.split('(')[1] # "(@1.90)"
+
+                    icon = ""
+                    if c_status == 'WON': icon = " (✅)"
+                    elif c_status == 'LOST': icon = " (❌)"
+                    elif c_status == 'PENDING': icon = " (⏳)"
+                    
+                    # Reconstruct nice string
+                    # e.g. "Lakers ML (@1.90) (✅)"
+                    final_str = f"{display_pick}{odds_part}{icon}"
+                    new_selections_display.append(final_str)
+
+                # Update Treble Status
+                h['selections'] = new_selections_display
+                
+                if component_updated:
+                    updated = True
+
+                if any_lost:
+                    h['status'] = 'LOST'
+                    h['profit'] = '-100%'
+                    updated = True
+                elif all_won and not pending_legs:
+                    h['status'] = 'WON'
+                    try:
+                        total_odd = float(h.get('total_odd', h.get('odd', 1.0)).replace(',','.'))
+                        h['profit'] = f"+{int((total_odd-1)*100)}%"
+                    except:
+                        h['profit'] = "+100%"
+                    updated = True
+                
+        except Exception as e:
+            print(f"[TREBLE-UPDATE-CRITICAL] {e}")
+
+    # 3. Save if updated
+    if updated:
+        try:
+            with open(history_file, 'w', encoding='utf-8') as f:
+                json.dump(history, f, indent=4, ensure_ascii=False)
+        except: pass
+            
+    return history
 
 def get_leverage_plan():
     """

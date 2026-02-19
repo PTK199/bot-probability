@@ -1,0 +1,121 @@
+[
+    {
+        "created_at": "2025-01-01T10:00:00",
+        "date": "01/01",
+        "name": "TEST WON TREBLE",
+        "total_odd": "2.00",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Test Won Pick 1",
+            "Test Won Pick 2"
+        ],
+        "components": [
+            {
+                "match": "Winner @ Loser",
+                "pick": "Winner ML (@1.40)",
+                "status": "PENDING"
+            },
+            {
+                "match": "OverTeam @ UnderTeam",
+                "pick": "Over 2.5 (@1.42)",
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-18T22:48:46.446461",
+        "date": "18/02",
+        "name": "🔥 VALUE HUNTER",
+        "odd": "4.51",
+        "total_odd": "4.51",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Mainz ou Empate (@1.52)",
+            "Athletico Paranaense ou Empate (@1.56)",
+            "Over 213.5 Pontos (@1.9)"
+        ],
+        "components": [
+            {
+                "match": "Hamburg SV @ Mainz",
+                "pick": "Mainz ou Empate (@1.52)",
+                "prob": 71,
+                "status": "PENDING"
+            },
+            {
+                "match": "Corinthians @ Athletico Paranaense",
+                "pick": "Athletico Paranaense ou Empate (@1.56)",
+                "prob": 70,
+                "status": "PENDING"
+            },
+            {
+                "match": "Celtics @ Warriors",
+                "pick": "Over 213.5 Pontos (@1.9)",
+                "prob": 74,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-18T22:48:46.446456",
+        "date": "18/02",
+        "name": "🏰 FORTRESS (3-LEGS)",
+        "odd": "4.51",
+        "total_odd": "4.51",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Mainz ou Empate (@1.52)",
+            "Athletico Paranaense ou Empate (@1.56)",
+            "Over 213.5 Pontos (@1.9)"
+        ],
+        "components": [
+            {
+                "match": "Hamburg SV @ Mainz",
+                "pick": "Mainz ou Empate (@1.52)",
+                "prob": 71,
+                "status": "PENDING"
+            },
+            {
+                "match": "Corinthians @ Athletico Paranaense",
+                "pick": "Athletico Paranaense ou Empate (@1.56)",
+                "prob": 70,
+                "status": "PENDING"
+            },
+            {
+                "match": "Celtics @ Warriors",
+                "pick": "Over 213.5 Pontos (@1.9)",
+                "prob": 74,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-18T22:48:46.446443",
+        "date": "18/02",
+        "name": "🛡️ BUNKER BLINDADO",
+        "odd": "2.37",
+        "total_odd": "2.37",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Mainz ou Empate (@1.52)",
+            "Athletico Paranaense ou Empate (@1.56)"
+        ],
+        "components": [
+            {
+                "match": "Hamburg SV @ Mainz",
+                "pick": "Mainz ou Empate (@1.52)",
+                "prob": 71,
+                "status": "PENDING"
+            },
+            {
+                "match": "Corinthians @ Athletico Paranaense",
+                "pick": "Athletico Paranaense ou Empate (@1.56)",
+                "prob": 70,
+                "status": "PENDING"
+            }
+        ]
+    }
+]

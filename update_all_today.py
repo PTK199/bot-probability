@@ -1,3 +1,10 @@
+import sys
+# Fix encoding for Windows terminals
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except:
+    pass
+
 import json
 import os
 import datetime
