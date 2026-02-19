@@ -8,6 +8,14 @@ import os
 import datetime
 import requests
 import time
+import sys
+
+# Fix encoding for Windows terminals
+os.environ["PYTHONIOENCODING"] = "utf-8"
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except:
+    pass
 
 HISTORY_FILE = os.path.join(os.path.dirname(__file__), "history.json")
 

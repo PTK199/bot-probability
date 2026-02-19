@@ -1,5 +1,114 @@
 [
     {
+        "created_at": "2026-02-19T11:31:49.270359",
+        "date": "18/02",
+        "name": "💎 DIAMANTE 4-LEGS",
+        "odd": "4.62",
+        "total_odd": "4.62",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Chelsea ou Empate (@1.38)",
+            "Athletic Club ou Empate (@1.45)",
+            "Mainz ou Empate (@1.52)",
+            "Sassuolo ou Empate (@1.52)"
+        ],
+        "components": [
+            {
+                "match": "Burnley @ Chelsea",
+                "pick": "Chelsea ou Empate (@1.38)",
+                "prob": 81,
+                "status": "PENDING"
+            },
+            {
+                "match": "Elche @ Athletic Club",
+                "pick": "Athletic Club ou Empate (@1.45)",
+                "prob": 77,
+                "status": "PENDING"
+            },
+            {
+                "match": "Hamburg SV @ Mainz",
+                "pick": "Mainz ou Empate (@1.52)",
+                "prob": 74,
+                "status": "PENDING"
+            },
+            {
+                "match": "Hellas Verona @ Sassuolo",
+                "pick": "Sassuolo ou Empate (@1.52)",
+                "prob": 74,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-19T03:02:55.246912",
+        "date": "19/02",
+        "name": "🔥 VALUE HUNTER",
+        "odd": "4.33",
+        "total_odd": "4.33",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Mainz ou Empate (@1.52)",
+            "Marseille ou Empate (@1.5)",
+            "Over 213.5 Pontos (@1.9)"
+        ],
+        "components": [
+            {
+                "match": "Hamburg SV @ Mainz",
+                "pick": "Mainz ou Empate (@1.52)",
+                "prob": 67,
+                "status": "PENDING"
+            },
+            {
+                "match": "Marseille @ Brest",
+                "pick": "Marseille ou Empate (@1.5)",
+                "prob": 64,
+                "status": "PENDING"
+            },
+            {
+                "match": "Celtics @ Warriors",
+                "pick": "Over 213.5 Pontos (@1.9)",
+                "prob": 74,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-19T03:02:55.246900",
+        "date": "19/02",
+        "name": "🏰 FORTRESS (3-LEGS)",
+        "odd": "3.56",
+        "total_odd": "3.56",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Mainz ou Empate (@1.52)",
+            "Marseille ou Empate (@1.5)",
+            "Athletico Paranaense ou Empate (@1.56)"
+        ],
+        "components": [
+            {
+                "match": "Hamburg SV @ Mainz",
+                "pick": "Mainz ou Empate (@1.52)",
+                "prob": 67,
+                "status": "PENDING"
+            },
+            {
+                "match": "Marseille @ Brest",
+                "pick": "Marseille ou Empate (@1.5)",
+                "prob": 64,
+                "status": "PENDING"
+            },
+            {
+                "match": "Corinthians @ Athletico Paranaense",
+                "pick": "Athletico Paranaense ou Empate (@1.56)",
+                "prob": 66,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
         "created_at": "2025-01-01T10:00:00",
         "date": "01/01",
         "name": "TEST WON TREBLE",

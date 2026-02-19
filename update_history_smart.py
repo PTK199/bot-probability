@@ -3,6 +3,7 @@ import os
 import datetime
 from data_fetcher import get_games_for_date
 from espn_api import fetch_from_espn_api
+from scores365 import fetch_results_365scores
 
 HISTORY_PATH = 'history.json'
 
@@ -52,7 +53,10 @@ def is_team_in_string(team_name, text):
 def main():
     print("🚀 Iniciando atualização inteligente do histórico (v2)...")
     
-    target_date = "2026-02-11"
+    # Calculando a data de ontem dinamicamente
+    today = datetime.date.today()
+    yesterday_date = today - datetime.timedelta(days=1)
+    target_date = yesterday_date.strftime("%Y-%m-%d")
     
     print(f"📅 Obtendo dados para {target_date}...")
     try:
@@ -62,8 +66,20 @@ def main():
         print(f"Error fetching games: {e}")
         return
 
-    print(f"📡 Obtendo resultados da ESPN...")
-    real_results = fetch_from_espn_api(target_date)
+    print(f"📡 Obtendo resultados da ESPN e 365Scores...")
+    
+    # 1. Fetch from 365Scores first (Broad coverage)
+    results_365 = fetch_results_365scores(target_date)
+    
+    # 2. Fetch from ESPN (Official/Detailed)
+    results_espn = fetch_from_espn_api(target_date)
+    
+    # 3. Merge (ESPN takes precedence if key exists, but 365 covers gaps)
+    # Start with 365, update with ESPN
+    real_results = results_365.copy()
+    real_results.update(results_espn)
+    
+    print(f"📊 Total de resultados encontrados: {len(real_results)} (ESPN: {len(results_espn)}, 365: {len(results_365)})")
     
     if os.path.exists(HISTORY_PATH):
         with open(HISTORY_PATH, 'r', encoding='utf-8') as f:
@@ -87,6 +103,11 @@ def main():
     for game in games_with_tips:
         home_team = game.get('home_team') or game.get('home')
         away_team = game.get('away_team') or game.get('away')
+        league_name = game.get('league', '')
+        
+        # Determine strict sport
+        is_basketball = "NBA" in league_name or "NBB" in league_name or "EuroLeague" in league_name
+        expected_sport = "basketball" if is_basketball else "football"
         
         tip = game.get('best_tip', {})
         selection = tip.get('selection', '') or game.get('selection', '')
@@ -103,6 +124,22 @@ def main():
         res = real_results.get(home_team)
         if not res: res = real_results.get(away_team)
         
+        # Validate Sport if available
+        if res:
+            res_sport = res.get('sport')
+            res_league = res.get('league', '')
+            
+            # If 365Scores sport is present
+            if res_sport and res_sport != expected_sport:
+                res = None # Mismatch
+            # If ESPN league suggests mismatch
+            elif "NBA" in res_league and not is_basketball:
+                res = None
+            elif "NBA" not in res_league and is_basketball and "NBA" in league_name:
+                # If we expect NBA but result is not NBA (and has league info), be careful
+                # ESPN NBA results have league="NBA" usually.
+                pass 
+
         status = "PENDING"
         score_str = "0-0"
         profit = "0%"

@@ -588,8 +588,10 @@ def fetch_results_365scores(target_date=None):
                 # status_group: 1=live, 2=pre, 3=finished
                 h_score = g.get("home_score", -1)
                 a_score = g.get("away_score", -1)
-                is_live = g.get("status_group") == 1
-                is_finished = g.get("status_group") == 3
+                status_grp = g.get("status_group", 0)
+                is_live = status_grp == 1
+                # 3=Finished, 4=Finished (FT/AET/Pens), 5+=Ended
+                is_finished = status_grp >= 3 and status_grp <= 10
                 
                 if h_score < 0 or a_score < 0:
                     continue  # No score yet
@@ -603,13 +605,22 @@ def fetch_results_365scores(target_date=None):
                 elif is_live:
                     status_text = "Ao Vivo"
                 
+                # Clean format for string
+                try:
+                    h_val = int(float(h_score))
+                    a_val = int(float(a_score))
+                except:
+                    h_val = h_score
+                    a_val = a_score
+                    
                 result_obj = {
-                    "score": f"{h_score}-{a_score}",
-                    "home_val": int(h_score),
-                    "away_val": int(a_score),
+                    "score": f"{h_val}-{a_val}",
+                    "home_val": h_val,
+                    "away_val": a_val,
                     "status": status_text,
                     "completed": is_finished,
-                    "source": "365Scores"
+                    "source": "365Scores",
+                    "sport": sport_name
                 }
                 
                 # Add multiple name keys for robust matching

@@ -78,6 +78,9 @@ def fetch_from_espn_api(target_date=None):
         "por.1": f"https://site.api.espn.com/apis/site/v2/sports/soccer/por.1/scoreboard?dates={date_param}",
         "ned.1": f"https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates={date_param}",
         "tur.1": f"https://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard?dates={date_param}",
+        "uefa.champions": f"https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates={date_param}",
+        "conmebol.libertadores": f"https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates={date_param}",
+        "conmebol.sudamericana": f"https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates={date_param}",
     }
     
     # Manual overrides for ESPN team names -> our names
