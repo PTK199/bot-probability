@@ -386,9 +386,9 @@
         "selection": "Timberwolves Vence",
         "odd": 1.54,
         "prob": 61,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -400,9 +400,9 @@
         "selection": "Heat Vence",
         "odd": 1.85,
         "prob": 37,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
+        "status": "WON",
+        "score": "70-103",
+        "profit": "+85%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -415,7 +415,7 @@
         "odd": 1.47,
         "prob": 76,
         "status": "WON",
-        "score": "6-1",
+        "score": "0-0",
         "profit": "+47%",
         "badge": "🛡️ SAFE"
     },
@@ -428,9 +428,9 @@
         "selection": "West Ham United ou Empate",
         "odd": 1.55,
         "prob": 72,
-        "status": "PENDING",
+        "status": "WON",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "+55%",
         "badge": "🛡️ SAFE"
     },
     {
@@ -442,9 +442,9 @@
         "selection": "Brighton & Hove Albion ou Empate",
         "odd": 1.52,
         "prob": 61,
-        "status": "PENDING",
+        "status": "WON",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "+52%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -457,7 +457,7 @@
         "odd": 1.46,
         "prob": 76,
         "status": "WON",
-        "score": "1-0",
+        "score": "0-0",
         "profit": "+46%",
         "badge": "🛡️ SAFE"
     },
@@ -470,9 +470,9 @@
         "selection": "Thunder Vence",
         "odd": 1.02,
         "prob": 85,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -484,9 +484,9 @@
         "selection": "Bucks Vence",
         "odd": 1.36,
         "prob": 69,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -498,9 +498,9 @@
         "selection": "Grizzlies Vence",
         "odd": 1.1,
         "prob": 75,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
+        "status": "LOST",
+        "score": "8-11",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -512,9 +512,9 @@
         "selection": "Chelsea ou Empate",
         "odd": 1.38,
         "prob": 80,
-        "status": "PENDING",
+        "status": "WON",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "+37%",
         "badge": "🛡️ SAFE"
     },
     {
@@ -526,9 +526,9 @@
         "selection": "Nuggets Vence",
         "odd": 1.4,
         "prob": 69,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -540,9 +540,9 @@
         "selection": "Over 225.5 Pontos",
         "odd": 1.9,
         "prob": 39,
-        "status": "PENDING",
+        "status": "LOST",
         "score": "0-0",
-        "profit": "0%",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -976,9 +976,9 @@
         "selection": "Pacers Vence",
         "odd": 1.14,
         "prob": 66,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
+        "status": "WON",
+        "score": "6-14",
+        "profit": "+13%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -1004,9 +1004,9 @@
         "selection": "Cavaliers Vence",
         "odd": 1.12,
         "prob": 73,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
+        "status": "LOST",
+        "score": "14-11",
+        "profit": "-100%",
         "badge": "⚠️ EV GATE"
     },
     {
