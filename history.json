@@ -22,10 +22,10 @@
         "selection": "Heat Vence",
         "odd": 1.85,
         "prob": 38,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "97-128",
+        "profit": "+85%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -36,10 +36,10 @@
         "selection": "Manchester City ou Empate",
         "odd": 1.47,
         "prob": 75,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "6-1",
+        "profit": "+47%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -78,10 +78,10 @@
         "selection": "Aston Villa ou Empate",
         "odd": 1.46,
         "prob": 75,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "1-0",
+        "profit": "+46%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -92,10 +92,10 @@
         "selection": "Thunder Vence",
         "odd": 1.02,
         "prob": 60,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "84-112",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "20/02",
@@ -120,10 +120,10 @@
         "selection": "Grizzlies Vence",
         "odd": 1.1,
         "prob": 43,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "123-114",
+        "profit": "+10%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -134,10 +134,10 @@
         "selection": "Pacers Vence",
         "odd": 1.15,
         "prob": 51,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "131-118",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "20/02",
@@ -148,10 +148,10 @@
         "selection": "Cavaliers Vence",
         "odd": 1.11,
         "prob": 59,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "113-118",
+        "profit": "+11%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -176,10 +176,10 @@
         "selection": "Nuggets Vence",
         "odd": 1.41,
         "prob": 67,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "114-115",
+        "profit": "+40%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -190,10 +190,10 @@
         "selection": "Over 225.5 Pontos",
         "odd": 1.9,
         "prob": 40,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "115-114",
+        "profit": "+89%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -232,10 +232,10 @@
         "selection": "Manchester City ou Empate",
         "odd": 1.47,
         "prob": 78,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "6-1",
+        "profit": "+47%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -274,10 +274,10 @@
         "selection": "Aston Villa ou Empate",
         "odd": 1.46,
         "prob": 78,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "1-0",
+        "profit": "+46%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -316,10 +316,10 @@
         "selection": "Grizzlies Vence",
         "odd": 1.1,
         "prob": 74,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "123-114",
+        "profit": "+10%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -653,10 +653,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.55,
         "prob": 62,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "LOST",
+        "score": "121-94",
+        "profit": "-100%",
+        "badge": "❌ RED",
         "reason": "🏀 [MONTE CARLO 5K]: Suns (32-23) favorito com 64.4%. | ⚠️ EV GATE: edge -2.5% | 🗳️ ENSEMBLE: 64% → 59% | 📊 KB: Suns em fase ELITE"
     },
     {
@@ -669,10 +669,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.56,
         "prob": 58,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "LOST",
+        "score": "101-110",
+        "profit": "-100%",
+        "badge": "❌ RED",
         "reason": "🏀 [MONTE CARLO 5K]: Bulls (24-31) leve favorito com 63.9%. | ⚠️ EV GATE: edge -6.1% | 🗳️ ENSEMBLE: 63% → 58%"
     },
     {
@@ -685,10 +685,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.8,
         "prob": 50,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "LOST",
+        "score": "97-128",
+        "profit": "-100%",
+        "badge": "❌ RED",
         "reason": "🏀 [MONTE CARLO 5K]: 76ers (30-24) leve favorito com 55.7%. | ⚠️ EV GATE: edge -5.6% | 🗳️ ENSEMBLE: 55% → 50%"
     },
     {
@@ -701,10 +701,10 @@
         "market": "Dupla Chance",
         "odd": 1.56,
         "prob": 66,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "WON",
+        "score": "1-0",
+        "profit": "+56%",
+        "badge": "✅ GREEN",
         "reason": "⚽ [POISSON]: Jogo equilibrado. DC Athletico Paranaense (64%) com fator casa. | ⚠️ EV GATE: edge 1.9% | 📋 Athletico Paranaense 4-4-2 vs Corinthians 4-2-3-1 | 🗳️ Público: Athletico Paranaense 22% | Corinthians 0% | ❌ Ryan Gauld FORA (Lesão no joelho) [Jogos (11/34), Gols (1)]"
     },
     {
@@ -717,10 +717,10 @@
         "market": "Dupla Chance",
         "odd": 1.5,
         "prob": 64,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "LOST",
+        "score": "2-0",
+        "profit": "-100%",
+        "badge": "❌ RED",
         "reason": "⚽ [POISSON]: Marseille (80pw) favorito. DC Marseille (67%) mais seguro. | ⚠️ EV GATE: edge -2.7% | 📋 Brest 4-4-2 vs Marseille 4-2-3-1 | 🗳️ Público: Brest 22% | Marseille 0% | ❌ Ryan Gauld FORA (Lesão no joelho) [Jogos (11/34), Gols (1)]"
     },
     {
@@ -733,10 +733,10 @@
         "market": "Dupla Chance",
         "odd": 1.52,
         "prob": 67,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "WON",
+        "score": "1-1",
+        "profit": "+52%",
+        "badge": "✅ GREEN",
         "reason": "⚽ [POISSON]: Jogo equilibrado. DC Mainz (66%) com fator casa. | ⚠️ EV GATE: edge 1.2% | 📋 Mainz 4-4-2 vs Hamburg SV 4-2-3-1 | 🗳️ Público: Mainz 22% | Hamburg SV 0% | ❌ Ryan Gauld FORA (Lesão no joelho) [Jogos (11/34), Gols (1)]"
     },
     {
@@ -762,10 +762,10 @@
         "selection": "Bulls Vence",
         "odd": 1.57,
         "prob": 58,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "101-110",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "19/02",
@@ -777,10 +777,10 @@
         "market": "Vencedor (ML)",
         "odd": 1.03,
         "prob": 89,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "⚠️ EV GATE",
+        "status": "WON",
+        "score": "118-113",
+        "profit": "+3%",
+        "badge": "✅ GREEN",
         "reason": "🏀 [MONTE CARLO 5K]: Cavaliers (34-21) com 96.8% de vitória. Nets (15-38) inferior em power rating. | ⚠️ EV GATE: edge -8.1% | 🗳️ ENSEMBLE: 96% → 87% | 📊 KB: Nets em CRISE"
     },
     {
@@ -806,10 +806,10 @@
         "selection": "76ers Vence",
         "odd": 1.78,
         "prob": 51,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "97-128",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "18/02",
@@ -820,10 +820,10 @@
         "selection": "Athletico Paranaense ou Empate",
         "odd": 1.56,
         "prob": 70,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "1-0",
+        "profit": "+56%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -835,10 +835,10 @@
         "market": "Total de Pontos",
         "odd": 1.9,
         "prob": 74,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "...",
-        "badge": "💰 BANKER",
+        "status": "WON",
+        "score": "110-121",
+        "profit": "+89%",
+        "badge": "✅ GREEN",
         "reason": "🏀 [PACE]: Média simulada 249 pts > Linha 213.5. Edge 35.5 pts. | 🕵️ TRAP DETECTED | ⚠️ TRAP ALERT: Odd para Warriors vs Celtics está excessivamente alta. Verifique desfalques de última hora. | 💰 EV+21% — VALUE BET"
     },
     {
@@ -864,10 +864,10 @@
         "selection": "Bulls Vence",
         "odd": 1.57,
         "prob": 58,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "101-110",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "18/02",
@@ -892,10 +892,10 @@
         "selection": "Marseille ou Empate",
         "odd": 1.5,
         "prob": 60,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "2-0",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "18/02",
@@ -920,10 +920,10 @@
         "selection": "Mainz ou Empate",
         "odd": 1.52,
         "prob": 71,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "1-1",
+        "profit": "+52%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "18/02",
@@ -934,10 +934,10 @@
         "selection": "Pacers Vence",
         "odd": 1.14,
         "prob": 66,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "131-118",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "18/02",
@@ -962,10 +962,10 @@
         "selection": "Cavaliers Vence",
         "odd": 1.12,
         "prob": 73,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "113-118",
+        "profit": "+12%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "18/02",
@@ -990,10 +990,10 @@
         "selection": "Cavaliers Vence",
         "odd": 1.03,
         "prob": 90,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "118-113",
+        "profit": "+3%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "18/02",
@@ -1032,10 +1032,10 @@
         "selection": "Over 226.5 Pontos",
         "odd": 1.9,
         "prob": 74,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "💰 BANKER"
+        "status": "WON",
+        "score": "115-114",
+        "profit": "+89%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "18/02",
@@ -1046,10 +1046,10 @@
         "selection": "Over 225.5 Pontos",
         "odd": 1.9,
         "prob": 66,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🚀 OVER"
+        "status": "LOST",
+        "score": "94-131",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "18/02",
@@ -1060,10 +1060,10 @@
         "selection": "Over 217.5 Pontos",
         "odd": 1.9,
         "prob": 74,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "💰 BANKER"
+        "status": "WON",
+        "score": "110-121",
+        "profit": "+89%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "17/02",
