@@ -57,7 +57,7 @@ MAX_CORRECTION = 15  # ±15% max adjustment
 # LEARNING STATE STRUCTURE
 # ═══════════════════════════════════════
 DEFAULT_STATE = {
-    "version": 2,
+    "version": 3,
     "last_study": None,
     "total_studied": 0,
     "global_stats": {
@@ -68,6 +68,11 @@ DEFAULT_STATE = {
         "pending": 0,
         "accuracy": 0.0,
         "roi": 0.0,
+    },
+    "thresholds": {
+        "sniper": 76,
+        "banker": 84,
+        "minimum": 62
     },
     # Performance by league
     "by_league": {},
@@ -116,9 +121,9 @@ def _load_state():
             with open(LEARNING_STATE_FILE, 'r', encoding='utf-8') as f:
                 state = json.load(f)
                 # Migrate old versions
-                if state.get("version", 1) < 2:
+                if state.get("version", 1) < 3:
                     state.update({k: v for k, v in DEFAULT_STATE.items() if k not in state})
-                    state["version"] = 2
+                    state["version"] = 3
                 return state
         except:
             pass
@@ -440,7 +445,26 @@ def study_results():
     if current_streak >= 5:
         insights.append(f"🔥 Sequência de {current_streak} GREENS! Momento excelente.")
     elif current_streak <= -4:
-        insights.append(f"❄️ Sequência de {abs(current_streak)} REDS. Reduzir agressividade temporariamente.")
+        insights.append(f"❄️ Sequência de {abs(current_streak)} REDS. Reduzindo agressividade e elevando barreira de entrada.")
+    
+    # ── PASS 3: CALCULATE DYNAMIC THRESHOLDS ──
+    # If accuracy < 75%, we raise the sniper/banker bar to be more selective
+    base_sniper = 72
+    base_banker = 82
+    
+    acc_gap = max(0, 78 - state["global_stats"]["accuracy"])
+    streak_penalty = max(0, abs(min(0, current_streak)) * 2)
+    
+    state["thresholds"] = {
+        "sniper": int(base_sniper + (acc_gap * 0.5) + streak_penalty),
+        "banker": int(base_banker + (acc_gap * 0.4) + (streak_penalty * 0.5)),
+        "minimum": int(60 + (acc_gap * 0.3))
+    }
+    
+    state["thresholds"]["sniper"] = min(85, state["thresholds"]["sniper"])
+    state["thresholds"]["banker"] = min(92, state["thresholds"]["banker"])
+    
+    insights.append(f"🎯 META 80%: Threshold Sniper ajustado para {state['thresholds']['sniper']}% (Rigidez: +{int(acc_gap + streak_penalty)})")
     
     state["insights"] = insights
     state["corrections"] = corrections
@@ -589,6 +613,12 @@ def get_learning_summary():
         "by_side": state.get("by_side", {}),
         "by_day": state.get("by_day", {}),
     }
+
+
+def get_active_thresholds():
+    """Returns the current learned thresholds for sniper/banker."""
+    state = _load_state()
+    return state.get("thresholds", DEFAULT_STATE["thresholds"])
 
 
 # ═══════════════════════════════════════

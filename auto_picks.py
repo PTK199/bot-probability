@@ -932,7 +932,7 @@ def get_auto_games(target_date):
         print(f"[AUTO-ENGINE] ⚠️ 365Scores not available: {e}")
 
     try:
-        from self_learning import apply_learning_correction, study_results, get_learning_summary
+        from self_learning import apply_learning_correction, study_results, get_learning_summary, get_active_thresholds
         LEARNING_ACTIVE = True
         # THROTTLED: Only study once per 10 minutes
         now = _time.time()
@@ -940,9 +940,11 @@ def get_auto_games(target_date):
             study_results()
             _last_study_time = now
             summary = get_learning_summary()
-            print(f"[AUTO-ENGINE] ✅ Self-Learning: {summary.get('corrections_active', 0)} correções")
+            learned_thresholds = get_active_thresholds()
+            print(f"[AUTO-ENGINE] ✅ Self-Learning: {summary.get('corrections_active', 0)} correções | Sniper: {learned_thresholds.get('sniper')}%")
         else:
-            print(f"[AUTO-ENGINE] ✅ Self-Learning CACHED (last study {int(now - _last_study_time)}s ago)")
+            learned_thresholds = get_active_thresholds()
+            print(f"[AUTO-ENGINE] ✅ Self-Learning CACHED (Sniper: {learned_thresholds.get('sniper')}%)")
     except Exception as e:
         LEARNING_ACTIVE = False
         print(f"[AUTO-ENGINE] ⚠️ Self-Learning not available: {e}")
@@ -1258,15 +1260,21 @@ def get_auto_games(target_date):
             # ─── STAGE 6: FINAL EV GATE ───
             tip_prob = tip.get("prob", 50)
             implied = (1 / tip_odd) * 100 if tip_odd > 0 else 100
-            ev_edge = tip_prob - implied
-            ev_pct = calculate_expected_value(tip_prob, tip_odd) if FUNNEL_ACTIVE else round((tip_prob / 100 * tip_odd - 1) * 100, 2)
-
-            if ev_edge < 5:
-                tip["reason"] += f" | ⚠️ EV GATE: edge {ev_edge:.1f}%"
-                tip["badge"] = "⚠️ EV GATE"
-            elif ev_edge >= 15:
-                tip["badge"] = "💰 BANKER"
-                funnel_notes.append(f"💰 EV+{ev_edge:.0f}% — VALUE BET")
+            # ─── STAGE 7: DYNAMIC BADGE & SNIPER RE-EVALUATION ───
+            # Re-evaluate is_sniper and badges using CORRECTED prob and LEARNED thresholds
+            final_prob = tip.get("prob", 50)
+            thresholds = learned_thresholds if LEARNING_ACTIVE else {"sniper": 72, "banker": 82, "minimum": 62}
+            
+            is_sniper = final_prob >= thresholds.get("sniper", 72)
+            
+            # Re-assign badge if it's not already something special like GOD MODE
+            if "GOD MODE" not in tip.get("badge", ""):
+                if final_prob >= thresholds.get("banker", 82):
+                    tip["badge"] = "💰 BANKER"
+                elif final_prob >= thresholds.get("sniper", 72):
+                    tip["badge"] = "🎯 SNIPER"
+                elif "EV GATE" not in tip.get("badge", ""):
+                    tip["badge"] = "🛡️ SAFE" if final_prob >= 65 else "🔎 ANALYZE"
 
             # Append funnel notes to reason
             if funnel_notes:
