@@ -43,16 +43,27 @@ def is_team_in_string(team_name, text):
                 
     parts = t_lower.split()
     if len(parts) > 1:
+        # Avoid matching generic "City" or "United" unless it's a significant part of the name
+        common_generic = ["city", "united", "club", "fc", "stats"]
         for p in parts:
-            if len(p) > 3 and p in text_lower:
+            if len(p) > 3 and p not in common_generic and p in text_lower:
                 return True
     
     return False
 
+import argparse
+
 def main():
+    parser = argparse.ArgumentParser(description="Auditoria de Resultados (v3)")
+    parser.add_argument("--date", type=str, help="Data no formato YYYY-MM-DD")
+    args = parser.parse_args()
+    
     print("🚀 Iniciando Auditoria de Resultados (v3)...")
     
-    target_date = "2026-02-11"
+    if args.date:
+        target_date = args.date
+    else:
+        target_date = datetime.datetime.now().strftime("%Y-%m-%d")
     
     print(f"📅 Baixando dados oficiais da ESPN para {target_date}...")
     real_results = fetch_from_espn_api(target_date)
@@ -112,6 +123,8 @@ def main():
         score_str = "0-0"
         profit = "0%"
         reason_log = "Aguardando início"
+        h_val = 0
+        a_val = 0
         
         if res:
             # We found a result
