@@ -11,7 +11,7 @@
         "status": "WON",
         "score": "122-111",
         "profit": "+55%",
-        "badge": "✅ GREEN"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -25,7 +25,7 @@
         "status": "WON",
         "score": "97-128",
         "profit": "+85%",
-        "badge": "✅ GREEN"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -36,10 +36,10 @@
         "selection": "Manchester City ou Empate",
         "odd": 1.47,
         "prob": 75,
-        "status": "WON",
-        "score": "6-1",
-        "profit": "+47%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "🛡️ SAFE"
     },
     {
         "date": "20/02",
@@ -78,10 +78,10 @@
         "selection": "Aston Villa ou Empate",
         "odd": 1.46,
         "prob": 75,
-        "status": "WON",
-        "score": "1-0",
-        "profit": "+46%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "🛡️ SAFE"
     },
     {
         "date": "20/02",
@@ -92,10 +92,10 @@
         "selection": "Thunder Vence",
         "odd": 1.02,
         "prob": 60,
-        "status": "LOST",
-        "score": "84-112",
-        "profit": "-100%",
-        "badge": "❌ RED"
+        "status": "WON",
+        "score": "105-86",
+        "profit": "+2%",
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -109,7 +109,7 @@
         "status": "WON",
         "score": "118-139",
         "profit": "+36%",
-        "badge": "✅ GREEN"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -123,7 +123,7 @@
         "status": "WON",
         "score": "123-114",
         "profit": "+10%",
-        "badge": "✅ GREEN"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -137,7 +137,7 @@
         "status": "LOST",
         "score": "131-118",
         "profit": "-100%",
-        "badge": "❌ RED"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -151,7 +151,7 @@
         "status": "WON",
         "score": "113-118",
         "profit": "+11%",
-        "badge": "✅ GREEN"
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -176,10 +176,10 @@
         "selection": "Nuggets Vence",
         "odd": 1.41,
         "prob": 67,
-        "status": "WON",
-        "score": "114-115",
-        "profit": "+40%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "20/02",
@@ -190,10 +190,10 @@
         "selection": "Over 225.5 Pontos",
         "odd": 1.9,
         "prob": 40,
-        "status": "WON",
-        "score": "115-114",
-        "profit": "+89%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "19/02",
@@ -204,10 +204,10 @@
         "selection": "Timberwolves Vence",
         "odd": 1.55,
         "prob": 61,
-        "status": "WON",
-        "score": "122-111",
-        "profit": "+55%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "19/02",
@@ -232,10 +232,10 @@
         "selection": "Manchester City ou Empate",
         "odd": 1.47,
         "prob": 78,
-        "status": "WON",
-        "score": "6-1",
-        "profit": "+47%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "🛡️ SAFE"
     },
     {
         "date": "19/02",
@@ -274,10 +274,10 @@
         "selection": "Aston Villa ou Empate",
         "odd": 1.46,
         "prob": 78,
-        "status": "WON",
-        "score": "1-0",
-        "profit": "+46%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "🛡️ SAFE"
     },
     {
         "date": "19/02",
@@ -302,10 +302,10 @@
         "selection": "Bucks Vence",
         "odd": 1.36,
         "prob": 69,
-        "status": "WON",
-        "score": "118-139",
-        "profit": "+36%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "19/02",
@@ -316,10 +316,10 @@
         "selection": "Grizzlies Vence",
         "odd": 1.1,
         "prob": 74,
-        "status": "WON",
-        "score": "123-114",
-        "profit": "+10%",
-        "badge": "✅ GREEN"
+        "status": "PENDING",
+        "score": "0-0",
+        "profit": "0%",
+        "badge": "⚠️ EV GATE"
     },
     {
         "date": "19/02",
@@ -784,20 +784,6 @@
         "reason": "🏀 [MONTE CARLO 5K]: Cavaliers (34-21) com 96.8% de vitória. Nets (15-38) inferior em power rating. | ⚠️ EV GATE: edge -8.1% | 🗳️ ENSEMBLE: 96% → 87% | 📊 KB: Nets em CRISE"
     },
     {
-        "date": "19/02",
-        "time": "21:00",
-        "home": "Hornets",
-        "away": "Cavaliers",
-        "league": "NBA",
-        "selection": "Cavaliers Vence",
-        "odd": 1.11,
-        "prob": 73,
-        "status": "WON",
-        "score": "101-105",
-        "profit": "+11%",
-        "badge": "⚠️ EV GATE"
-    },
-    {
         "date": "18/02",
         "time": "21:00",
         "home": "76ers",
@@ -853,34 +839,6 @@
         "status": "WON",
         "score": "70-73",
         "profit": "+55%",
-        "badge": "⚠️ EV GATE"
-    },
-    {
-        "date": "18/02",
-        "time": "22:00",
-        "home": "Bulls",
-        "away": "Raptors",
-        "league": "NBA",
-        "selection": "Bulls Vence",
-        "odd": 1.57,
-        "prob": 58,
-        "status": "LOST",
-        "score": "101-110",
-        "profit": "-100%",
-        "badge": "❌ RED"
-    },
-    {
-        "date": "18/02",
-        "time": "21:00",
-        "home": "76ers",
-        "away": "Hawks",
-        "league": "NBA",
-        "selection": "76ers Vence",
-        "odd": 1.78,
-        "prob": 51,
-        "status": "WON",
-        "score": "103-70",
-        "profit": "+78%",
         "badge": "⚠️ EV GATE"
     },
     {
@@ -970,20 +928,6 @@
     {
         "date": "18/02",
         "time": "21:00",
-        "home": "Wizards",
-        "away": "Pacers",
-        "league": "NBA",
-        "selection": "Pacers Vence",
-        "odd": 1.14,
-        "prob": 66,
-        "status": "WON",
-        "score": "6-14",
-        "profit": "+13%",
-        "badge": "⚠️ EV GATE"
-    },
-    {
-        "date": "18/02",
-        "time": "21:00",
         "home": "Cavaliers",
         "away": "Nets",
         "league": "NBA",
@@ -994,20 +938,6 @@
         "score": "118-113",
         "profit": "+3%",
         "badge": "✅ GREEN"
-    },
-    {
-        "date": "18/02",
-        "time": "21:00",
-        "home": "Hornets",
-        "away": "Cavaliers",
-        "league": "NBA",
-        "selection": "Cavaliers Vence",
-        "odd": 1.12,
-        "prob": 73,
-        "status": "LOST",
-        "score": "14-11",
-        "profit": "-100%",
-        "badge": "⚠️ EV GATE"
     },
     {
         "date": "18/02",

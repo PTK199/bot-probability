@@ -102,7 +102,15 @@ def main():
         prob = tip.get('prob') or game.get('prob', 0)
         badge = tip.get('badge') or game.get('badge', '🤖 AI PICK')
         
-        if not selection: continue
+        # Check Update or Insert existing logic first
+        key = f"{current_dd_mm}|{home}"
+        existing_index = existing_map.get(key)
+        
+        if existing_index is not None:
+            existing_status = history[existing_index].get('status', 'PENDING')
+            if existing_status in ["WON", "LOST", "VOID"]:
+                print(f"   ⏭️ {home} vs {away}: Já finalizado as {existing_status}. Pulando.")
+                continue
         
         # Check if we have a real result
         # Try finding via Alias or direct key
@@ -269,12 +277,22 @@ def main():
             history.insert(0, new_entry)
             changes += 1
             
+    # Final Duplicate Cleanup (on the whole history)
+    seen_keys = set()
+    clean_history = []
+    for entry in history:
+        k = f"{entry.get('date')}|{entry.get('home')}|{entry.get('away')}"
+        if k not in seen_keys:
+            clean_history.append(entry)
+            seen_keys.add(k)
+    
+    with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
+        json.dump(clean_history, f, indent=4, ensure_ascii=False)
+    
     if changes > 0:
-        with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
-            json.dump(history, f, indent=4, ensure_ascii=False)
-        print(f"\n💾 Histórico salvo com {changes} atualizações.")
+        print(f"\n💾 Histórico salvo com {changes} atualizações e limpeza de duplicatas concluída.")
     else:
-        print("\nℹ️ Nenhuma alteração necessária.")
+        print(f"\n💾 Histórico auditado e limpeza de duplicatas concluída.")
 
 if __name__ == "__main__":
     main()
