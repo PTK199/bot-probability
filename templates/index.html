@@ -1684,6 +1684,20 @@
                     if (item.badge.includes("ELITE")) bClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
                     badgeHtml = `<span class="px-1.5 py-0.5 rounded text-[8px] font-black border ${bClass} uppercase tracking-tighter ml-2">${item.badge}</span>`;
                 }
+                const statusLower = item.status.toUpperCase();
+                let statusStyle = "bg-red-500/20 text-red-500 border border-red-500/20";
+                let profitStyle = "text-red-500";
+
+                if (statusLower === 'WON') {
+                    statusStyle = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20";
+                    profitStyle = "text-emerald-500";
+                } else if (statusLower === 'PENDING' || statusLower === 'AGUARDANDO') {
+                    statusStyle = "bg-white/5 text-gray-500 border border-white/10";
+                    profitStyle = "text-gray-500";
+                } else if (statusLower === 'VOID') {
+                    statusStyle = "bg-blue-500/10 text-blue-400 border border-blue-500/10";
+                    profitStyle = "text-blue-400";
+                }
 
                 row.innerHTML = `
                     <div class="mb-3 sm:mb-0">
@@ -1701,15 +1715,15 @@
                     <div class="flex items-center justify-between w-full sm:w-auto gap-4">
                         <div class="text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <div class="text-[10px] font-bold text-gray-500 uppercase leading-none">${item.score}</div>
-                                <div class="px-2 py-1 rounded-md text-[9px] font-black ${isWin ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/20 text-red-500 border border-red-500/20'}">
+                                <div class="text-[10px] font-bold text-gray-500 leading-none">${item.score}</div>
+                                <div class="px-2 py-1 rounded-md text-[9px] font-black ${statusStyle}">
                                     ${item.status}
                                 </div>
                             </div>
-                            <div class="text-[10px] mt-1 font-bold ${isWin ? 'text-emerald-500' : 'text-red-500'} tracking-wider">${item.profit}</div>
+                            <div class="text-[10px] mt-1 font-bold ${profitStyle} tracking-wider">${item.profit}</div>
                         </div>
                         
-                        ${isWin ? `
+                        ${statusLower === 'WON' ? `
                         <button onclick="openShareModal('${item.home} vs ${item.away}', '${item.selection}', '${item.odd}', '${item.profit}', '${item.badge || 'PRO IA'}')" 
                             class="p-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-400 transition-all border border-white/5 hover:border-emerald-500/20" 
                             title="Compartilhar Green">

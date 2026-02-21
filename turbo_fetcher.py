@@ -522,7 +522,9 @@ def calculate_today_scout(history, total_scheduled):
     today_results = [h for h in history if h.get('date') == target_short]
     greens = sum(1 for h in today_results if h.get('status') == 'WON')
     reds = sum(1 for h in today_results if h.get('status') == 'LOST')
-    pending = max(0, total_scheduled - len(today_results))
+    pends_hist = sum(1 for h in today_results if h.get('status') == 'PENDING')
+    
+    pending = pends_hist + max(0, total_scheduled - len(today_results))
     resolved = greens + reds
     daily_acc = round((greens / resolved) * 100, 1) if resolved > 0 else 0
     

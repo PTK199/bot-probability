@@ -1032,12 +1032,14 @@ def get_today_scout():
         today_results = [h for h in history if h.get('date') == target_short]
         greens = len([h for h in today_results if h.get('status') == 'WON'])
         reds = len([h for h in today_results if h.get('status') == 'LOST'])
+        pends_hist = len([h for h in today_results if h.get('status') == 'PENDING'])
     except Exception as e:
         greens = 0
         reds = 0
+        pends_hist = 0
         today_results = []
     
-    pending = max(0, total_tips - len(today_results))
+    pending = pends_hist + max(0, total_tips - len(today_results))
     resolved = greens + reds
     daily_acc = round((greens / resolved) * 100, 1) if resolved > 0 else 0
     
