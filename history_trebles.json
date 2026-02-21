@@ -1,5 +1,32 @@
 [
     {
+        "created_at": "2026-02-21T01:59:49.310929",
+        "date": "21/02",
+        "name": "🛡️ BUNKER BLINDADO",
+        "odd": "2.04",
+        "total_odd": "2.04",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Aston Villa ou Empate (@1.46)",
+            "Nuggets Vence (@1.4)"
+        ],
+        "components": [
+            {
+                "match": "Leeds United @ Aston Villa",
+                "pick": "Aston Villa ou Empate (@1.46)",
+                "prob": 68,
+                "status": "PENDING"
+            },
+            {
+                "match": "Nuggets @ Trail Blazers",
+                "pick": "Nuggets Vence (@1.4)",
+                "prob": 67,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
         "created_at": "2026-02-19T11:31:49.270359",
         "date": "18/02",
         "name": "💎 DIAMANTE 4-LEGS",

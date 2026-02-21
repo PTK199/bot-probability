@@ -945,8 +945,13 @@ def get_auto_games(target_date):
         else:
             learned_thresholds = get_active_thresholds()
             print(f"[AUTO-ENGINE] ✅ Self-Learning CACHED (Sniper: {learned_thresholds.get('sniper')}%)")
+            
+        # Global learning state for downstream filtering
+        from self_learning import get_learning_state
+        GLOBAL_LEARNING = get_learning_state()
     except Exception as e:
         LEARNING_ACTIVE = False
+        GLOBAL_LEARNING = {}
         print(f"[AUTO-ENGINE] ⚠️ Self-Learning not available: {e}")
 
     # ══════════════════════════════════════════════
@@ -1279,6 +1284,43 @@ def get_auto_games(target_date):
             # Append funnel notes to reason
             if funnel_notes:
                 tip["reason"] += " | " + " | ".join(funnel_notes[-3:])  # Max 3 notes
+
+            # ─── STAGE 8: 80% GREEN SURGICAL FILTERS ───
+            toxic_teams = GLOBAL_LEARNING.get("toxic_teams", {})
+            blacklisted_leagues = GLOBAL_LEARNING.get("blacklisted_leagues", [])
+            market_efficiency = GLOBAL_LEARNING.get("market_efficiency", {})
+            
+            # 1. Variance Protection
+            mkt_key = "ML" if "vence" in tip['selection'].lower() else "DC"
+            league_mkt_key = f"{game['league']} ({mkt_key})"
+            eff = market_efficiency.get(league_mkt_key, 100)
+            if eff < 60:
+                tip['prob'] -= 7
+                tip['reason'] += f" | 🛡️ VAR PROTECT: {eff}% eff"
+                
+            # 2. Toxic Team Protection
+            h_toxic = toxic_teams.get(home, "")
+            a_toxic = toxic_teams.get(away, "")
+            if "TOXIC" in str(h_toxic) or "TOXIC" in str(a_toxic):
+                tip['prob'] = int(tip['prob'] * 0.75) # Heavy cut
+                tip['reason'] += f" | 🔥 TOXIC TEAM: {h_toxic or a_toxic}"
+            elif "UNRELIABLE" in str(h_toxic) or "UNRELIABLE" in str(a_toxic):
+                tip['prob'] -= 10
+                tip['reason'] += f" | ⚠️ UNRELIABLE TEAM"
+
+            # 3. League Blacklist
+            if game['league'] in blacklisted_leagues:
+                tip['prob'] = int(tip['prob'] * 0.5)
+                tip['reason'] += " | 🚫 BLACKLISTED LEAGUE"
+
+            # Re-Finalize Badge after surgical filters
+            is_sniper = tip['prob'] >= thresholds.get("sniper", 72)
+            if tip['prob'] >= thresholds.get("banker", 82):
+                tip["badge"] = "💰 BANKER"
+            elif tip['prob'] >= thresholds.get("sniper", 72):
+                tip["badge"] = "🎯 SNIPER"
+            elif tip['prob'] < 60:
+                tip["badge"] = "❌ AVOID"
 
             processed.append({
                 "sport": sport,

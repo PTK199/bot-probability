@@ -97,6 +97,10 @@ DEFAULT_STATE = {
     },
     # Generated insights (human-readable lessons)
     "insights": [],
+    "toxic_teams": {},
+    "top_leagues": [],
+    "blacklisted_leagues": [],
+    "market_efficiency": {},
     # Correction factors applied to future predictions
     "corrections": {
         "by_league": {},
@@ -467,6 +471,45 @@ def study_results():
     insights.append(f"🎯 META 80%: Threshold Sniper ajustado para {state['thresholds']['sniper']}% (Rigidez: +{int(acc_gap + streak_penalty)})")
     
     state["insights"] = insights
+    
+    # ── PASS 4: DEEP MARKET & TOXICITY ANALYSIS ──
+    # Identify leagues that are "Blacklisted" (ROI < -20% and 5+ games)
+    blacklisted = []
+    top_leagues = []
+    for league, stats in state["by_league"].items():
+        total = stats["total"]
+        if total >= 5:
+            win_rate = (stats["won"] / total) * 100
+            # Calculate simple ROI if we don't have it tracked perfectly
+            # Assuming avg odd 1.50
+            est_roi = (stats["won"] * 0.5 - stats["lost"]) / total * 100
+            
+            if est_roi < -20 or win_rate < 40:
+                blacklisted.append(league)
+            elif est_roi > 10 or win_rate >= 75:
+                top_leagues.append(league)
+                
+    state["blacklisted_leagues"] = blacklisted
+    state["top_leagues"] = top_leagues
+    
+    # Identify Toxic Teams (Losses >= 3 and 0 wins)
+    toxic = {}
+    for team, stats in state["by_team"].items():
+        if stats["total"] >= 3 and stats["won"] == 0:
+            toxic[team] = "🔥 TOXIC (0% WR)"
+        elif stats.get("lost", 0) > stats.get("won", 0) + 2:
+            toxic[team] = "⚠️ UNRELIABLE"
+            
+    state["toxic_teams"] = toxic
+    
+    # Market Efficiency (which market is winning)
+    efficiency = {}
+    for mkt, stats in state["by_market"].items():
+        if stats["total"] >= 10:
+            efficiency[mkt] = round((stats["won"] / stats["total"]) * 100, 1)
+            
+    state["market_efficiency"] = efficiency
+    
     state["corrections"] = corrections
     state["last_study"] = datetime.datetime.now().isoformat()
     state["total_studied"] = total
@@ -704,3 +747,18 @@ if __name__ == "__main__":
     
     print(f"\n🔧 Correções ativas: {summary['corrections_active']}")
     print(f"📅 Último estudo: {summary['last_study']}")
+
+def get_learning_state():
+    """
+    Exposes the full current learning state for other modules.
+    """
+    try:
+        if os.path.exists(LEARNING_STATE_PATH):
+            with open(LEARNING_STATE_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except:
+        pass
+    return DEFAULT_STATE.copy()
+
+if __name__ == "__main__":
+    main()
