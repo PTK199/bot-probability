@@ -36,10 +36,10 @@
         "selection": "Manchester City ou Empate",
         "odd": 1.47,
         "prob": 75,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+47%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -50,10 +50,10 @@
         "selection": "West Ham United ou Empate",
         "odd": 1.55,
         "prob": 71,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+55%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -64,10 +64,10 @@
         "selection": "Brighton & Hove Albion ou Empate",
         "odd": 1.52,
         "prob": 72,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-3",
+        "profit": "+52%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -78,10 +78,10 @@
         "selection": "Aston Villa ou Empate",
         "odd": 1.46,
         "prob": 75,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+46%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -162,10 +162,10 @@
         "selection": "Chelsea ou Empate",
         "odd": 1.38,
         "prob": 73,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+37%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "20/02",
@@ -176,10 +176,10 @@
         "selection": "Nuggets Vence",
         "odd": 1.41,
         "prob": 67,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "LOST",
+        "score": "115-114",
+        "profit": "-100%",
+        "badge": "❌ RED"
     },
     {
         "date": "20/02",
@@ -190,10 +190,10 @@
         "selection": "Over 225.5 Pontos",
         "odd": 1.9,
         "prob": 40,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "⚠️ EV GATE"
+        "status": "WON",
+        "score": "105-127",
+        "profit": "+89%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -232,10 +232,10 @@
         "selection": "Manchester City ou Empate",
         "odd": 1.47,
         "prob": 78,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+47%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -246,10 +246,10 @@
         "selection": "West Ham United ou Empate",
         "odd": 1.55,
         "prob": 74,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+55%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
@@ -274,10 +274,10 @@
         "selection": "Aston Villa ou Empate",
         "odd": 1.46,
         "prob": 78,
-        "status": "PENDING",
-        "score": "0-0",
-        "profit": "0%",
-        "badge": "🛡️ SAFE"
+        "status": "WON",
+        "score": "2-2",
+        "profit": "+46%",
+        "badge": "✅ GREEN"
     },
     {
         "date": "19/02",
