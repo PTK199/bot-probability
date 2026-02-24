@@ -187,6 +187,15 @@ def main():
                     break
         
         if res:
+            # Check if game is completed/final
+            is_completed = res.get('completed', True) # Default to True if field missing to not break old results
+            current_status_desc = res.get('status_desc', '').lower()
+            
+            # Avoid suspicious placeholders if not explicitly final
+            if not is_completed or "final" not in current_status_desc:
+                 print(f"⚠️ Skipping {home} vs {away}: Game not finished or status uncertain ({current_status_desc})")
+                 continue
+
             h_score, a_score = get_normalized_score(res, home)
             
             # Additional check: if it was away team picked in ML
