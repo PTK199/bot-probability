@@ -361,47 +361,51 @@ def get_history_games():
                             a_val = int(res['away_val'] or 0)
                             found_real = True
                             
-                            # Determine WON/LOST based on selection
+                            
+                            # Determine WON/LOST based on selection ONLY IF COMPLETED
                             sel = tip['selection'].lower()
                             
-                            # Handle Double Chance (e.g., 'Man Utd ou Empate')
-                            if "ou empate" in sel:
-                                team_in_sel = sel.split("ou empate")[0].strip()
-                                # Check if the mentioned team didn't lose
-                                if h_val == a_val:
-                                    status = "WON"
-                                elif team_in_sel in game['home_team'].lower() and h_val > a_val:
-                                    status = "WON"
-                                elif team_in_sel in game['away_team'].lower() and a_val > h_val:
-                                    status = "WON"
-                                else:
-                                    status = "LOST"
+                            if not res.get('completed', False):
+                                status = "PENDING"
+                            else:
+                                # Handle Double Chance (e.g., 'Man Utd ou Empate')
+                                if "ou empate" in sel:
+                                    team_in_sel = sel.split("ou empate")[0].strip()
+                                    # Check if the mentioned team didn't lose
+                                    if h_val == a_val:
+                                        status = "WON"
+                                    elif team_in_sel in game['home_team'].lower() and h_val > a_val:
+                                        status = "WON"
+                                    elif team_in_sel in game['away_team'].lower() and a_val > h_val:
+                                        status = "WON"
+                                    else:
+                                        status = "LOST"
+                                        
+                                elif "vence" in sel:
+                                    is_draw = (h_val == a_val)
                                     
-                            elif "vence" in sel:
-                                is_draw = (h_val == a_val)
-                                
-                                # Handle Draw No Bet (DNB)
-                                is_dnb = "dnb" in tip.get('badge', "").lower() or "(dnb)" in sel
-                                
-                                if is_draw:
-                                    status = "VOID" if is_dnb else "LOST"
-                                elif game['home_team'].lower() in sel:
-                                    status = "WON" if h_val > a_val else "LOST"
-                                else:
-                                    status = "WON" if a_val > h_val else "LOST"
+                                    # Handle Draw No Bet (DNB)
+                                    is_dnb = "dnb" in tip.get('badge', "").lower() or "(dnb)" in sel
                                     
-                            elif "over" in sel:
-                                try:
-                                    line_str = sel.split("over")[1].strip().split(" ")[0]
-                                    line = float(line_str.replace("gols", "").strip())
-                                    status = "WON" if (h_val + a_val) > line else "LOST"
-                                except: pass
-                            elif "under" in sel:
-                                try:
-                                    line_str = sel.split("under")[1].strip().split(" ")[0]
-                                    line = float(line_str.replace("gols", "").strip())
-                                    status = "WON" if (h_val + a_val) < line else "LOST"
-                                except: pass
+                                    if is_draw:
+                                        status = "VOID" if is_dnb else "LOST"
+                                    elif game['home_team'].lower() in sel:
+                                        status = "WON" if h_val > a_val else "LOST"
+                                    else:
+                                        status = "WON" if a_val > h_val else "LOST"
+                                        
+                                elif "over" in sel:
+                                    try:
+                                        line_str = sel.split("over")[1].strip().split(" ")[0]
+                                        line = float(line_str.replace("gols", "").strip())
+                                        status = "WON" if (h_val + a_val) > line else "LOST"
+                                    except: pass
+                                elif "under" in sel:
+                                    try:
+                                        line_str = sel.split("under")[1].strip().split(" ")[0]
+                                        line = float(line_str.replace("gols", "").strip())
+                                        status = "WON" if (h_val + a_val) < line else "LOST"
+                                    except: pass
                         
                         if not found_real and h_idx == -1:
                             # Fallback simulation only if doesn't exist at all
@@ -416,6 +420,11 @@ def get_history_games():
                                 h_sc = random.randint(105,125)
                                 a_sc = random.randint(85, h_sc - 5) if is_win else random.randint(h_sc + 5, 135)
                                 score = f"{h_sc}-{a_sc}"
+                                
+                        profit_str = "-100%"
+                        if status == "WON": profit_str = f"+{int((tip['odd']-1)*100)}%"
+                        elif status == "VOID": profit_str = "REEMBOLSO (0%)"
+                        elif status == "PENDING": profit_str = "Aguardando"
 
                         new_entry = {
                             "date": today_short,
@@ -428,7 +437,7 @@ def get_history_games():
                             "prob": tip['prob'],
                             "status": status,
                             "score": score,
-                            "profit": f"+{int((tip['odd']-1)*100)}%" if status == "WON" else ("REEMBOLSO (0%)" if status == "VOID" else "-100%"),
+                            "profit": profit_str,
                             "badge": tip.get('badge', "🎯 SNIPER IA")
                         }
                         
