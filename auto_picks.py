@@ -560,6 +560,7 @@ LEAGUE_RELIABILITY = {
 # Market safety hierarchy (DC > ML for combos)
 MARKET_SAFETY = {
     "dupla chance": 1.0,    # Safest — covers 2 of 3 outcomes
+    "mercado de jogadores": 0.90, # High data precision for Props
     "vencedor": 0.85,       # ML — riskier but higher odds
     "total de pontos": 0.80, # Over/Under — volatile
     "gols": 0.75,           # Goals market
@@ -703,7 +704,11 @@ def build_trebles(processed_games):
         odd = float(tip.get("odd", 1.5))
         
         # HARD FILTERS - If any fail, pick is excluded from combos
-        if prob < 62:
+        min_p = 60 # Softened to allow more Elite picks in combos
+        if "🏀" in tip.get("reason", ""):
+            min_p = 58 
+
+        if prob < min_p:
             continue  # Too low confidence
         if "trap" in reason and odd < 1.20:
             continue  # Trap + juice = dangerous
@@ -730,9 +735,10 @@ def build_trebles(processed_games):
     over_keywords = ["over", "acima", "mais de"]
     
     dc_picks = [g for g in fortress_pool if "ou empate" in g["best_tip"]["selection"].lower()]
+    prop_safe = [g for g in fortress_pool if "mercado de jogadores" in g["best_tip"].get("market", "").lower() and g["best_tip"]["prob"] >= 70]
     ml_picks = [g for g in fortress_pool if any(kw in g["best_tip"]["selection"].lower() for kw in ["vence", "vitória", "win"])]
     over_picks = [g for g in fortress_pool if any(kw in g["best_tip"]["selection"].lower() for kw in over_keywords)]
-    safe_picks = dc_picks + ml_picks  # DC first (safer), then ML
+    safe_picks = dc_picks + prop_safe + ml_picks  # DC and Safe Props first, then ML
     
     # Remove duplicates while preserving order
     seen = set()
@@ -750,7 +756,7 @@ def build_trebles(processed_games):
     # Only DC picks or very high ML picks
     # ═══════════════════════════════════════
     
-    bunker_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 55]
+    bunker_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 42]
     
     if len(bunker_candidates) >= 2:
         # Pick the 2 safest, ensuring diversification
@@ -799,7 +805,7 @@ def build_trebles(processed_games):
     # Mix of DC + ML for better odds
     # ═══════════════════════════════════════
     
-    fortress_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 48]
+    fortress_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 38]
     
     if len(fortress_candidates) >= 3:
         picks = []
@@ -1396,6 +1402,13 @@ def get_auto_games(target_date):
                         tip["prob"] = learned_prob
                 except Exception:
                     pass
+
+            # ─── STAGE 4.6: PLAYER PROP SHIELD 🛡️ ───
+            # High-accuracy NBA Props should not be dropped below 68% by generic league filters
+            if "🏀" in tip.get("reason", "") and raw_prob >= 70:
+                if tip["prob"] < 68:
+                    tip["prob"] = 68
+                    funnel_notes.append("🛡️ Prop Shield: Reforçada prob para NBA Sniper")
 
             # ─── STAGE 6: FINAL EV GATE ───
             tip_prob = tip.get("prob", 50)

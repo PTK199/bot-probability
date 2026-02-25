@@ -1,5 +1,66 @@
 [
     {
+        "created_at": "2026-02-25T02:02:14.356086",
+        "date": "25/02",
+        "name": "🏰 FORTRESS (3-LEGS)",
+        "odd": "4.83",
+        "total_odd": "4.83",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Palmeiras ou Empate (@1.41)",
+            "Paolo Banchero Over 20.0 Pontos (@1.85)",
+            "Anthony Edwards Over 28.0 Pontos (@1.85)"
+        ],
+        "components": [
+            {
+                "match": "Fluminense @ Palmeiras",
+                "pick": "Palmeiras ou Empate (@1.41)",
+                "prob": 61,
+                "status": "PENDING"
+            },
+            {
+                "match": "Magic @ Lakers",
+                "pick": "Paolo Banchero Over 20.0 Pontos (@1.85)",
+                "prob": 77,
+                "status": "PENDING"
+            },
+            {
+                "match": "Timberwolves @ Trail Blazers",
+                "pick": "Anthony Edwards Over 28.0 Pontos (@1.85)",
+                "prob": 68,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-25T02:01:48.744495",
+        "date": "25/02",
+        "name": "🛡️ BUNKER BLINDADO",
+        "odd": "3.42",
+        "total_odd": "3.42",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Paolo Banchero Over 20.0 Pontos (@1.85)",
+            "Anthony Edwards Over 28.0 Pontos (@1.85)"
+        ],
+        "components": [
+            {
+                "match": "Magic @ Lakers",
+                "pick": "Paolo Banchero Over 20.0 Pontos (@1.85)",
+                "prob": 77,
+                "status": "PENDING"
+            },
+            {
+                "match": "Timberwolves @ Trail Blazers",
+                "pick": "Anthony Edwards Over 28.0 Pontos (@1.85)",
+                "prob": 68,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
         "created_at": "2026-02-21T01:59:49.310929",
         "date": "21/02",
         "name": "🛡️ BUNKER BLINDADO",
