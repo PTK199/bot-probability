@@ -240,6 +240,9 @@ def study_results():
     # ── PASS 1: COLLECT STATISTICS ──
     for entry in history:
         status = entry.get("status", "PENDING")
+        # ARCHIVE_WON = WON arquivado (mesmo resultado para aprendizado)
+        if status == "ARCHIVE_WON":
+            status = "WON"
         if status == "PENDING":
             state["global_stats"]["pending"] += 1
             continue
