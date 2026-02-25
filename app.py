@@ -135,10 +135,13 @@ def cron_results():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# --- DEBUG ENDPOINT (TEMPORARY) ---
+# --- DEBUG ENDPOINT (admin only) ---
 @app.route('/api/debug')
+@login_required
 def debug_endpoint():
-    """Temporary endpoint to diagnose data_fetcher errors. Remove after fixing."""
+    """Internal diagnostics — admin only."""    
+    if getattr(current_user, 'role', 'user') != 'admin':
+        return jsonify({"error": "Forbidden"}), 403
     results = {"status": "running", "checks": {}}
     
     # Check 1: Can we import data_fetcher?
@@ -239,14 +242,7 @@ def admin_renew_user(user_id):
     return redirect('/admin')
 
 
-@app.route('/promote_me')
-@login_required
-def promote_me():
-    """Temporary backdoor to become admin"""
-    current_user.role = 'admin'
-    current_user.subscription_end = datetime.datetime.utcnow() + datetime.timedelta(days=3650)
-    db.session.commit()
-    return "<h1>Agora você é ADMIN! <a href='/admin'>Ir para Painel</a></h1>"
+# /promote_me removido por segurança — era um backdoor de admin
 
 @app.route('/')
 @login_required # Protect Home

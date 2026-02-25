@@ -753,12 +753,9 @@ def get_learning_state():
     Exposes the full current learning state for other modules.
     """
     try:
-        if os.path.exists(LEARNING_STATE_PATH):
-            with open(LEARNING_STATE_PATH, 'r', encoding='utf-8') as f:
+        if os.path.exists(LEARNING_STATE_FILE):
+            with open(LEARNING_STATE_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
     except:
         pass
     return DEFAULT_STATE.copy()
-
-if __name__ == "__main__":
-    main()

@@ -634,14 +634,6 @@ def fetch_from_espn_api(target_date=None):
             except Exception as e:
                 continue
     
-    # Apply manual overrides
-    manual_overrides = {
-        "Tottenham": {"score": "1-2", "home_val": 1, "away_val": 2, "completed": True, "status": "Encerrado"},
-        "Newcastle": {"score": "1-2", "home_val": 1, "away_val": 2, "completed": True, "status": "Encerrado"},
-    }
-    for team, data in manual_overrides.items():
-        results[team] = data
-    
     return results
 
 class ResultScoutBot:

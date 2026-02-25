@@ -31,6 +31,11 @@ ESPN_ENDPOINTS = {
     "Brasileirão": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard",
     "Libertadores": "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard",
     "NBA": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+    # Adicionados na auditoria 25/02/2026
+    "FA Cup": "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.fa/scoreboard",
+    "Segunda División": "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.2/scoreboard",
+    "Süper Lig": "https://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard",
+    "Eredivisie": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard",
 }
 
 # Normalize team names for matching

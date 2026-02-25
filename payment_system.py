@@ -91,8 +91,13 @@ def init_payment_system(app):
         db.create_all()
         # Create default admin if not exists
         if not User.query.filter_by(role='admin').first():
-            print("Creating default admin...")
-            admin = User(email='admin@bot.com', role='admin', subscription_end=datetime.utcnow() + timedelta(days=36500))
-            admin.set_password('admin123') # CHANGE THIS PASSWORD IMMEDIATELY
-            db.session.add(admin)
-            db.session.commit()
+            admin_email = os.getenv('ADMIN_EMAIL', 'admin@bot.com')
+            admin_pass = os.getenv('ADMIN_PASSWORD')
+            if not admin_pass:
+                print("[WARNING] ADMIN_PASSWORD not set in env. Skipping default admin creation.")
+            else:
+                print(f"Creating default admin: {admin_email}")
+                admin = User(email=admin_email, role='admin', subscription_end=datetime.utcnow() + timedelta(days=36500))
+                admin.set_password(admin_pass)
+                db.session.add(admin)
+                db.session.commit()
