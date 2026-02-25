@@ -535,13 +535,22 @@ def get_history_stats():
         return {"accuracy": 0, "red_pct": 0, "total": 0, "greens": 0, "reds": 0, "win_rate": "0%"}
     
     total = len(history)
-    greens = len([h for h in history if h['status'] == 'WON'])
+    
+    # "Greens" exibe volume total para marketing (Won normais + Archive Wons)
+    greens = len([h for h in history if h['status'] in ('WON', 'ARCHIVE_WON')])
+    
+    # "Pure" é usado para o cálculo REAL de assertividade da máquina (apenas apostas de fato testadas ao vivo)
+    pure_greens = len([h for h in history if h['status'] == 'WON'])
+    
     reds = len([h for h in history if h['status'] == 'LOST'])
     voids = len([h for h in history if h['status'] == 'VOID'])
     pending = len([h for h in history if h['status'] == 'PENDING'])
-    resolved = greens + reds
-    accuracy = round((greens / resolved) * 100, 1) if resolved > 0 else 0
-    red_pct = round((reds / resolved) * 100, 1) if resolved > 0 else 0
+    
+    # Acc calculado apenas em cima do que a IA testou ao vivo no dia a dia
+    pure_resolved = pure_greens + reds
+    accuracy = round((pure_greens / pure_resolved) * 100, 1) if pure_resolved > 0 else 0
+    red_pct = round((reds / pure_resolved) * 100, 1) if pure_resolved > 0 else 0
+
     
     streak_val = 0
     for h in reversed(history):
@@ -552,6 +561,7 @@ def get_history_stats():
     
     leagues = {}
     for h in history:
+        # Pega apenas os reais (ignora ARCHIVE_WON na % da liga)
         if h['status'] not in ('WON', 'LOST'): continue
         lg = h.get('league', 'Desconhecida')
         if lg not in leagues:
@@ -562,16 +572,20 @@ def get_history_stats():
     league_stats = []
     for lg, data in leagues.items():
         lg_total = data["greens"] + data["reds"]
-        lg_acc = round((data["greens"] / lg_total) * 100, 1) if lg_total > 0 else 0
-        league_stats.append({"league": lg, "greens": data["greens"], "reds": data["reds"], "accuracy": lg_acc})
+        # Mostrar a liga apenas se tiver pelo menos 1 aposta real processada nela
+        if lg_total > 0:
+            lg_acc = round((data["greens"] / lg_total) * 100, 1)
+            league_stats.append({"league": lg, "greens": data["greens"], "reds": data["reds"], "accuracy": lg_acc})
+            
     league_stats.sort(key=lambda x: x["accuracy"], reverse=True)
 
     return {
         "accuracy": accuracy, "win_rate": f"{accuracy}%", "red_pct": red_pct,
         "total": total, "greens": greens, "reds": reds,
-        "voids": voids, "pending": pending, "resolved": resolved,
+        "voids": voids, "pending": pending, "resolved": pure_resolved,
         "streak": str(streak_val), "league_breakdown": league_stats[:10]
     }
+
 
 def get_today_scout():
     """
