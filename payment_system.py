@@ -75,7 +75,13 @@ class PaymentManager:
 
 def init_payment_system(app):
     """Initializes DB and Payment System with Flask App"""
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+    # Use Postgres from Supabase if available in ENV, otherwise fallback to local SQLite
+    db_url = os.environ.get('SUPABASE_DB_URL', 'sqlite:///users.db')
+    # If the URL starts with postgres://, SQLAlchemy requires it to be postgresql://
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+        
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_secret_key_change_in_prod')
     
