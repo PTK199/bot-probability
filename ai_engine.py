@@ -790,6 +790,76 @@ def protocol_nba_master(team_data, opponent_data):
 
     return total_boost, alerts
 
+# --- PLAYER PROPS ENGINE (NBA 80% GREEN INITIATIVE) ---
+def simulate_player_props(player_data, team_missing, opponent_defense_rating):
+    """
+    Project a player's Points, Rebounds, and Assists based on their season averages,
+    adjusting for missing teammates (Usage Rate Boost) and opponent defensive strength.
+    """
+    if "avg_pts" not in player_data:
+        return None
+        
+    pts = player_data.get("avg_pts", 0.0)
+    reb = player_data.get("avg_reb", 0.0)
+    ast = player_data.get("avg_ast", 0.0)
+    
+    # 1. USAGE RATE BOOST (Alpha Dog Effect)
+    # If key starters are missing, the remaining players get more volume.
+    usage_boost = 1.0
+    for missing_player in team_missing:
+        # Example logic: if a 20+ PPG scorer is out, bump others by 15%
+        if missing_player.get("avg_pts", 0) > 20:
+            usage_boost += 0.15
+        elif missing_player.get("avg_pts", 0) > 15:
+            usage_boost += 0.08
+            
+    # Position specific boosts for missing teammates
+    # If the starting PG is out, the SG/SF gets way more assists (Usage)
+    ast_boost = 1.0
+    reb_boost = 1.0
+    for missing_player in team_missing:
+        missing_pos = missing_player.get("position", "").lower()
+        my_pos = player_data.get("position", "").lower()
+        if "guard" in missing_pos and ("guard" in my_pos or "forward" in my_pos):
+            ast_boost += 0.20 # Huge bump in playmaking duties
+        if "center" in missing_pos and ("forward" in my_pos or "center" in my_pos):
+            reb_boost += 0.25 # Huge bump in rebounding duties
+            
+    # 2. MATCHUP MULTIPLIER (Defensive Resistance)
+    # Opponent defense rating (1 = average, >1 = bad defense, <1 = elite defense)
+    # We will pass this from FOOTBALL_POWER equivalent for NBA defense, but for now 
+    # we simulate based on power gap if not explicitly provided.
+    def_multiplier = opponent_defense_rating if opponent_defense_rating else 1.0
+    
+    projected_pts = pts * usage_boost * def_multiplier
+    projected_reb = reb * reb_boost * (1.0 + (def_multiplier - 1.0) * 0.5) # Reb less affected by raw def rating
+    projected_ast = ast * ast_boost * def_multiplier
+    
+    # 3. HIGH VALUE DETECTION (Sniper)
+    # If the projected vs average gap is huge, it's a sniper pick.
+    is_value = False
+    reasons = []
+    
+    if projected_pts > pts + 4.5:
+        is_value = True
+        reasons.append(f"🔥 USAGE BOOST: Projetando {projected_pts:.1f} PTS (Média: {pts:.1f}) devido a ausências no time.")
+    if projected_ast > ast + 2.5:
+        is_value = True
+        reasons.append(f"🧠 PLAYMAKER BUMP: Projetando {projected_ast:.1f} AST (Média: {ast:.1f}) assumindo armação do time.")
+    if projected_reb > reb + 3.0:
+        is_value = True
+        reasons.append(f"💪 GLASS CLEANER: Projetando {projected_reb:.1f} REB (Média: {reb:.1f}) cobrindo o garrafão.")
+
+    return {
+        "projected_pts": round(projected_pts, 1),
+        "projected_reb": round(projected_reb, 1),
+        "projected_ast": round(projected_ast, 1),
+        "projected_pra": round(projected_pts + projected_reb + projected_ast, 1),
+        "is_value": is_value,
+        "reasons": reasons
+    }
+
+
 def neural_cortex_omega(basic_probs, home_team_data, away_team_data, odd_home, odd_away):
     """
     The Ultimate AI Engine. Aggregates decisions from 15 distinct analytical modules.

@@ -20,6 +20,8 @@ import random
 import time as _time
 import sys
 import os
+CACHE_DIR = "cache"
+os.makedirs(CACHE_DIR, exist_ok=True)
 import json
 
 # Fix encoding for Windows terminals
@@ -261,7 +263,7 @@ def prob_to_odd(prob_pct):
 
 
 def generate_nba_tip(game, sim):
-    """Gera melhor tip para jogo NBA baseado na simulação."""
+    """Gera melhor tip para jogo NBA. Prioriza Player Props se hover valor; fallback para ML/Over."""
     home, away = game["home"], game["away"]
     h_prob, a_prob = sim["home_prob"], sim["away_prob"]
     total_avg = sim["total_avg"]
@@ -271,7 +273,92 @@ def generate_nba_tip(game, sim):
 
     odd_h = prob_to_odd(h_prob)
     odd_a = prob_to_odd(a_prob)
+    
+    # 1. TENTATIVA DE PLAYER PROP (Prioridade Máxima para NBA - Meta 80% Green)
+    # Procurar nas estruturas do 365Scores se temos projetores de Props explodindo.
+    intel_data = game.get("_team_intel", {})
+    home_intel = intel_data.get("home", {})
+    away_intel = intel_data.get("away", {})
+    
+    # Acessar a engine (já foi chamada no turbo_fetcher, então vamos ler os 'top_performers' injetados)
+    from ai_engine import simulate_player_props
+    
+    best_prop = None
+    best_prop_val = 0
+    
+    for team_intel, is_home in [(home_intel, True), (away_intel, False)]:
+        team_name = home if is_home else away
+        starters = team_intel.get("starters", [])
+        missing = team_intel.get("missing", [])
+        # Extrair odds reais se disponíveis (The-Odds-API)
+        live_odds = game.get("_live_odds", {})
 
+        # Simular Props para todos os titulares usando a nova Engine
+        for player in starters:
+            prop_sim = simulate_player_props(player, missing, opponent_defense_rating=1.0) # Def rating placeholder
+            if prop_sim:
+                pts = prop_sim["projected_pts"]
+                avg_pts = player.get("avg_pts", 0)
+                
+                is_value = prop_sim.get("is_value", False)
+                p_name = player.get("name", "")
+                
+                # Check for REAL bookmaker lines
+                real_line_data = None
+                p_aliases = [p_name, p_name.split(" ")[-1], player.get("short_name", "")]
+                
+                for alias in p_aliases:
+                    if alias and alias in live_odds:
+                        # Tenta pegar linha do pinnacle ou bet365, ou a primeira que vier
+                        lines_dict = live_odds[alias].get("lines", {})
+                        if "pinnacle" in lines_dict:
+                             real_line_data = lines_dict["pinnacle"].get("Over")
+                        elif "bet365" in lines_dict:
+                             real_line_data = lines_dict["bet365"].get("Over")
+                        elif lines_dict:
+                             first_bm = list(lines_dict.keys())[0]
+                             real_line_data = lines_dict[first_bm].get("Over")
+                        break
+
+                # Estimar a linha padrão se não houver linha real
+                proj_line = real_line_data["val"] if real_line_data else round(max(14.5, avg_pts - 1.5) * 2) / 2
+                
+                # Assign a common baseline odd (1.80 to 1.90 is typical for an Over line)
+                prop_odd = real_line_data["odd"] if real_line_data else 1.85
+                
+                # O Score de valor agora respeita a linha REAL (ou estimada AI EV)
+                diff = pts - proj_line
+                prop_score = diff * 5 + avg_pts  # Combina potencial de explosao com média base
+                
+                if prop_score > best_prop_val and pts > 15:
+                    best_prop_val = prop_score
+                    if pts >= proj_line + 1.0: # Softened threshold to allow more +EV edge
+                        reason = prop_sim["reasons"][0] if prop_sim["reasons"] else f"Média de {avg_pts:.1f} PTS."
+                        
+                        # Penalidade de probabilidade se odds forem muito justas (< 1.60)
+                        prob_penalty = 0 if prop_odd >= 1.70 else 5
+                        prob_calc = min(92, 70 + int(diff * 3)) - prob_penalty
+                        
+                        best_prop = {
+                            "market": "Mercado de Jogadores",
+                            "selection": f"{p_name} Over {proj_line:.1f} Pontos",
+                            "prob": prob_calc,
+                            "odd": prop_odd, 
+                            "reason": f"🏀 [PROP SNIPER] {team_name}: {reason} Projeção: {pts:.1f}",
+                            "badge": "🎯 PROP SNIPER" if not is_value else "🔥 ALPHA DOG",
+                        }
+                        # DEBUG
+                        print(f"[DEBUG PROPS] Found potential: {p_name} Pts: {pts:.1f} (Line: {proj_line:.1f}) -> Score: {prop_score:.1f}, Prob: {prob_calc}% (Odd: {prop_odd})")
+
+    # Se achou uma Tip de Prop com alta probabilidade, ela reduz a chance do ML aparecer
+    if best_prop:
+         print(f"[DEBUG PROPS] GAME {home} vs {away} BEST PROP: {best_prop['selection']} with Prob: {best_prop['prob']}%")
+         # NBA player props are highly volatile but high value. Lowering threshold to 65% to pass EV models.
+         if best_prop["prob"] >= 65:
+             return best_prop, True, odd_h, 0, odd_a
+
+
+    # --- FALLBACK: ML / MÉTODOS ANTIGOS ---
     # Strong favorite ML
     if h_prob >= 72:
         tip = {
@@ -314,6 +401,7 @@ def generate_nba_tip(game, sim):
 
     is_sniper = tip["prob"] >= 70
     return tip, is_sniper, odd_h, 0, odd_a
+
 
 
 def generate_football_tip(game, sim):
@@ -960,6 +1048,13 @@ def get_auto_games(target_date):
     t0 = _time.time()
     
     # 1. Busca jogos na ESPN (PARALELO)
+    cache_file = os.path.join(CACHE_DIR, f"today_{target_date}.json")
+    # Forçando o reprocessamento temporário ignorando o cache para rodar os props da NBA
+    # if os.path.exists(cache_file): 
+    #    print(f"[AUTO-ENGINE] ☑️ Picks for {target_date} already generated.")
+    #    return {"games": [], "trebles": []}
+    
+    
     raw_games = fetch_espn_schedule(target_date)
     if not raw_games:
         print("[AUTO-ENGINE] ⚠️ Nenhum jogo encontrado na ESPN")
@@ -987,6 +1082,46 @@ def get_auto_games(target_date):
             away = game["away"]
             league = game["league"]
             funnel_notes = []
+
+            # ─── STAGE 0.5: INJECT LIVE ODDS & 365SCORES LINEUPS ───
+            # 1. Inject Live Bookmaker Odds
+            try:
+                from odds_api import get_nba_player_props
+                if "_live_odds" not in game:
+                    # Fetch odds once per run and cache in the first game object (or pass globally)
+                    game["_live_odds"] = get_nba_player_props(target_date, "player_points")
+            except Exception as e:
+                print(f"[AUTO-ENGINE] ⚠️ Stage 0.5 OddsAPI error: {e}")
+                
+            # 2. Inject 365Scores Lineups
+            if SCORES365_ACTIVE:
+                try:
+                    intel = intel_map.get(home)
+                    # For NBA, always fetch lineups explicitly because it dictates our Player Props algorithm
+                    needs_fetch = not intel and (not TURBO_ACTIVE or sport == 'basketball')
+                    if needs_fetch and get_lineup_intelligence:
+                        sport_365 = "basketball" if sport == "basketball" else "football"
+                        intel = get_lineup_intelligence(home, away, target_date, sport=sport_365)
+                        if intel:
+                            intel_map[home] = intel # Cache it so STAGE 3.5 doesn't re-fetch
+                            
+                    if intel:
+                        game["_team_intel"] = {
+                            "home": {
+                                "starters": intel.get("home_starters", []),
+                                "missing": intel.get("home_missing", [])
+                            },
+                            "away": {
+                                "starters": intel.get("away_starters", []),
+                                "missing": intel.get("away_missing", [])
+                            }
+                        }
+                        if sport == "basketball":
+                            h_st = len(game["_team_intel"]["home"]["starters"])
+                            a_st = len(game["_team_intel"]["away"]["starters"])
+                            print(f"[DEBUG PIPELINE] {home} (Starters: {h_st}) vs {away} (Starters: {a_st}) injected")
+                except Exception as e:
+                    print(f"[AUTO-ENGINE] ⚠️ Stage 0.5 Lineups error for {home}: {e}")
 
             # ─── STAGE 1: RAW SIMULATION (Poisson / Monte Carlo) ───
             if sport == "basketball":
@@ -1500,3 +1635,12 @@ def get_auto_games(target_date):
     t_total = _time.time() - t_total_start
     print(f"[AUTO-ENGINE] ⚡ TURBO COMPLETE: {len(processed)} picks + {len(trebles)} combos em {t_total:.1f}s")
     return {"games": processed, "trebles": trebles}
+
+if __name__ == "__main__":
+    import sys
+    import datetime
+    target = sys.argv[1] if len(sys.argv) > 1 else datetime.datetime.now().strftime("%Y-%m-%d")
+    res = get_auto_games(target)
+    if res and res.get('trebles'):
+        for t in res['trebles']:
+            print(t.get('copy_text', ''))

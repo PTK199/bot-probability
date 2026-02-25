@@ -15,6 +15,7 @@ import datetime
 import json
 import os
 import sys
+from nba_stats import get_nba_player_stats
 
 os.environ["PYTHONIOENCODING"] = "utf-8"
 try:
@@ -216,6 +217,48 @@ def _parse_competitor(comp, members_lookup):
         ranking = m.get("ranking", 0)
         status = m.get("status", 0)
         
+        # Extrair Season Stats numéricos (Pontos, Rebotes, Assistências)
+        season_stats = m.get("seasonStats", [])
+        avg_pts = 0.0
+        avg_reb = 0.0
+        avg_ast = 0.0
+        raw_stats = []
+        for s in season_stats:
+            # 365Scores can return {"text": "PPG (12.9)"} OR {"name": "Pontos", "value": 12.9}
+            text = s.get("text", s.get("name", ""))
+            val = s.get("value", 0.0)
+            
+            # If val is 0, try to extract it from text, e.g., "PPG (12.9)"
+            if val == 0.0 and "(" in text and ")" in text:
+                try:
+                    inside = text.split("(")[1].split(")")[0]
+                    val = float(inside)
+                except:
+                    pass
+            elif val == 0.0 and text:
+                # Fallback if text has numbers
+                import re
+                nums = re.findall(r"[-+]?\d*\.\d+|\d+", text)
+                if nums: val = float(nums[-1])
+
+            raw_stats.append(text)
+            text_lower = text.lower()
+            if "ponto" in text_lower or "pts" in text_lower or "ppg" in text_lower:
+                avg_pts = float(val)
+            elif "reb" in text_lower or "rbt" in text_lower or "rb " in text_lower or "rb" == text_lower.strip():
+                avg_reb = float(val)
+            elif "assist" in text_lower or "ast" in text_lower or "apg" in text_lower:
+                avg_ast = float(val)
+
+        # Enrichment for NBA players if stats are missing
+        if avg_pts == 0.0:
+            nba_data = get_nba_player_stats(name)
+            if nba_data:
+                avg_pts = nba_data.get("avg_pts", 0.0)
+                avg_reb = nba_data.get("avg_reb", 0.0)
+                avg_ast = nba_data.get("avg_ast", 0.0)
+                raw_stats.append(f"NBA-API Enrichment: {avg_pts} PPG")
+        
         player_data = {
             "name": name,
             "short_name": short_name,
@@ -223,6 +266,10 @@ def _parse_competitor(comp, members_lookup):
             "position": position,
             "formation_role": formation_pos,
             "ranking": ranking,
+            "avg_pts": avg_pts,
+            "avg_reb": avg_reb,
+            "avg_ast": avg_ast,
+            "raw_stats": raw_stats
         }
         
         if status == 1:  # Starting
@@ -233,9 +280,7 @@ def _parse_competitor(comp, members_lookup):
             injury = m.get("injury", {})
             player_data["injury_reason"] = injury.get("reason", "Desconhecido")
             player_data["expected_return"] = injury.get("expectedReturn", "")
-            # Season stats
-            stats = m.get("seasonStats", [])
-            player_data["season_stats"] = [s.get("text", "") for s in stats]
+            player_data["season_stats"] = raw_stats
             missing.append(player_data)
         elif status == 4:  # Management (Coach)
             coach = {"name": name}
@@ -243,9 +288,9 @@ def _parse_competitor(comp, members_lookup):
             injury = m.get("injury", {})
             player_data["injury_reason"] = injury.get("reason", "Desconhecido")
             player_data["expected_return"] = injury.get("expectedReturn", "")
-            stats = m.get("seasonStats", [])
-            player_data["season_stats"] = [s.get("text", "") for s in stats]
+            player_data["season_stats"] = raw_stats
             doubtful.append(player_data)
+
     
     return {
         "name": comp.get("name", ""),
@@ -432,22 +477,23 @@ def get_lineup_intelligence(home_team, away_team, target_date=None, sport="footb
         al = g.get("away_long", "").lower().strip()
         
         # Check all combinations of aliases against 365scores names
-        home_match = False
-        away_match = False
+        home_match = any(alias in h or alias in hl for alias in home_aliases)
+        away_match = any(alias in a or alias in al for alias in away_aliases)
         
-        for alias in home_aliases:
-            if (alias in h or alias in hl or h in alias or hl in alias or
-                any(w in alias for w in h.split() if len(w) > 3) or
-                any(w in h for w in alias.split() if len(w) > 3)):
-                home_match = True
-                break
-        
-        for alias in away_aliases:
-            if (alias in a or alias in al or a in alias or al in alias or
-                any(w in alias for w in a.split() if len(w) > 3) or
-                any(w in a for w in alias.split() if len(w) > 3)):
-                away_match = True
-                break
+        # If no direct alias match, try more strict word matching
+        if not home_match:
+            for alias in home_aliases:
+                words = alias.split()
+                if len(words) > 0 and all(w in h or w in hl for w in words if len(w) > 3):
+                    home_match = True
+                    break
+                    
+        if not away_match:
+            for alias in away_aliases:
+                words = alias.split()
+                if len(words) > 0 and all(w in a or w in al for w in words if len(w) > 3):
+                    away_match = True
+                    break
         
         if home_match and away_match:
             game_id = g["game_id"]
@@ -473,6 +519,10 @@ def get_lineup_intelligence(home_team, away_team, target_date=None, sport="footb
         "lineup_confirmed": not details["home"].get("is_probable", True),
         "key_facts": [],
         "prob_adjustment": 0,  # How much to adjust home team probability
+        "home_starters": details["home"].get("starters", []),
+        "home_missing": details["home"].get("missing", []),
+        "away_starters": details["away"].get("starters", []),
+        "away_missing": details["away"].get("missing", []),
     }
     
     # === INJURY IMPACT ANALYSIS ===

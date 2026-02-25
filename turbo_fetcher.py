@@ -232,9 +232,10 @@ def fetch_365_intelligence_parallel(games, target_date, get_lineup_func):
     """
     cache_key = f"365intel_{target_date}"
     cached = _cache.get(cache_key)
-    if cached is not None:
-        print(f"[TURBO] ⚡ 365Scores Intel HIT cache ({len(cached)} entries)")
-        return cached
+    # Temporary bypass memory cache for debugging NBA EV Player Props:
+    # if cached is not None:
+    #     print(f"[TURBO] ⚡ 365Scores Intel HIT cache ({len(cached)} entries)")
+    #     return cached
 
     intel_map = {}
     t0 = time.time()
