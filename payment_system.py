@@ -92,12 +92,11 @@ def init_payment_system(app):
         # Create default admin if not exists
         if not User.query.filter_by(role='admin').first():
             admin_email = os.getenv('ADMIN_EMAIL', 'admin@bot.com')
-            admin_pass = os.getenv('ADMIN_PASSWORD')
-            if not admin_pass:
-                print("[WARNING] ADMIN_PASSWORD not set in env. Skipping default admin creation.")
-            else:
-                print(f"Creating default admin: {admin_email}")
-                admin = User(email=admin_email, role='admin', subscription_end=datetime.utcnow() + timedelta(days=36500))
-                admin.set_password(admin_pass)
-                db.session.add(admin)
-                db.session.commit()
+            admin_pass = os.getenv('ADMIN_PASSWORD', 'admin123')
+            print(f"[INIT] Creating default admin: {admin_email}")
+            admin = User(email=admin_email, role='admin', subscription_end=datetime.utcnow() + timedelta(days=36500))
+            admin.set_password(admin_pass)
+            db.session.add(admin)
+            db.session.commit()
+            print(f"[INIT] ✅ Admin criado. Altere ADMIN_PASSWORD no .env de produção!")
+
