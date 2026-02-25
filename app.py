@@ -21,7 +21,7 @@ except ImportError:
     pass
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'bot_probability_fallback_dev_key_2026')
 
 # --- INITIALIZE PAYMENT SYSTEM ---
 init_payment_system(app)
