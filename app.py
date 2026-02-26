@@ -329,6 +329,22 @@ def analyze():
     analysis = ai_engine.analyze_match(game_id)
     return jsonify(analysis)
 
+@app.route('/api/analyze_multiple', methods=['POST'])
+@login_required
+def analyze_multiple():
+    if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
+    
+    data = request.json
+    ocr_text = data.get('text', '')
+    bankroll = float(data.get('bankroll', 1000.0))
+    
+    try:
+        analysis = ai_engine.analyze_multiple_risk(ocr_text, bankroll)
+        return jsonify(analysis)
+    except Exception as e:
+        print(f"Error in analyze_multiple: {e}")
+        return jsonify({"status": "error", "message": "Erro ao processar a análise do bilhete."}), 500
+
 @app.route('/api/leverage')
 @login_required
 def leverage():
