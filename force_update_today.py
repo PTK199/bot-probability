@@ -3,6 +3,7 @@ import json
 import os
 import datetime
 import sys
+from git_autopush import autopush
 
 # Fix encoding for Windows terminals
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -127,6 +128,7 @@ def main():
 
     print(f"💾 Sucesso! Adicionados: {count_new}, Atualizados: {count_update}")
     print(f"📄 Verifique {HISTORY_PATH} ou o dashboard.")
+    autopush(f"auto: force_update_today [{datetime.date.today().strftime('%d/%m/%Y')}]")
 
 if __name__ == "__main__":
     main()

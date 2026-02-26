@@ -9,6 +9,7 @@ import json
 import os
 import datetime
 import requests
+from git_autopush import autopush
 
 HISTORY_PATH = 'history.json'
 
@@ -87,9 +88,10 @@ def fetch_all_espn(date_str):
     return results
 
 def main():
-    print("🚀 Iniciando Atualização Completa de Hoje...")
-    target_date = "2026-02-11"
-    espn_date = "20260211"
+    print("Iniciando Atualizacao Completa de Hoje...")
+    today = datetime.date.today()
+    target_date = today.strftime("%Y-%m-%d")
+    espn_date   = today.strftime("%Y%m%d")
     
     real_data = fetch_all_espn(espn_date)
     
@@ -101,8 +103,9 @@ def main():
         history = json.load(f)
 
     updates = 0
+    today_fmt = today.strftime("%d/%m")
     for h in history:
-        if h.get('date') != "11/02": continue
+        if h.get('date') != today_fmt: continue
         
         home = h['home']
         away = h['away']
@@ -193,7 +196,8 @@ def main():
     with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
         json.dump(history, f, indent=4, ensure_ascii=False)
     
-    print(f"\n🚀 Sincronização finalizada. {updates} jogos atualizados.")
+    print(f"Sincronizacao finalizada. {updates} jogos atualizados.")
+    autopush(f"auto: update_all_today [{today.strftime('%d/%m/%Y')}]")
 
 if __name__ == "__main__":
     main()
