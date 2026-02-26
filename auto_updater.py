@@ -305,13 +305,23 @@ def run():
     rate = all_won / (all_won + all_lost) * 100 if (all_won + all_lost) > 0 else 0
     log.info(f"GREEN RATE: {rate:.1f}% | WON:{all_won} LOST:{all_lost} PEND:{all_pend}")
 
+    # Atualiza Trincas
+    trebles_updated = 0
+    try:
+        import update_trebles
+        log.info("Iniciando avaliacao de trincas (update_trebles)...")
+        trebles_updated = update_trebles.run()
+    except Exception as e:
+        log.error(f"Erro ao atualizar trincas: {e}")
+
     # Push ao GitHub
-    if updated > 0:
+    total_updated = updated + trebles_updated
+    if total_updated > 0:
         try:
             sys.path.insert(0, BASE_DIR)
             from git_autopush import autopush
             now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
-            msg = f"auto: atualiza history [{now_str}] | WON:{won} LOST:{lost} | Green:{rate:.1f}%"
+            msg = f"auto: atualiza history/trebles [{now_str}] | Upd: {total_updated} picks"
             ok = autopush(msg)
             if ok:
                 log.info("Push ao GitHub: OK")
@@ -323,6 +333,7 @@ def run():
         log.info("Nenhuma mudança — push ignorado.")
 
     log.info("auto_updater finalizado.")
+
 
 
 if __name__ == "__main__":
