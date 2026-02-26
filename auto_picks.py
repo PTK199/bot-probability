@@ -771,17 +771,17 @@ def build_trebles(processed_games):
         odd = float(tip.get("odd", 1.5))
         
         # HARD FILTERS - If any fail, pick is excluded from combos
-        min_p = 60 # Softened to allow more Elite picks in combos
+        min_p = 68 # Aumentado de 60 para 68: só picks premium entram em combo
         if "🏀" in tip.get("reason", ""):
-            min_p = 58 
+            min_p = 65 
 
         if prob < min_p:
             continue  # Too low confidence
-        if "trap" in reason and odd < 1.20:
-            continue  # Trap + juice = dangerous
-        if odd < 1.08:
+        if "trap" in reason:
+            continue  # Zero tolerância com trap em combos
+        if odd < 1.10:
             continue  # Bad risk/reward ratio for combos
-        if odd > 2.50:
+        if odd > 2.20:
             continue  # Too volatile for combo inclusion
         
         # Calculate safety score
@@ -793,7 +793,7 @@ def build_trebles(processed_games):
     fortress_pool.sort(key=lambda x: x.get("_safety_score", 0), reverse=True)
     
     print(f"[TREBLE-ENGINE] 🏰 Fortress pool: {len(fortress_pool)} picks (from {len(processed_games)} total)")
-    for g in fortress_pool[:8]:
+    for g in fortress_pool[:5]:
         print(f"  → {g['home_team']} vs {g['away_team']}: {g['best_tip']['selection']} "
               f"(prob:{g['best_tip']['prob']}%, safety:{g.get('_safety_score', 0):.0f})")
     
@@ -823,7 +823,8 @@ def build_trebles(processed_games):
     # Only DC picks or very high ML picks
     # ═══════════════════════════════════════
     
-    bunker_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 42]
+    # Aumentado safety mínimo de 42 para 55
+    bunker_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 55]
     
     if len(bunker_candidates) >= 2:
         # Pick the 2 safest, ensuring diversification
@@ -872,7 +873,8 @@ def build_trebles(processed_games):
     # Mix of DC + ML for better odds
     # ═══════════════════════════════════════
     
-    fortress_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 38]
+    # Aumentado safety mínimo de 38 para 48
+    fortress_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 48]
     
     if len(fortress_candidates) >= 3:
         picks = []
@@ -912,109 +914,6 @@ def build_trebles(processed_games):
                 )
             })
             print(f"[TREBLE-ENGINE] 🏰 FORTRESS: {combo_prob}% @ {total_odd:.2f}")
-    
-    # ═══════════════════════════════════════
-    # TREBLE 3: 🔥 VALUE HUNTER (3-leg, higher risk/reward)
-    # Uses a broader pool including Over picks
-    # ═══════════════════════════════════════
-    
-    value_candidates = [g for g in fortress_pool if g.get("_safety_score", 0) >= 40]
-    
-    if safe_picks and over_picks and len(value_candidates) >= 3:
-        # 2 safest ML/DC + 1 best Over
-        picks = []
-        used_leagues = set()
-        
-        # First: add 2 safest ML/DC
-        for g in safe_picks:
-            if len(picks) >= 2:
-                break
-            league = g.get("league", "")
-            if league in used_leagues:
-                continue
-            picks.append(g)
-            used_leagues.add(league)
-        
-        # Then: add 1 best Over (different league)
-        for g in over_picks:
-            if len(picks) >= 3:
-                break
-            league = g.get("league", "")
-            if league in used_leagues:
-                continue
-            picks.append(g)
-            used_leagues.add(league)
-        
-        if len(picks) >= 3 and _diversification_check(picks):
-            total_odd = 1
-            sels = []
-            for p in picks:
-                total_odd *= float(p["best_tip"]["odd"])
-                sels.append({
-                    "match": f"{p['away_team']} @ {p['home_team']}", 
-                    "pick": f"{p['best_tip']['selection']} (@{p['best_tip']['odd']})",
-                    "league": p.get("league", ""),
-                    "prob": p["best_tip"]["prob"]
-                })
-            
-            combo_prob = _calc_combo_probability(picks)
-            
-            trebles.append({
-                "name": "🔥 VALUE HUNTER",
-                "total_odd": f"{total_odd:.2f}",
-                "probability": f"{combo_prob}%",
-                "selections": sels,
-                "copy_text": (
-                    f"🔥 VALUE HUNTER (Prob: {combo_prob}%)\n" + 
-                    "\n".join([f"• {s['pick']} [{s['league']}]" for s in sels]) + 
-                    f"\n💰 Odd Total: {total_odd:.2f}"
-                )
-            })
-            print(f"[TREBLE-ENGINE] 🔥 VALUE HUNTER: {combo_prob}% @ {total_odd:.2f}")
-    
-    # ═══════════════════════════════════════
-    # TREBLE 4: 💎 DIAMANTE (4-leg, high reward if pool is deep)
-    # Only built if we have 6+ fortress-quality picks
-    # ═══════════════════════════════════════
-    
-    if len(fortress_candidates) >= 6:
-        picks = []
-        used_leagues = set()
-        for g in fortress_candidates:
-            if len(picks) >= 4:
-                break
-            league = g.get("league", "")
-            if league in used_leagues:
-                continue
-            picks.append(g)
-            used_leagues.add(league)
-        
-        if len(picks) >= 4 and _diversification_check(picks):
-            total_odd = 1
-            sels = []
-            for p in picks:
-                total_odd *= float(p["best_tip"]["odd"])
-                sels.append({
-                    "match": f"{p['away_team']} @ {p['home_team']}", 
-                    "pick": f"{p['best_tip']['selection']} (@{p['best_tip']['odd']})",
-                    "league": p.get("league", ""),
-                    "prob": p["best_tip"]["prob"]
-                })
-            
-            combo_prob = _calc_combo_probability(picks)
-            
-            trebles.append({
-                "name": "💎 DIAMANTE 4-LEGS",
-                "total_odd": f"{total_odd:.2f}",
-                "probability": f"{combo_prob}%",
-                "selections": sels,
-                "copy_text": (
-                    f"💎 DIAMANTE (Prob: {combo_prob}%)\n" + 
-                    "\n".join([f"• {s['pick']} [{s['league']}]" for s in sels]) + 
-                    f"\n💰 Odd Total: {total_odd:.2f}"
-                )
-            })
-            print(f"[TREBLE-ENGINE] 💎 DIAMANTE: {combo_prob}% @ {total_odd:.2f}")
     
     if not trebles:
         print("[TREBLE-ENGINE] ⚠️ No trebles built — insufficient fortress-quality picks")
