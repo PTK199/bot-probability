@@ -992,11 +992,24 @@
             return `Hoje (${d}/${m})`;
         }
 
-        // Set button label on load
+        // Set button label on load + auto-carrega jogos se ja logado
         document.addEventListener('DOMContentLoaded', () => {
             const label = document.getElementById('btn-today-label');
             if (label) label.innerText = getTodayLabel();
+
+            // Auto-carrega os jogos de hoje se o usuario ja estiver logado (sessao ativa)
+            // O app-content fica visivel quando o backend renderiza a pagina autenticada
+            const appContent = document.getElementById('app-content');
+            const loginOverlay = document.getElementById('login-overlay');
+            const isLoggedIn = appContent && !appContent.classList.contains('hidden');
+            const noLoginOverlay = !loginOverlay || loginOverlay.classList.contains('hidden');
+
+            if (isLoggedIn || noLoginOverlay) {
+                // Ja esta autenticado — carrega os jogos direto
+                setTimeout(() => fetchGames(getTodayDate()), 100);
+            }
         });
+
 
         function fetchGames(date, forceRefresh = false) {
             // TURBO: Check client cache first
