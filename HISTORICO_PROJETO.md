@@ -1,527 +1,320 @@
-# 📊 BOT PROBABILITY - Histórico e Resumo do Projeto
+# 📊 BOT PROBABILITY — Histórico Completo do Projeto
 
-**Última Atualização:** 07 de Fevereiro de 2026, 01:32 AM  
-**Status:** ✅ Sistema Operacional  
-**Versão Atual:** IA-Sniper 3.0
-
----
-
-## 🎯 VISÃO GERAL DO PROJETO
-
-**Bot Probability** é uma plataforma avançada de análise esportiva que utiliza Inteligência Artificial e OCR (Reconhecimento Óptico de Caracteres) para fornecer análises técnicas profundas de jogos e apostas esportivas.
-
-### Objetivo Principal
-Processar milhares de dados em tempo real para entregar análises táticas de elite, combinando:
-- 🧠 **Inteligência Artificial** para análise preditiva
-- 📸 **OCR** para extração de dados de bilhetes
-- 📊 **Análise Estatística** para validação matemática
-- ⚽ **Scout Técnico** para insights táticos profundos
+**Última Atualização:** 26 de Fevereiro de 2026, 15:39  
+**Status:** ✅ Sistema Operacional em Produção  
+**Versão Atual:** Neural Cortex 6.0 / Vanguarda Neural
 
 ---
 
-## 🏗️ ARQUITETURA DO SISTEMA
+## 🎯 VISÃO GERAL
+
+**Bot Probability** é uma plataforma de análise esportiva com IA para geração de picks esportivos premium (NBA + Futebol). O sistema busca dados reais em tempo real via ESPN API e The Odds API, gera picks automaticamente com Monte Carlo e Poisson, e exibe tudo em um dashboard web premium com glassmorphism.
+
+### Missão
+> Atingir **80%+ de Green Rate** com um sistema de IA que aprende continuamente dos resultados passados.
+
+---
+
+## 🏗️ ARQUITETURA ATUAL
 
 ### Stack Tecnológico
 
-#### Backend
-- **Framework:** Flask (Python)
-- **Módulos Principais:**
-  - `app.py` - Servidor principal e rotas API
-  - `data_fetcher.py` - Geração de dados de jogos e odds
-  - `ai_engine.py` - Motor de análise de IA
-  - `patch.py` - Utilitários e correções
+| Camada | Tecnologia |
+|---|---|
+| Backend | Flask (Python) |
+| Banco de Dados Local | SQLite (`database.db`) + `history.json` |
+| Banco de Dados Nuvem | Supabase (REST API) |
+| Frontend | HTML5 + TailwindCSS + Glassmorphism |
+| IA | Monte Carlo (NBA) + Poisson (Futebol) + 42 módulos |
+| Dados | ESPN API + The Odds API + Scores365 |
+| OCR | Tesseract.js |
+| Deploy | Railway (via Procfile + Gunicorn) |
 
-#### Frontend
-- **Framework:** HTML5 + TailwindCSS
-- **Bibliotecas:**
-  - Tesseract.js (OCR)
-  - Chart.js (Gráficos)
-  - Lucide Icons
-- **Design:** Dark Mode Premium com Glassmorphism
+### Arquivos do Projeto (Estado Atual)
 
-#### Dependências
 ```
-Flask
-flask-cors
+d:\BOT PROBABILITY\
+├── app.py                    # Flask: rotas, autenticação, API
+├── ai_engine.py              # Motor IA: 42+ módulos, Monte Carlo, Poisson (~68KB)
+├── data_fetcher.py           # Fetcher de jogos/odds/trebles (~45KB)
+├── auto_picks.py             # Gerador automático de picks diários (~75KB)
+├── specialized_modules.py    # 14 módulos táticos especializados
+├── knowledge_base.py         # Elencos, técnicos, fases dos times
+├── espn_api.py               # Integração ESPN API
+├── odds_api.py               # Integração The Odds API
+├── scores365.py              # Scraper de resultados (~31KB)
+├── result_checker.py         # Verificação automática de resultados
+├── self_learning.py          # Sistema de aprendizado contínuo (~30KB)
+├── turbo_fetcher.py          # Fetcher otimizado de alta velocidade (~25KB)
+├── real_news.py              # Busca de notícias em inglês
+├── update_history_v3.py      # Atualização do histórico v3
+├── update_all_today.py       # Script de atualização diária completa
+├── force_update_today.py     # Forçar atualização dos resultados de hoje
+├── supabase_client.py        # Cliente REST Supabase
+├── admin.py                  # Painel admin CLI
+├── payment_system.py         # Sistema de pagamentos
+├── betano_scraper.py         # Scraper Betano
+├── history.json              # Histórico de picks (~217KB)
+├── history_trebles.json      # Histórico de trebles/múltiplas (~9KB)
+├── learning_state.json       # Estado do aprendizado (~54KB)
+├── database.db               # SQLite: usuários e sessões
+├── AUDIT_REPORT.md           # Auditoria técnica completa
+├── DEPLOY.md                 # Instruções de deploy
+├── AGENTS.md                 # Instruções para agentes IA
+├── requirements.txt          # Dependências Python
+├── Procfile                  # Config Railway/Heroku
+├── runtime.txt               # Versão Python para deploy
+└── templates/
+    ├── index.html            # Dashboard principal (~99KB)
+    ├── login.html            # Tela de login
+    ├── admin.html            # Painel admin web
+    ├── subscribe.html        # Página de assinatura
+    ├── payment_success.html  # Pós-pagamento sucesso
+    ├── payment_failure.html  # Pós-pagamento falha
+    └── payment_pending.html  # Pagamento pendente
 ```
 
 ---
 
-## 🎨 ESTRUTURA DE NAVEGAÇÃO
+## 📅 LINHA DO TEMPO — EVOLUÇÃO DO PROJETO
 
-O sistema possui 4 visualizações principais:
+### 🟦 FASE 1 — Fundação (05–06/02/2026)
+- Criação do projeto base Flask
+- Frontend premium com dark mode + glassmorphism
+- Sistema de picks hardcoded por data
+- OCR integrado (Tesseract.js) para análise de bilhetes
+- Sistema de scout técnico (Tactical Dossier)
+- Trust Score Gauge (gauge SVG animado)
 
-### 1. 📅 **Dashboard (Games)**
-- **Função:** Exibição dos jogos do dia com análises "Sniper"
-- **Features:**
-  - Filtros por data (Hoje/Amanhã)
-  - Filtros por esporte (Futebol/Basquete)
-  - Cards de jogos com odds de múltiplas casas
-  - Sistema de badges para picks premium (SNIPER #1, #2, #3)
-  - Logos reais dos times (ESPN CDN + Wikipedia)
-  - Comparação de odds entre Betano, Bet365, Pinnacle, Betfair
+### 🟦 FASE 2 — IA & Backend (07–11/02/2026)
+- **Motor de IA:** 42 módulos incluindo Monte Carlo, Poisson, Markov Chain
+- **Supabase:** Integração com banco em nuvem (260 times + 1500+ jogadores)
+- **Self-Calibration Engine:** Loop de feedback que ajusta probabilidades
+- **EV Gate:** Rejeita tips sem valor matemático (prob > implied + 5%)
+- **Emotional Weight:** Morale baseado em resultados recentes do histórico
+- **Knowledge Base:** `knowledge_base.py` com elencos e técnicos
+- **Auditoria:** `AUDIT_REPORT.md` gerado — 78% de accuracy em 41 tips
+- Sistema de logos com fallback em 3 níveis (ESPN CDN → Wikipedia → Shield)
+- **Login system** com sessão Flask + hash werkzeug
+- Módulos especializados: corners, goals, handicaps, NBA totals, sharp money
 
-### 2. 💰 **Gestão & Scout (Calculator)**
-- **Função:** Gestão de banca e análise técnica
-- **Features:**
-  - **Calculadora de Alavancagem:**
-    - Define banca inicial, meta final e período
-    - Gera plano diário de ROI necessário
-    - Sugere odds ideais para cada dia
-  - **Calculadora de Dutching:**
-    - Distribui stake entre múltiplos resultados
-    - Calcula lucro garantido
-    - Exibe rendimento percentual
+### 🟦 FASE 3 — Mobile & Automação (11–17/02/2026)
+- **Mobile-First:** Interface adaptativa 9:16 com bottom navigation bar
+- **PWA-like:** Detecção de dispositivo móvel + layout nativo
+- **`auto_picks.py`:** Gerador automático de picks e trebles (elimina hardcode manual)
+  - Busca jogos via ESPN API automaticamente
+  - Monte Carlo (NBA) + Poisson (Futebol) dinâmico
+  - EV calculado por pick, trebles auto-construídos
+- **`real_news.py`:** Busca notícias em inglês para análise contextual
+- **`history_trebles.json`:** Persistência de trebles gerados
+- **`data_fetcher.py`:** Leitura do `history_trebles.json` para gerenciamento de status
 
-### 3. 🎲 **Validador de Múltiplas (Analyzer)**
-- **Função:** Análise de bilhetes combinados via OCR
-- **Features:**
-  - Upload de imagem do bilhete
-  - OCR para extração de times e odds
-  - Análise do "Elo Mais Fraco"
-  - Validação de probabilidade matemática
-  - Scout técnico de cada jogo
-  - Trust Score visual (gauge animado)
+### 🟦 FASE 4 — Admin, Velocidade & Correções (17–19/02/2026)
+- **Admin Panel Web:** `templates/admin.html` + `admin.py` + rota `/admin`
+- **Turbo Fetcher:** `turbo_fetcher.py` para alta velocidade de fetch (~25KB)
+- **`update_history_v3.py`:** Script de atualização do histórico v3
+- **`scores365.py`:** Scraper completo de resultados (~31KB)
+- **ESPN API expandida:** Endpoints para Champions League e outras ligas europeias
+- **`update_history_smart.py`:** Busca dinâmica da data de ontem (v anterior)
+- Fix: Date dinâmica no script de atualização
+- Fix: Deduplicação de picks no `history.json`
 
-### 4. 📜 **Histórico (History)**
-- **Função:** Registro de performance passada
-- **Features:**
-  - Lista de tips anteriores
-  - Status: WON (Green) / LOST (Red)
-  - Placar final e lucro/prejuízo
-  - Botão de sincronização
+### 🟦 FASE 5 — Self-Learning & Acurácia 80% (20–21/02/2026)
+- **`self_learning.py`:** Sistema de aprendizado contínuo de 30 dias (~30KB)
+  - Backfill de dados históricos de 30 dias
+  - Detecção de mercados voláteis e "times tóxicos"
+  - Filtros cirúrgicos para aumentar precision
+- **`learning_state.json`:** Estado do aprendizado (~54KB de dados acumulados)
+- **Meta:** Atingir 80%+ de Green Rate
+- Atualização de status Green/Red no histórico
 
----
-
-## 🔥 FUNCIONALIDADES PRINCIPAIS
-
-### Sistema de Análise "Sniper"
-O sistema identifica diariamente os 3 melhores picks do mercado baseado em:
-- Disparidade técnica entre times
-- Estatísticas de forma recente
-- Contexto tático (desfalques, mando de campo)
-- Valor matemático (Expected Value)
-
-**Exemplo de Sniper Pick:**
-```
-🎯 SNIPER #1: Magic vs Nets
-Mercado: Total de Pontos - Under 223.5
-Odd: 1.40
-Probabilidade: 92%
-Razão: "Nets tem o pior ataque da liga (107 PPG). 
-        Magic tem defesa Top 10 e pace lento."
-```
-
-### Motor de OCR Inteligente
-- **Tesseract.js** para reconhecimento de texto
-- **Filtros de ruído** para melhorar precisão
-- **Extração de:**
-  - Nomes de times
-  - Odds decimais
-  - Mercados de aposta
-- **Validação cruzada** com banco de dados de logos
-
-### Análise Técnica Profunda (Tactical Dossier)
-Quando o usuário clica em "Ver Dossiê", o sistema exibe:
-- **Dados ao Vivo:**
-  - Placar atual
-  - Posse de bola
-  - Chutes no alvo
-  - Escanteios
-  - Faltas
-- **Contexto Tático:**
-  - Narrativa da situação do jogo
-  - Probabilidade implícita
-  - Fonte de pesquisa
-- **Perfil dos Times:**
-  - Forma recente
-  - Jogadores-chave
-  - Estilo de jogo
-  - Pontos fortes/fracos
-
-### Trust Score Gauge
-Indicador visual de confiança da análise:
-- **0-50%:** Zona de Risco (Vermelho)
-- **50-75%:** Zona Neutra (Amarelo)
-- **75-100%:** Zona de Confiança (Verde)
-
-Animação SVG com stroke-dasharray para efeito de "preenchimento".
+### 🟦 FASE 6 — Dados Reais & Segurança (24–25/02/2026)
+- **Dashboard com dados reais:** ESPN API para NBA + Premier League (25/02/2026)
+  - Substituição de dados placeholder por dados live
+  - Jogos verificados do dia atual
+- **Fix crítico de segurança:**
+  - Admin backdoor removido
+  - Senhas hardcoded eliminadas
+  - Variáveis indefinidas corrigidas
+  - `secret_key` movida para `.env`
+  - Instabilidade de sessão resolvida
+- **Sistema de pagamentos:** `payment_system.py` + páginas de sucesso/falha/pendente
+- **Página de assinatura:** `templates/subscribe.html`
+- **Deploy:** Configuração Railway com `Procfile` e `runtime.txt`
 
 ---
 
-## 📊 DADOS E LÓGICA DE NEGÓCIO
+## 🔥 FUNCIONALIDADES PRINCIPAIS (ESTADO ATUAL)
 
-### Geração de Jogos (`data_fetcher.py`)
-O sistema possui dados hardcoded para:
-- **05/02/2026:** 13 jogos (Futebol BR + NBA + Europa)
-- **06/02/2026:** 7 jogos (NBA Friday + Futebol)
+### 1. Geração Automática de Picks (`auto_picks.py`)
+- Busca jogos do dia via ESPN API automaticamente
+- Aplica Monte Carlo (NBA) e Poisson (Futebol) para cada jogo
+- Calcula EV (Expected Value) e filtra picks negativos
+- Gera trebles automáticos com os 3 melhores picks
+- Salva em `history.json` e `history_trebles.json`
 
-Cada jogo contém:
-```python
-{
-    "home": "Celtics",
-    "away": "Heat",
-    "league": "NBA",
-    "time": "21:30",
-    "sport": "basketball",
-    "odds": {"home": "1.45", "draw": "-", "away": "2.80"},
-    "best_tip": {
-        "market": "Vencedor",
-        "selection": "Celtics -4.5",
-        "prob": 85,
-        "odd": 1.90,
-        "reason": "🔥 TD GARDEN: Celtics em casa são rolo compressor...",
-        "badge": "SNIPER #1 🎯"
-    },
-    "is_sniper": True,
-    "home_logo": "https://a.espncdn.com/i/teamlogos/nba/500/bos.png",
-    "away_logo": "https://a.espncdn.com/i/teamlogos/nba/500/mia.png",
-    "comparisons": [...]  // Odds de 4 casas
-}
-```
+### 2. Motor de IA (`ai_engine.py` — 68KB)
+- **42+ módulos neurais** incluindo:
+  - `calculate_monte_carlo_simulation` — 5000 iterações com numpy
+  - `calculate_poisson_probability` — Cálculo matemático puro para futebol
+  - `neural_cortex_omega` — Pipeline principal de análise (375 linhas)
+  - `self_calibration_engine` — Ajusta pesos baseado no histórico real
+  - `trap_hunter_funnel` — Identifica armadilhas de mercado
+  - `golden_path_optimizer` — Compara mercados e escolhe o melhor
+  - `detect_blood_in_water` — Times em queda livre
+  - `calculate_nba_b2b_impact` — Impacto de back-to-back
 
-### Logos de Times
-Sistema de fallback em 3 níveis:
-1. **Exact Match:** Busca exata no dicionário
-2. **Partial Match:** Busca parcial (ex: "Sporting" → "Sporting CP")
-3. **Generic Shield:** Ícone genérico se não encontrar
+### 3. Sistema de História (`history.json` — 217KB)
+- Registro completo de todos os picks
+- Status automático: `WON` / `LOST` / `PENDING`
+- Atualização via ESPN API (placar final)
+- Deduplicação implementada (sem picks duplicados)
 
-**Fontes:**
-- ESPN CDN (NBA, Futebol Internacional)
-- Wikipedia (Times menores, estaduais)
+### 4. Self-Learning de 30 Dias (`self_learning.py`)
+- Analisa resultados dos últimos 30 dias
+- Identifica padrões de vitória por liga/mercado
+- Ajusta pesos dos filtros automaticamente
+- Estado persistido em `learning_state.json`
+
+### 5. Frontend Premium (`templates/index.html` — 99KB)
+- Dark mode com glassmorphism
+- Cards de jogos com logos (ESPN CDN)
+- Comparação de odds entre 4 casas (Betano, Bet365, Pinnacle, Betfair)
+- Sistema de badges Sniper (#1, #2, #3)
+- Modal de Dossiê Tático
+- Trust Score Gauge animado (SVG)
+- Share/download de cards (html2canvas)
+- Mobile-first com bottom navigation
+
+### 6. Sistema de Autenticação & Pagamentos
+- Login com Flask-session + hash werkzeug
+- `secret_key` fixa via variável de ambiente
+- Planos de assinatura (`subscribe.html`)
+- Integração de pagamentos (`payment_system.py`)
+- Admin panel restrito (`/admin`)
 
 ---
 
-## 🎨 DESIGN SYSTEM
+## 📊 PERFORMANCE DO SISTEMA
 
-### Paleta de Cores
-```css
---dark-bg: #030712 (Fundo principal)
---glass-bg: rgba(15, 23, 42, 0.6) (Painéis)
---neon-blue: #00f2ff (Destaque primário)
---neon-purple: #bc13fe (Destaque secundário)
---emerald: #10b981 (Sucesso/Greens)
---red: #ef4444 (Perda/Reds)
-```
-
-### Tipografia
-- **Primária:** Outfit (Sans-serif moderna)
-- **Secundária:** Inter
-- **Mono:** Font-mono do sistema (para odds/números)
-
-### Componentes Visuais
-- **Glass Panels:** Backdrop-blur + border transparente
-- **Badges:** Pills com gradientes e sombras neon
-- **Cards:** Rounded-3xl com hover effects
-- **Buttons:** Transform scale + shadow transitions
-- **Icons:** Lucide (SVG icons)
-
-### Animações
-- **Fade-in:** Entrada suave de elementos
-- **Pulse:** Indicadores de status online
-- **Shimmer:** Loading states
-- **Draw-gauge:** Animação do Trust Score
+| Métrica | Valor |
+|---|---|
+| **Green Rate Registrado** | ~78% (histórico auditado em 11/02) |
+| **Meta Atual** | 80%+ |
+| **Total de Picks** | 100+ (history.json ~217KB) |
+| **Ligas Cobertas** | NBA, Premier League, Champions League, La Liga, Serie A, Brasileirão |
+| **Módulos de IA** | 42+ |
+| **Linhas de Código** | ~7.000+ |
 
 ---
 
 ## 🔌 API ENDPOINTS
 
-### `GET /`
-Renderiza a página principal (`index.html`)
-
-### `GET /api/games?date=YYYY-MM-DD`
-Retorna lista de jogos para a data especificada
-- **Params:** `date` (default: 2026-02-05)
-- **Response:** Array de objetos de jogo
-
-### `GET /api/history`
-Retorna histórico de tips passados
-- **Response:** Array de resultados históricos
-
-### `GET /api/analyze?id=<game_id>`
-Análise básica de um jogo (mock)
-- **Params:** `id` (ID do jogo)
-- **Response:** Objeto de análise
-
-### `POST /api/analyze_deep`
-Análise profunda via OCR
-- **Body:** `{ "text": "texto_extraido_ocr" }`
-- **Response:** Dados de análise técnica completa
-
-### `POST /api/analyze_multiple`
-Validação de múltiplas
-- **Body:** `{ "text": "...", "bankroll": 1000 }`
-- **Response:** Análise de risco + scout de cada jogo
+| Endpoint | Método | Função |
+|---|---|---|
+| `/` | GET | Dashboard principal |
+| `/login` | GET/POST | Autenticação |
+| `/subscribe` | GET | Página de assinatura |
+| `/admin` | GET | Painel admin (restrito) |
+| `/api/games?date=YYYY-MM-DD` | GET | Picks do dia |
+| `/api/history` | GET | Histórico completo |
+| `/api/trebles` | GET | Histórico de trebles |
+| `/api/analyze?id=<id>` | GET | Análise de jogo |
+| `/api/analyze_deep` | POST | Análise via OCR |
+| `/api/analyze_multiple` | POST | Validação de múltiplas |
+| `/api/sync_history` | POST | Sincronizar resultados |
+| `/api/payment/*` | POST | Webhooks de pagamento |
 
 ---
 
-## 📁 ESTRUTURA DE ARQUIVOS
+## 🐛 PROBLEMAS CONHECIDOS / LIMITAÇÕES
 
-```
-d:\BOT PROBABILITY\
-├── app.py                    # Servidor Flask
-├── data_fetcher.py           # Gerador de dados de jogos
-├── ai_engine.py              # Motor de IA e análise
-├── patch.py                  # Utilitários
-├── requirements.txt          # Dependências Python
-├── temp_logic.js             # Lógica JS temporária
-├── HISTORICO_PROJETO.md      # Este arquivo
-├── templates/
-│   └── index.html            # Interface principal (1726 linhas)
-├── static/                   # Assets estáticos (se houver)
-└── __pycache__/              # Cache Python
-```
+| # | Problema | Gravidade | Status |
+|---|---|---|---|
+| 1 | `data_fetcher.py` monolito (1600+ linhas em 1 função) | Alta | Pendente refactor |
+| 2 | Vários módulos de IA retornam dados simulados | Média | Documentado |
+| 3 | Knowledge base estática (elencos não auto-atualizam) | Média | Backlog |
+| 4 | OCR accuracy depende da qualidade da imagem | Baixa | Design limitation |
+| 5 | Supabase subutilizado (opera principalmente local) | Baixa | Backlog |
+
+---
+
+## 🚀 ROADMAP — PRÓXIMOS PASSOS
+
+### 🔥 Alta Prioridade
+- [ ] Conectar `self_learning.py` ao pipeline principal de geração de picks
+- [ ] Refatorar `data_fetcher.py` em módulos menores
+- [ ] Dashboard de performance admin (winrate por liga em tempo real)
+
+### 📌 Médio Prazo
+- [ ] Self-Correction automático dos módulos de IA baseado em dados acumulados
+- [ ] Notificações Telegram quando picks Sniper são gerados
+- [ ] Exportação de relatórios em PDF
+- [ ] Implementar módulos de IA que hoje são simulados (weather, travel, lineup)
+
+### 💡 Longo Prazo
+- [ ] Expansão mobile (PWA completo com offline mode)
+- [ ] Integração com mais casas de apostas via scraper
+- [ ] Inteligência de arbitragem cross-house
 
 ---
 
 ## 🚀 COMO EXECUTAR
 
-### 1. Instalar Dependências
 ```bash
+# Instalar dependências
 pip install -r requirements.txt
-```
 
-### 2. Iniciar Servidor
-```bash
+# Ativar variáveis de ambiente (.env)
+# (Preencher FLASK_SECRET_KEY, THE_ODDS_API_KEY, SUPABASE_URL, SUPABASE_KEY)
+
+# Iniciar servidor
 python app.py
-```
+# → http://localhost:5000
 
-### 3. Acessar Interface
-Abrir navegador em: `http://localhost:5000`
+# Gerar picks do dia
+python auto_picks.py
 
-### 4. Modo Debug
-O servidor roda em modo debug por padrão:
-```python
-if __name__ == '__main__':
-    app.run(debug=True)
-```
+# Atualizar resultados de hoje
+python update_all_today.py
 
----
-
-## 🎯 FLUXO DE USO
-
-### Cenário 1: Consultar Picks do Dia
-1. Usuário acessa o Dashboard
-2. Seleciona data (Hoje/Amanhã)
-3. Filtra por esporte (opcional)
-4. Visualiza cards de jogos ordenados por "is_sniper"
-5. Clica em "Ver Dossiê" para análise profunda
-6. Modal exibe dados táticos completos
-
-### Cenário 2: Planejar Gestão de Banca
-1. Usuário vai para "Gestão & Scout"
-2. Insere: Banca inicial (R$ 100), Meta (R$ 1000), Dias (30)
-3. Clica em "Gerar Plano de Alavancagem"
-4. Sistema calcula ROI diário necessário
-5. Exibe tabela dia-a-dia com metas progressivas
-
-### Cenário 3: Validar Múltipla
-1. Usuário vai para "Múltiplas"
-2. Faz upload de print do bilhete
-3. Clica em "Validar Probabilidade & Scout"
-4. OCR extrai times e odds
-5. IA analisa cada jogo individualmente
-6. Exibe:
-   - Elo mais fraco (jogo com menor probabilidade)
-   - Trust Score total
-   - Scout técnico de cada partida
-   - Recomendação final (Apostar/Evitar)
-
----
-
-## 🧠 LÓGICA DE IA
-
-### Análise de Jogo Individual
-O `ai_engine.py` (não visualizado ainda) provavelmente contém:
-- Modelos de probabilidade baseados em:
-  - Forma recente dos times
-  - Head-to-head histórico
-  - Contexto (mando, desfalques)
-  - Estatísticas avançadas (xG, posse, etc.)
-
-### Validação de Múltiplas
-Fórmula de probabilidade combinada:
-```
-P(múltipla) = P(jogo1) × P(jogo2) × ... × P(jogoN)
-```
-
-**Exemplo:**
-- Jogo 1: 85% (0.85)
-- Jogo 2: 78% (0.78)
-- Jogo 3: 92% (0.92)
-- **Múltipla:** 0.85 × 0.78 × 0.92 = **61%**
-
-### Trust Score
-Calculado com base em:
-- Probabilidade matemática
-- Qualidade dos dados (OCR confidence)
-- Consistência das odds entre casas
-- Fatores de risco (desfalques, clima, etc.)
-
----
-
-## 🎨 DESTAQUES VISUAIS
-
-### Cards de Jogo
-- **Layout:** Grid responsivo (1 col mobile, 2 cols desktop)
-- **Elementos:**
-  - Logos dos times (64x64px)
-  - Badge de liga
-  - Horário do jogo
-  - Odds principais (Casa/Empate/Fora)
-  - Tip recomendado com probabilidade
-  - Badge "SNIPER" para picks premium
-  - Comparação de 4 casas de apostas
-
-### Modal de Dossiê
-- **Tamanho:** Max-width 5xl, altura 90vh
-- **Seções:**
-  1. Header com título e botão fechar
-  2. Corpo scrollável com:
-     - Dados ao vivo (se disponível)
-     - Contexto tático narrativo
-     - Perfil detalhado de cada time
-     - Estatísticas comparativas
-  3. Footer com timestamp e botão de ação
-
-### Gauge de Trust Score
-```html
-<svg viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="44" 
-          stroke="#1e293b" 
-          stroke-width="12" 
-          fill="none"/>
-  <circle cx="50" cy="50" r="44"
-          stroke="url(#gradient)"
-          stroke-width="12"
-          fill="none"
-          stroke-dasharray="276"
-          stroke-dashoffset="calc(276 - (276 * TRUST_SCORE / 100))"
-          class="animate-draw-gauge"/>
-</svg>
+# Forçar atualização de resultados
+python force_update_today.py
 ```
 
 ---
 
-## 📈 ROADMAP E MELHORIAS FUTURAS
+## 👥 LOG DE CONVERSAS (HISTÓRICO COMPLETO)
 
-### Funcionalidades Planejadas
-- [ ] Integração com APIs reais de odds (Odds API)
-- [ ] Sistema de notificações push para novos Snipers
-- [ ] Histórico persistente em banco de dados (SQLite/PostgreSQL)
-- [ ] Autenticação de usuários
-- [ ] Planos de assinatura (Free/Premium)
-- [ ] Exportação de relatórios em PDF
-- [ ] Modo mobile app (PWA)
-- [ ] Integração com Telegram Bot
-
-### Otimizações Técnicas
-- [ ] Cache de análises de IA
-- [ ] Lazy loading de imagens de logos
-- [ ] Service Worker para offline mode
-- [ ] Compressão de assets
-- [ ] CDN para logos de times
-- [ ] Rate limiting nas APIs
-
-### UX/UI
-- [ ] Onboarding tutorial
-- [ ] Tema claro (opcional)
-- [ ] Customização de cores
-- [ ] Atalhos de teclado
-- [ ] Modo compacto para telas pequenas
-
----
-
-## 🐛 PROBLEMAS CONHECIDOS
-
-### Limitações Atuais
-1. **Dados Hardcoded:** Jogos são estáticos, não vêm de API real
-2. **OCR Accuracy:** Depende da qualidade da imagem
-3. **Sem Persistência:** Histórico não é salvo entre sessões
-4. **Logos Limitados:** Apenas ~50 times no dicionário
-5. **Análise Mock:** `ai_engine.py` pode ter lógica simplificada
-
-### Bugs Reportados
-- Nenhum bug crítico reportado até o momento
+| Data | Conversa ID | Tópico |
+|---|---|---|
+| 05–06/02 | `a7c154af` | Adding Login System (PDKHOT) |
+| 05–06/02 | `2d24eb04` | Creating PDKHOT Website |
+| 05–06/02 | `0620b7bb` | Install Agent Skills |
+| 06/02 | `28b39905` | Resume Bot Probability Project |
+| 09–10/02 | `713a3b05` | Updating Game Results Accuracy (Heat → Red) |
+| 10/02 | `ec52afd4` | Updating Game Results (Everton, Chelsea) |
+| 10/02 | `63ceabe4` | Mobile App Experience (9:16, bottom nav) |
+| 10/02 | `c9afa038` | Modare Website Development |
+| 11/02 | `f93f5b72` | Automating Daily Picks (auto_picks.py criado) |
+| 11/02 | `e4bcc364` | Refining News Fetching (inglês) |
+| 12/02 | `09298faf` | Updating Game History Accuracy |
+| 17/02 | `4fd10349` | Updating Daily Picks |
+| 17–18/02 | `73ae1146` | Optimizing System Speed (turbo_fetcher) |
+| 18/02 | `d29669cb` | Admin Panel Deployment Fix |
+| 19/02 | `a467dabf` | Implementing Treble Persistence |
+| 19/02 | `35c0a708` | Updating and Verifying History |
+| 19/02 | `8b70cd3f` | Updating Game History (ESPN API para Champions) |
+| 20/02 | `e717f4aa` | Update Green and Red History |
+| 20–21/02 | `9eec8bbe` | 80% Green Evolution (self_learning.py) |
+| 24/02 | `d634c440` | Updating Last Three Days |
+| 24/02 | `81e0a9d3` | Checking Website Readiness For Sales |
+| 25/02 | `f5590734` | Updating Website Picks |
+| 25/02 | `7cdea81e` | Populating Dashboard with Real Data (ESPN live) |
+| 25/02 | `ef303931` | Fixing Critical Bugs (segurança, backdoor, sessão) |
 
 ---
 
-## 📚 CONHECIMENTO TÉCNICO ACUMULADO
-
-### Knowledge Items Relacionados
-- **bot_probability_system** (Última atualização: 05/02/2026)
-  - `overview.md` - Visão geral do sistema
-  - `ai_knowledge_base.md` - Base de conhecimento da IA
-  - `multi_risk_validator.md` - Validador de múltiplas
-  - `ocr_logic.md` - Lógica de OCR
-  - `technical_scout.md` - Sistema de scout técnico
-  - `troubleshooting.md` - Solução de problemas
-
----
-
-## 👥 HISTÓRICO DE CONVERSAS
-
-### Conversas Relevantes
-1. **28b39905** (06/02/2026) - Resume Bot Probability Project
-2. **0620b7bb** (05-06/02/2026) - Install Agent Skills
-3. **a7c154af** (05/02/2026) - Adding Login System (PDKHOT)
-4. **2d24eb04** (05/02/2026) - Creating PDKHOT Website
-
----
-
-## 🎓 CONCEITOS-CHAVE
-
-### Glossário
-- **Sniper Pick:** Aposta de alta confiança (>80% probabilidade)
-- **Dutching:** Estratégia de distribuir stake entre múltiplos resultados
-- **DNB (Draw No Bet):** Empate anula a aposta
-- **Handicap:** Vantagem/desvantagem virtual
-- **Over/Under:** Acima/Abaixo de um total
-- **xG (Expected Goals):** Gols esperados baseado em qualidade de chances
-- **Trust Score:** Índice de confiança da análise (0-100%)
-- **Elo Mais Fraco:** Jogo com menor probabilidade numa múltipla
-
-### Mercados de Aposta
-- **1X2:** Casa/Empate/Fora
-- **Dupla Chance:** Combina 2 resultados (1X, X2, 12)
-- **Ambas Marcam:** Sim/Não
-- **Total de Pontos/Gols:** Over/Under
-- **Handicap Asiático:** -1.5, -2.0, etc.
-- **HT/FT:** Resultado no intervalo e final
-
----
-
-## 📞 SUPORTE E CONTATO
-
-### Para Desenvolvedores
-- Código fonte: `d:\BOT PROBABILITY\`
-- Documentação técnica: Este arquivo
-- Knowledge Base: `.gemini\antigravity\knowledge\bot_probability_system\`
-
-### Para Usuários
-- Interface web: `http://localhost:5000`
-- Tutorial: Disponível no primeiro acesso (planejado)
-
----
-
-## 📝 NOTAS FINAIS
-
-Este projeto representa uma plataforma completa de análise esportiva com foco em:
-- **Precisão:** Análises baseadas em dados reais e estatísticas
-- **Usabilidade:** Interface intuitiva e responsiva
-- **Transparência:** Histórico de performance visível
-- **Educação:** Explicações detalhadas de cada análise
-
-**Status Atual:** Sistema funcional em ambiente de desenvolvimento, pronto para testes e iterações.
-
-**Próximos Passos Sugeridos:**
-1. Integrar API real de odds
-2. Implementar banco de dados
-3. Adicionar autenticação
-4. Deploy em servidor de produção
-
----
-
-**Documento gerado em:** 07/02/2026 às 01:32 AM  
-**Versão:** 1.0  
+**Documento atualizado em:** 26/02/2026 às 15:39  
+**Versão:** 3.0  
 **Autor:** Sistema de Documentação Automática
