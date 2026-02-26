@@ -1528,6 +1528,8 @@
             fetch('/api/history_trebles')
                 .then(r => r.json())
                 .then(data => {
+                    sortHistoryByDate(data);
+
                     container.innerHTML = '';
                     if (data.length === 0) {
                         container.innerHTML = `<div class="text-center py-20 text-gray-500">Nenhum bilhete encontrado.</div>`;
@@ -1678,7 +1680,24 @@
             refreshIcons();
         }
 
+        function sortHistoryByDate(data) {
+            data.sort((a, b) => {
+                const parse = (d, t) => {
+                    if (!d) return 0;
+                    let [day, month] = d.split('/').map(Number);
+                    let [hr, min] = (t && t !== "Ao Vivo") ? t.split(':').map(Number) : [0, 0];
+                    let year = new Date().getFullYear();
+                    if (month === 12 && new Date().getMonth() <= 2) year -= 1;
+                    else if (month === 1 && new Date().getMonth() === 11) year += 1;
+                    return new Date(year, month - 1, day, hr || 0, min || 0).getTime();
+                };
+                return parse(b.date, b.time) - parse(a.date, a.time);
+            });
+        }
+
         function renderHistoryList(data) {
+            sortHistoryByDate(data);
+
             const list = document.getElementById('history-list');
             list.innerHTML = '';
             if (data.length === 0) {
