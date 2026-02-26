@@ -1,0 +1,10 @@
+2026-02-26 16:09:00,114 [INFO] ============================================================
+2026-02-26 16:09:00,114 [INFO] Iniciando auto_updater
+2026-02-26 16:09:00,130 [INFO] Picks pendentes: 6
+2026-02-26 16:09:00,130 [INFO] Buscando ESPN: 2026-02-25 e 2026-02-26
+2026-02-26 16:09:15,131 [INFO] Jogos finalizados encontrados: 25
+2026-02-26 16:09:15,142 [INFO] Atualizados: 0 | WON: 0 | LOST: 0 | Ainda pendente: 6
+2026-02-26 16:09:15,149 [INFO] history.json salvo.
+2026-02-26 16:09:15,150 [INFO] GREEN RATE: 73.7% | WON:98 LOST:35 PEND:6
+2026-02-26 16:09:15,150 [INFO] Nenhuma mudança — push ignorado.
+2026-02-26 16:09:15,150 [INFO] auto_updater finalizado.
