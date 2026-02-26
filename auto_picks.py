@@ -50,21 +50,87 @@ except ImportError:
 # ══════════════════════════════════════════════
 
 NBA_POWER = {
-    # === TIER S (Elite, 90+) ===
-    "Thunder": 95, "Cavaliers": 93, "Celtics": 92,
-    # === TIER A (Contenders, 85-89) ===
-    "Rockets": 88, "Nuggets": 87, "Knicks": 87, "Timberwolves": 86,
-    "Grizzlies": 85, "Warriors": 85,
-    # === TIER B (Playoff, 78-84) ===
-    "Bucks": 84, "Suns": 83, "Mavericks": 82, "Pacers": 82,
-    "Magic": 81, "Clippers": 80, "Lakers": 80, "Heat": 79,
-    "Kings": 79, "Sixers": 78,
-    # === TIER C (Play-in / Lower, 70-77) ===
-    "Hawks": 75, "Spurs": 74, "Bulls": 73, "Pistons": 72,
-    "Pelicans": 71, "Raptors": 70, "Hornets": 69,
-    # === TIER D (Lottery, <70) ===
-    "Blazers": 66, "Jazz": 65, "Nets": 63, "Wizards": 60
+    # ═══════════════════════════════════════════════════════
+    # POWER RATINGS — Atualizado em 26/02/2026 (Standings Reais ESPN)
+    # Fórmula: Base 60 + Win% * 35 + Form Bonus (L10)
+    # ═══════════════════════════════════════════════════════
+
+    # === TIER S — ELITE (90+) ===
+    "Thunder":       97,  # 45-15 (.750) | L10: 6-4 | #1 Oeste
+    "Pistons":       96,  # 43-14 (.754) | L10: 8-2 | #1 Leste ← SURPRESA DA TEMPORADA
+    "Spurs":         94,  # 42-16 (.724) | L10: 10-0 | 🔥 EM CHAMAS
+    "Celtics":       92,  # 38-20 (.655) | L10: 8-2 | Campeão defensor
+
+    # === TIER A — CONTENDERS (85-89) ===
+    "Rockets":       88,  # 36-21 (.632) | L10: 6-4
+    "Nuggets":       87,  # 37-22 (.627) | L10: 4-6 | Caiu nos últimos 10
+    "Knicks":        87,  # 37-22 (.627) | L10: 6-4
+    "Cavaliers":     86,  # 37-23 (.617) | L10: 8-2 | Em alta
+    "Timberwolves":  85,  # 36-23 (.610) | L10: 6-4
+    "Lakers":        84,  # 34-23 (.596) | L10: 5-5
+
+    # === TIER B — PLAYOFF (75-84) ===
+    "Raptors":       80,  # 34-25 (.576) | L10: 5-5 | Subiu muito
+    "76ers":         79,  # 32-26 (.552) | L10: 5-5
+    "Magic":         78,  # 31-26 (.544) | L10: 6-4
+    "Heat":          77,  # 31-28 (.525) | L10: 5-5
+    "Suns":          75,  # 33-26 (.559) | L10: 3-7 | Caindo
+    "Warriors":      74,  # 31-28 (.525) | L10: 4-6 | Caindo
+
+    # === TIER C — PLAY-IN (65-74) ===
+    "Hawks":         70,  # 29-31 (.483) | L10: 5-5
+    "Hornets":       69,  # 28-31 (.475) | L10: 7-3 | Em alta
+    "Bucks":         68,  # 26-31 (.456) | L10: 8-2 | Reagindo!
+    "Trail Blazers": 67,  # 28-31 (.475) | L10: 5-5
+    "Clippers":      66,  # 27-30 (.474) | L10: 5-5
+
+    # === TIER D — LOTTERY (55-64) ===
+    "Bulls":         60,  # 24-35 (.407) | L10: 0-10 | EM COLAPSO ⚠️
+    "Grizzlies":     59,  # 21-36 (.368) | L10: 3-7
+    "Mavericks":     58,  # 21-36 (.368) | L10: 2-8 | Caindo muito
+    "Jazz":          57,  # 18-40 (.310) | L10: 3-7
+    "Pelicans":      56,  # 17-42 (.288) | L10: 5-5
+    "Wizards":       54,  # 16-41 (.281) | L10: 4-6
+
+    # === TIER E — TANKING (< 55) ===
+    "Nets":          52,  # 15-42 (.263) | L10: 2-8
+    "Pacers":        51,  # 15-44 (.254) | L10: 2-8
+    "Kings":         48,  # 13-47 (.217) | L10: 1-9 | PIOR TIME DO OESTE ⚠️
+
+    # Aliases (nomes completos ESPN)
+    "Detroit Pistons":           96,
+    "Oklahoma City Thunder":     97,
+    "San Antonio Spurs":         94,
+    "Boston Celtics":            92,
+    "Houston Rockets":           88,
+    "Denver Nuggets":            87,
+    "New York Knicks":           87,
+    "Cleveland Cavaliers":       86,
+    "Minnesota Timberwolves":    85,
+    "Los Angeles Lakers":        84,
+    "Toronto Raptors":           80,
+    "Philadelphia 76ers":        79,
+    "Orlando Magic":             78,
+    "Miami Heat":                77,
+    "Phoenix Suns":              75,
+    "Golden State Warriors":     74,
+    "Atlanta Hawks":             70,
+    "Charlotte Hornets":         69,
+    "Milwaukee Bucks":           68,
+    "Portland Trail Blazers":    67,
+    "LA Clippers":               66,
+    "Los Angeles Clippers":      66,
+    "Chicago Bulls":             60,
+    "Memphis Grizzlies":         59,
+    "Dallas Mavericks":          58,
+    "Utah Jazz":                 57,
+    "New Orleans Pelicans":      56,
+    "Washington Wizards":        54,
+    "Brooklyn Nets":             52,
+    "Indiana Pacers":            51,
+    "Sacramento Kings":          48,
 }
+
 
 FOOTBALL_POWER = {
     # Premier League
