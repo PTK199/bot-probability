@@ -373,6 +373,45 @@ def register_api():
     
     return jsonify({"status": "success", "message": "Conta criada! Assine para acessar.", "redirect": "/subscribe"})
 
+@app.route('/api/forgot_password', methods=['POST'])
+def forgot_password_api():
+    email = request.json.get('email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"status": "error", "message": "E-mail não encontrado."}), 404
+        
+    import random
+    code = str(random.randint(100000, 999999))
+    user.reset_code = code
+    db.session.commit()
+    
+    # Exibe o código diretamente no retorno para a interface
+    return jsonify({
+        "status": "success", 
+        "message": "Código gerado com sucesso.",
+        "code": code
+    })
+
+@app.route('/api/reset_password', methods=['POST'])
+def reset_password_api():
+    data = request.json
+    email = data.get('email')
+    code = data.get('code')
+    new_password = data.get('new_password')
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"status": "error", "message": "Usuário não encontrado."}), 404
+        
+    if not user.reset_code or user.reset_code != str(code).strip():
+        return jsonify({"status": "error", "message": "Código de verificação inválido."}), 401
+        
+    user.set_password(new_password)
+    user.reset_code = None  # Invalida o código após uso
+    db.session.commit()
+    
+    return jsonify({"status": "success", "message": "Senha alterada com sucesso."})
+
 @app.route('/api/logout')
 @login_required
 def logout_api():

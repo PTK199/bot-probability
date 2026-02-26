@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256))
     subscription_end = db.Column(db.DateTime, nullable=True)
     role = db.Column(db.String(20), default='user') # 'admin', 'user'
+    reset_code = db.Column(db.String(10), nullable=True)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

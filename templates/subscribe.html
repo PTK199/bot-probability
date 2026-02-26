@@ -180,7 +180,7 @@
             </button>
             <p id="error-msg"></p>
 
-            <a href="/api/logout" class="logout-link">Sair / Trocar Conta</a>
+            <a href="#" onclick="handleLogout(event)" class="logout-link">Sair / Trocar Conta</a>
         </div>
     </div>
 
@@ -214,6 +214,17 @@
                 btn.innerText = "TENTAR NOVAMENTE";
                 errorMsg.innerText = "Erro ao conectar com gateway de pagamento. Tente novamente.";
                 errorMsg.style.display = 'block';
+            }
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            try {
+                await fetch('/api/logout');
+                window.location.href = '/login';
+            } catch (err) {
+                console.error(err);
+                window.location.href = '/login';
             }
         }
     </script>

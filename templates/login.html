@@ -73,7 +73,7 @@
         </div>
 
         <form id="authForm" class="space-y-5">
-            <div>
+            <div id="emailField">
                 <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Identificação</label>
                 <div class="relative">
                     <i data-lucide="user" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
@@ -83,21 +83,53 @@
                 </div>
             </div>
 
-            <div>
-                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Chave de Segurança</label>
+            <div id="passwordField">
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 flex justify-between">
+                    <span>Chave de Segurança</span>
+                    <a href="#" onclick="toggleMode('forgot')"
+                        class="text-purple-400 hover:text-purple-300 normal-case mb-1">Esqueci a senha</a>
+                </label>
                 <div class="relative">
                     <i data-lucide="lock" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
                     <input type="password" id="password"
                         class="w-full bg-[#0a0a0f] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white font-bold focus:outline-none glow-input transition-all placeholder-gray-700"
-                        placeholder="••••••••" required>
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <div id="codeField" class="hidden">
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Código de Verificação <span
+                        class="text-xs text-emerald-400 normal-case ml-2" id="codeDisplay"></span></label>
+                <div class="relative">
+                    <i data-lucide="key" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
+                    <input type="text" id="resetCode"
+                        class="w-full bg-[#0a0a0f] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white font-bold focus:outline-none glow-input transition-all placeholder-gray-700 tracking-widest"
+                        placeholder="000000">
+                </div>
+            </div>
+
+            <div id="newPasswordField" class="hidden">
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Nova Chave de
+                    Segurança</label>
+                <div class="relative">
+                    <i data-lucide="lock" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
+                    <input type="password" id="newPassword"
+                        class="w-full bg-[#0a0a0f] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white font-bold focus:outline-none glow-input transition-all placeholder-gray-700"
+                        placeholder="Nova senha">
                 </div>
             </div>
 
             <button type="submit" id="mainBtn"
                 class="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white font-black rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.2)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.02] uppercase tracking-widest text-xs flex items-center justify-center gap-2 group">
-                <i data-lucide="unlock" class="w-4 h-4 group-hover:text-white transition-colors"></i>
+                <i data-lucide="unlock" class="w-4 h-4 group-hover:text-white transition-colors" id="btnIcon"></i>
                 <span id="btnText">Desbloquear Sistema</span>
             </button>
+
+            <div id="backToLogin" class="text-center mt-4 hidden">
+                <a href="#" onclick="toggleMode('login')"
+                    class="text-xs text-gray-500 hover:text-white transition-colors uppercase tracking-widest">Voltar
+                    para Login</a>
+            </div>
         </form>
 
         <div id="msg" class="text-center mt-6 h-4 text-xs font-bold text-red-500 opacity-0 transition-opacity"></div>
@@ -112,9 +144,19 @@
             const loginTab = document.getElementById('loginTab');
             const registerTab = document.getElementById('registerTab');
             const btnText = document.getElementById('btnText');
-            const mainBtn = document.getElementById('mainBtn');
+            const btnIcon = document.getElementById('btnIcon');
             const msg = document.getElementById('msg');
             msg.opacity = 0;
+
+            // Fields
+            const fieldPassword = document.getElementById('passwordField');
+            const fieldCode = document.getElementById('codeField');
+            const fieldNewPwd = document.getElementById('newPasswordField');
+            const backToLogin = document.getElementById('backToLogin');
+
+            document.getElementById('password').required = false;
+            document.getElementById('resetCode').required = false;
+            document.getElementById('newPassword').required = false;
 
             if (mode === 'login') {
                 loginTab.classList.add('bg-purple-600', 'text-white');
@@ -122,19 +164,63 @@
                 registerTab.classList.remove('bg-purple-600', 'text-white');
                 registerTab.classList.add('text-gray-500');
                 btnText.innerText = 'Desbloquear Sistema';
-            } else {
+                btnIcon.setAttribute('data-lucide', 'unlock');
+
+                fieldPassword.classList.remove('hidden');
+                fieldCode.classList.add('hidden');
+                fieldNewPwd.classList.add('hidden');
+                backToLogin.classList.add('hidden');
+                document.getElementById('password').required = true;
+
+            } else if (mode === 'register') {
                 registerTab.classList.add('bg-purple-600', 'text-white');
                 registerTab.classList.remove('text-gray-500');
                 loginTab.classList.remove('bg-purple-600', 'text-white');
                 loginTab.classList.add('text-gray-500');
                 btnText.innerText = 'Criar Conta Neural';
+                btnIcon.setAttribute('data-lucide', 'user-plus');
+
+                fieldPassword.classList.remove('hidden');
+                fieldCode.classList.add('hidden');
+                fieldNewPwd.classList.add('hidden');
+                backToLogin.classList.add('hidden');
+                document.getElementById('password').required = true;
+
+            } else if (mode === 'forgot') {
+                loginTab.classList.remove('bg-purple-600', 'text-white');
+                loginTab.classList.add('text-gray-500');
+                registerTab.classList.remove('bg-purple-600', 'text-white');
+                registerTab.classList.add('text-gray-500');
+                btnText.innerText = 'Solicitar Código de Acesso';
+                btnIcon.setAttribute('data-lucide', 'mail');
+
+                fieldPassword.classList.add('hidden');
+                fieldCode.classList.add('hidden');
+                fieldNewPwd.classList.add('hidden');
+                backToLogin.classList.remove('hidden');
+
+            } else if (mode === 'reset') {
+                btnText.innerText = 'Salvar Nova Senha';
+                btnIcon.setAttribute('data-lucide', 'save');
+
+                fieldPassword.classList.add('hidden');
+                fieldCode.classList.remove('hidden');
+                fieldNewPwd.classList.remove('hidden');
+                backToLogin.classList.remove('hidden');
+                document.getElementById('resetCode').required = true;
+                document.getElementById('newPassword').required = true;
             }
+
+            lucide.createIcons();
         }
 
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const code = document.getElementById('resetCode').value;
+            const newPassword = document.getElementById('newPassword').value;
+
             const msg = document.getElementById('msg');
             const btn = document.getElementById('mainBtn');
 
@@ -145,21 +231,57 @@
             btn.disabled = true;
             btn.classList.add('opacity-70');
 
-            const endpoint = mode === 'login' ? '/api/login' : '/api/register';
+            let endpoint = '/api/login';
+            let payload = { email };
+
+            if (mode === 'login') {
+                endpoint = '/api/login';
+                payload.password = password;
+            } else if (mode === 'register') {
+                endpoint = '/api/register';
+                payload.password = password;
+            } else if (mode === 'forgot') {
+                endpoint = '/api/forgot_password';
+            } else if (mode === 'reset') {
+                endpoint = '/api/reset_password';
+                payload.code = code;
+                payload.new_password = newPassword;
+            }
 
             try {
                 const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await res.json();
 
                 if (res.ok) {
                     msg.className = "text-center mt-6 text-xs font-black text-emerald-400 tracking-widest opacity-100";
-                    msg.innerText = mode === 'login' ? "ACESSO AUTORIZADO. REDIRECIONANDO..." : "CONTA CRIADA! ACESSANDO...";
-                    setTimeout(() => window.location.href = '/', 1000);
+
+                    if (mode === 'login') {
+                        msg.innerText = "ACESSO AUTORIZADO. REDIRECIONANDO...";
+                        setTimeout(() => window.location.href = '/', 1000);
+                    } else if (mode === 'register') {
+                        msg.innerText = "CONTA CRIADA! ACESSANDO...";
+                        setTimeout(() => window.location.href = '/', 1000);
+                    } else if (mode === 'forgot') {
+                        msg.innerText = "CÓDIGO GERADO! VEJA ACIMA.";
+                        document.getElementById('codeDisplay').innerText = `(CÓDIGO: ${data.code})`;
+
+                        btn.innerHTML = originalBtnHTML;
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-70');
+                        toggleMode('reset');
+                    } else if (mode === 'reset') {
+                        msg.innerText = "SENHA ALTERADA. FAÇA LOGIN AGORA.";
+                        setTimeout(() => toggleMode('login'), 2000);
+                        btn.innerHTML = originalBtnHTML;
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-70');
+                    }
+
                 } else {
                     throw new Error(data.message || "Erro no Processamento");
                 }
