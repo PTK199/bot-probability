@@ -359,20 +359,20 @@ def generate_nba_tip(game, sim):
 
 
     # --- FALLBACK: ML / MÉTODOS ANTIGOS ---
-    # Strong favorite ML
-    if h_prob >= 72:
+    # Strong favorite ML (threshold reduzido de 72 para 60 para cobrir jogos equilibrados)
+    if h_prob >= 60:
         tip = {
             "market": "Vencedor (ML)", "selection": f"{home} Vence",
             "prob": int(h_prob), "odd": odd_h,
             "reason": f"🏀 [MONTE CARLO 5K]: {home} ({h_rec}) com {h_prob}% de vitória. {away} ({a_rec}) inferior em power rating.",
-            "badge": "💰 BANKER" if h_prob >= 82 else "🎯 SNIPER",
+            "badge": "💰 BANKER" if h_prob >= 75 else "🎯 SNIPER",
         }
-    elif a_prob >= 72:
+    elif a_prob >= 60:
         tip = {
             "market": "Vencedor (ML)", "selection": f"{away} Vence",
             "prob": int(a_prob), "odd": odd_a,
             "reason": f"🏀 [MONTE CARLO 5K]: {away} ({a_rec}) com {a_prob}% mesmo fora de casa. {home} ({h_rec}) muito inferior.",
-            "badge": "💰 BANKER" if a_prob >= 82 else "🎯 SNIPER",
+            "badge": "💰 BANKER" if a_prob >= 75 else "🎯 SNIPER",
         }
     elif ou_line and total_avg > ou_line + 2:
         edge = total_avg - ou_line
@@ -385,21 +385,22 @@ def generate_nba_tip(game, sim):
             "badge": "🚀 OVER",
         }
     elif h_prob > a_prob:
+        # Jogo equilibrado — escolhe favorito com Dupla Chance (se basquete não tem DC, usa ML)
         tip = {
             "market": "Vencedor (ML)", "selection": f"{home} Vence",
             "prob": int(h_prob), "odd": odd_h,
-            "reason": f"🏀 [MONTE CARLO 5K]: {home} ({h_rec}) leve favorito com {h_prob}%.",
+            "reason": f"🏀 [MONTE CARLO 5K]: {home} ({h_rec}) leve favorito com {h_prob:.0f}%. Vantagem de quadra.",
             "badge": "🎯 SNIPER",
         }
     else:
         tip = {
             "market": "Vencedor (ML)", "selection": f"{away} Vence",
             "prob": int(a_prob), "odd": odd_a,
-            "reason": f"🏀 [MONTE CARLO 5K]: {away} ({a_rec}) favorito com {a_prob}%.",
+            "reason": f"🏀 [MONTE CARLO 5K]: {away} ({a_rec}) favorito com {a_prob:.0f}%.",
             "badge": "🎯 SNIPER",
         }
 
-    is_sniper = tip["prob"] >= 70
+    is_sniper = tip["prob"] >= 65  # reduzido de 70 para 65
     return tip, is_sniper, odd_h, 0, odd_a
 
 
