@@ -8,3 +8,14 @@
 2026-02-26 16:09:15,150 [INFO] GREEN RATE: 73.7% | WON:98 LOST:35 PEND:6
 2026-02-26 16:09:15,150 [INFO] Nenhuma mudança — push ignorado.
 2026-02-26 16:09:15,150 [INFO] auto_updater finalizado.
+2026-02-27 00:30:03,328 [INFO] ============================================================
+2026-02-27 00:30:03,329 [INFO] Iniciando auto_updater
+2026-02-27 00:30:03,337 [INFO] Picks pendentes: 6
+2026-02-27 00:30:03,337 [INFO] Buscando ESPN: 2026-02-26 e 2026-02-27
+2026-02-27 00:30:23,228 [INFO] Jogos finalizados encontrados: 18
+2026-02-27 00:30:23,240 [INFO] Atualizados: 0 | WON: 0 | LOST: 0 | Ainda pendente: 6
+2026-02-27 00:30:23,252 [INFO] history.json salvo.
+2026-02-27 00:30:23,253 [INFO] GREEN RATE: 73.8% | WON:104 LOST:37 PEND:6
+2026-02-27 00:30:23,259 [INFO] Iniciando avaliacao de trincas (update_trebles)...
+2026-02-27 00:32:38,167 [INFO] Nenhuma mudança — push ignorado.
+2026-02-27 00:32:38,167 [INFO] auto_updater finalizado.
