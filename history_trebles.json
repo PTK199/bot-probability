@@ -1,87 +1,148 @@
 [
-  {
-    "created_at": "2026-02-25T02:02:14.356086",
-    "date": "25/02",
-    "name": "🏰 FORTRESS (3-LEGS)",
-    "odd": "4.83",
-    "total_odd": "4.83",
-    "status": "WON",
-    "profit": "+383%",
-    "selections": [
-      "Palmeiras ou Empate (@1.41)",
-      "Paolo Banchero Over 20.0 Pontos (@1.85)",
-      "Anthony Edwards Over 28.0 Pontos (@1.85)"
-    ],
-    "components": [
-      {
-        "match": "Fluminense @ Palmeiras",
-        "pick": "Palmeiras ou Empate (@1.41)",
-        "prob": 61,
-        "status": "WON"
-      },
-      {
-        "match": "Magic @ Lakers",
-        "pick": "Paolo Banchero Over 20.0 Pontos (@1.85)",
-        "prob": 77,
-        "status": "WON"
-      },
-      {
-        "match": "Timberwolves @ Trail Blazers",
-        "pick": "Anthony Edwards Over 28.0 Pontos (@1.85)",
-        "prob": 68,
-        "status": "WON"
-      }
-    ]
-  },
-  {
-    "created_at": "2026-02-25T02:01:48.744495",
-    "date": "25/02",
-    "name": "🛡️ BUNKER BLINDADO",
-    "odd": "3.42",
-    "total_odd": "3.42",
-    "status": "WON",
-    "profit": "+242%",
-    "selections": [
-      "Paolo Banchero Over 20.0 Pontos (@1.85)",
-      "Anthony Edwards Over 28.0 Pontos (@1.85)"
-    ],
-    "components": [
-      {
-        "match": "Magic @ Lakers",
-        "pick": "Paolo Banchero Over 20.0 Pontos (@1.85)",
-        "prob": 77,
-        "status": "WON"
-      },
-      {
-        "match": "Timberwolves @ Trail Blazers",
-        "pick": "Anthony Edwards Over 28.0 Pontos (@1.85)",
-        "prob": 68,
-        "status": "WON"
-      }
-    ]
-  },
-  {
-    "created_at": "2025-01-01T10:00:00",
-    "date": "01/01",
-    "name": "TEST WON TREBLE",
-    "total_odd": "2.00",
-    "status": "PENDING",
-    "profit": "---",
-    "selections": [
-      "Test Won Pick 1",
-      "Test Won Pick 2"
-    ],
-    "components": [
-      {
-        "match": "Winner @ Loser",
-        "pick": "Winner ML (@1.40)",
-        "status": "PENDING"
-      },
-      {
-        "match": "OverTeam @ UnderTeam",
-        "pick": "Over 2.5 (@1.42)",
-        "status": "PENDING"
-      }
-    ]
-  }
+    {
+        "created_at": "2026-02-27T01:11:33.279435",
+        "date": "27/02",
+        "name": "🏰 FORTRESS (3-LEGS)",
+        "odd": "3.44",
+        "total_odd": "3.44",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Aston Villa ou Empate (@1.49)",
+            "FC Augsburg ou Empate (@1.52)",
+            "Levante ou Empate (@1.52)"
+        ],
+        "components": [
+            {
+                "match": "Aston Villa @ Wolverhampton Wanderers",
+                "pick": "Aston Villa ou Empate (@1.49)",
+                "prob": 81,
+                "status": "PENDING"
+            },
+            {
+                "match": "FC Cologne @ FC Augsburg",
+                "pick": "FC Augsburg ou Empate (@1.52)",
+                "prob": 75,
+                "status": "PENDING"
+            },
+            {
+                "match": "Alavés @ Levante",
+                "pick": "Levante ou Empate (@1.52)",
+                "prob": 75,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-27T01:11:33.279418",
+        "date": "27/02",
+        "name": "🛡️ BUNKER BLINDADO",
+        "odd": "2.26",
+        "total_odd": "2.26",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Aston Villa ou Empate (@1.49)",
+            "FC Augsburg ou Empate (@1.52)"
+        ],
+        "components": [
+            {
+                "match": "Aston Villa @ Wolverhampton Wanderers",
+                "pick": "Aston Villa ou Empate (@1.49)",
+                "prob": 81,
+                "status": "PENDING"
+            },
+            {
+                "match": "FC Cologne @ FC Augsburg",
+                "pick": "FC Augsburg ou Empate (@1.52)",
+                "prob": 75,
+                "status": "PENDING"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-25T02:02:14.356086",
+        "date": "25/02",
+        "name": "🏰 FORTRESS (3-LEGS)",
+        "odd": "4.83",
+        "total_odd": "4.83",
+        "status": "WON",
+        "profit": "+383%",
+        "selections": [
+            "Palmeiras ou Empate (@1.41)",
+            "Paolo Banchero Over 20.0 Pontos (@1.85)",
+            "Anthony Edwards Over 28.0 Pontos (@1.85)"
+        ],
+        "components": [
+            {
+                "match": "Fluminense @ Palmeiras",
+                "pick": "Palmeiras ou Empate (@1.41)",
+                "prob": 61,
+                "status": "WON"
+            },
+            {
+                "match": "Magic @ Lakers",
+                "pick": "Paolo Banchero Over 20.0 Pontos (@1.85)",
+                "prob": 77,
+                "status": "WON"
+            },
+            {
+                "match": "Timberwolves @ Trail Blazers",
+                "pick": "Anthony Edwards Over 28.0 Pontos (@1.85)",
+                "prob": 68,
+                "status": "WON"
+            }
+        ]
+    },
+    {
+        "created_at": "2026-02-25T02:01:48.744495",
+        "date": "25/02",
+        "name": "🛡️ BUNKER BLINDADO",
+        "odd": "3.42",
+        "total_odd": "3.42",
+        "status": "WON",
+        "profit": "+242%",
+        "selections": [
+            "Paolo Banchero Over 20.0 Pontos (@1.85)",
+            "Anthony Edwards Over 28.0 Pontos (@1.85)"
+        ],
+        "components": [
+            {
+                "match": "Magic @ Lakers",
+                "pick": "Paolo Banchero Over 20.0 Pontos (@1.85)",
+                "prob": 77,
+                "status": "WON"
+            },
+            {
+                "match": "Timberwolves @ Trail Blazers",
+                "pick": "Anthony Edwards Over 28.0 Pontos (@1.85)",
+                "prob": 68,
+                "status": "WON"
+            }
+        ]
+    },
+    {
+        "created_at": "2025-01-01T10:00:00",
+        "date": "01/01",
+        "name": "TEST WON TREBLE",
+        "total_odd": "2.00",
+        "status": "PENDING",
+        "profit": "---",
+        "selections": [
+            "Test Won Pick 1",
+            "Test Won Pick 2"
+        ],
+        "components": [
+            {
+                "match": "Winner @ Loser",
+                "pick": "Winner ML (@1.40)",
+                "status": "PENDING"
+            },
+            {
+                "match": "OverTeam @ UnderTeam",
+                "pick": "Over 2.5 (@1.42)",
+                "status": "PENDING"
+            }
+        ]
+    }
 ]
