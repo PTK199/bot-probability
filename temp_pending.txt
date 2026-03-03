@@ -1,0 +1,16 @@
+[
+  {
+    "date": "27/02",
+    "time": "16:45",
+    "home": "Port Vale",
+    "away": "Bristol City",
+    "league": "FA Cup",
+    "selection": "Port Vale ou Empate",
+    "odd": 1.52,
+    "prob": 75,
+    "status": "PENDING",
+    "score": "0-0 (Live)",
+    "profit": "...",
+    "badge": "🎯 SNIPER"
+  }
+]

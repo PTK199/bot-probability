@@ -19,3 +19,58 @@
 2026-02-27 00:30:23,259 [INFO] Iniciando avaliacao de trincas (update_trebles)...
 2026-02-27 00:32:38,167 [INFO] Nenhuma mudança — push ignorado.
 2026-02-27 00:32:38,167 [INFO] auto_updater finalizado.
+2026-02-28 00:30:03,362 [INFO] ============================================================
+2026-02-28 00:30:03,362 [INFO] Iniciando auto_updater
+2026-02-28 00:30:03,377 [INFO] Picks pendentes: 16
+2026-02-28 00:30:03,377 [INFO] Buscando ESPN: 2026-02-27 e 2026-02-28
+2026-02-28 00:30:23,911 [INFO] Jogos finalizados encontrados: 8
+2026-02-28 00:30:23,915 [INFO]   [WON ] Levante 2x0 Alavés | ?: Levante ou Empate
+2026-02-28 00:30:23,917 [INFO]   [LOST] Wolverhampton Wanderers 2x0 Aston Villa | ?: Aston Villa ou Empate
+2026-02-28 00:30:23,918 [INFO]   [WON ] Parma 1x1 Cagliari | ?: Parma ou Empate
+2026-02-28 00:30:23,918 [INFO]   [WON ] Strasbourg 1x1 Lens | ?: Strasbourg ou Empate
+2026-02-28 00:30:23,919 [INFO]   [WON ] FC Augsburg 2x0 FC Cologne | ?: FC Augsburg ou Empate
+2026-02-28 00:30:23,922 [INFO]   [LOST] Wolverhampton Wanderers 2x0 Aston Villa | ?: Aston Villa ou Empate
+2026-02-28 00:30:23,923 [INFO]   [WON ] Strasbourg 1x1 Lens | ?: Strasbourg ou Empate
+2026-02-28 00:30:23,923 [INFO]   [WON ] Parma 1x1 Cagliari | ?: Parma ou Empate
+2026-02-28 00:30:23,924 [INFO]   [WON ] FC Augsburg 2x0 FC Cologne | ?: FC Augsburg ou Empate
+2026-02-28 00:30:23,924 [INFO] Atualizados: 9 | WON: 7 | LOST: 2 | Ainda pendente: 7
+2026-02-28 00:30:23,935 [INFO] history.json salvo.
+2026-02-28 00:30:23,936 [INFO] GREEN RATE: 73.0% | WON:116 LOST:43 PEND:7
+2026-02-28 00:30:23,939 [INFO] Iniciando avaliacao de trincas (update_trebles)...
+2026-02-28 00:32:46,731 [INFO] Push ao GitHub: OK
+2026-02-28 00:32:46,732 [INFO] auto_updater finalizado.
+2026-03-01 02:52:31,700 [INFO] ============================================================
+2026-03-01 02:52:31,701 [INFO] Iniciando auto_updater
+2026-03-01 02:52:31,712 [INFO] Picks pendentes: 7
+2026-03-01 02:52:31,713 [INFO] Buscando ESPN: 2026-02-28 e 2026-03-01
+2026-03-01 02:52:55,109 [INFO] Jogos finalizados encontrados: 32
+2026-03-01 02:52:55,109 [INFO]   [PEND] Jazz vs Pelicans — resultado ainda indefinido
+2026-03-01 02:52:55,114 [INFO]   [PEND] Jazz vs Pelicans — resultado ainda indefinido
+2026-03-01 02:52:55,121 [INFO] Atualizados: 0 | WON: 0 | LOST: 0 | Ainda pendente: 7
+2026-03-01 02:52:55,129 [INFO] history.json salvo.
+2026-03-01 02:52:55,129 [INFO] GREEN RATE: 73.0% | WON:116 LOST:43 PEND:7
+2026-03-01 02:52:55,131 [INFO] Iniciando avaliacao de trincas (update_trebles)...
+2026-03-01 02:55:01,509 [INFO] Nenhuma mudança — push ignorado.
+2026-03-01 02:55:01,509 [INFO] auto_updater finalizado.
+2026-03-02 07:25:57,091 [INFO] ============================================================
+2026-03-02 07:25:57,092 [INFO] Iniciando auto_updater
+2026-03-02 07:25:57,103 [INFO] Picks pendentes: 7
+2026-03-02 07:25:57,103 [INFO] Buscando ESPN: 2026-03-01 e 2026-03-02
+2026-03-02 07:26:14,304 [INFO] Jogos finalizados encontrados: 41
+2026-03-02 07:26:14,324 [INFO] Atualizados: 0 | WON: 0 | LOST: 0 | Ainda pendente: 7
+2026-03-02 07:26:14,332 [INFO] history.json salvo.
+2026-03-02 07:26:14,332 [INFO] GREEN RATE: 73.0% | WON:116 LOST:43 PEND:7
+2026-03-02 07:26:14,334 [INFO] Iniciando avaliacao de trincas (update_trebles)...
+2026-03-02 07:28:18,178 [INFO] Nenhuma mudança — push ignorado.
+2026-03-02 07:28:18,178 [INFO] auto_updater finalizado.
+2026-03-03 00:30:03,123 [INFO] ============================================================
+2026-03-03 00:30:03,123 [INFO] Iniciando auto_updater
+2026-03-03 00:30:03,137 [INFO] Picks pendentes: 7
+2026-03-03 00:30:03,137 [INFO] Buscando ESPN: 2026-03-02 e 2026-03-03
+2026-03-03 00:30:29,112 [INFO] Jogos finalizados encontrados: 11
+2026-03-03 00:30:29,119 [INFO] Atualizados: 0 | WON: 0 | LOST: 0 | Ainda pendente: 7
+2026-03-03 00:30:29,128 [INFO] history.json salvo.
+2026-03-03 00:30:29,129 [INFO] GREEN RATE: 73.0% | WON:116 LOST:43 PEND:7
+2026-03-03 00:30:29,131 [INFO] Iniciando avaliacao de trincas (update_trebles)...
+2026-03-03 00:32:43,008 [INFO] Nenhuma mudança — push ignorado.
+2026-03-03 00:32:43,010 [INFO] auto_updater finalizado.
