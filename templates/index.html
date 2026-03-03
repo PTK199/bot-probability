@@ -1735,7 +1735,16 @@
                     <div class="mb-3 sm:mb-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-[10px] font-bold text-gray-600 uppercase tabular-nums">${item.date} • <span class="text-purple-400">${item.time || '--:--'}</span></span>
-                            <span class="text-xs font-bold text-gray-300">${item.home} <span class="text-gray-600 font-normal">vs</span> ${item.away}</span>
+                            
+                            <!-- Team Logos & Names -->
+                            <div class="flex items-center gap-1.5 ml-1">
+                                <img src="${item.home_logo}" class="w-4 h-4 object-contain" onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1665/1665922.png'">
+                                <span class="text-xs font-bold text-gray-300 pointer-events-none">${item.home}</span>
+                                <span class="text-gray-600 font-normal text-xs mx-1">vs</span>
+                                <img src="${item.away_logo}" class="w-4 h-4 object-contain" onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1665/1665922.png'">
+                                <span class="text-xs font-bold text-gray-300 pointer-events-none">${item.away}</span>
+                            </div>
+
                             ${badgeHtml}
                         </div>
                         <div class="flex items-center gap-2">

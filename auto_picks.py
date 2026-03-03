@@ -222,6 +222,8 @@ def fetch_espn_schedule(target_date):
                         continue
                     h_name = home_c["team"].get("name", home_c["team"]["displayName"])
                     a_name = away_c["team"].get("name", away_c["team"]["displayName"])
+                    h_logo = home_c["team"].get("logo", "")
+                    a_logo = away_c["team"].get("logo", "")
                     game_time = "TBD"
                     try:
                         raw = event.get("date", "")
@@ -246,6 +248,7 @@ def fetch_espn_schedule(target_date):
                                 a_record = rec
                     games.append({
                         "home": h_name, "away": a_name,
+                        "home_logo": h_logo, "away_logo": a_logo,
                         "league": league["name"], "sport": league["sport"],
                         "time": game_time, "espn_odds": espn_odds,
                         "home_record": h_record, "away_record": a_record,
@@ -1445,8 +1448,8 @@ def get_auto_games(target_date):
                 "odds": {"home": str(oh), "draw": str(od), "away": str(oa)},
                 "best_tip": {**tip, "prob": max(5, min(99, tip["prob"]))},
                 "is_sniper": is_sniper,
-                "home_logo": get_logo(home, sport),
-                "away_logo": get_logo(away, sport),
+                "home_logo": game.get("home_logo") or get_logo(home, sport),
+                "away_logo": game.get("away_logo") or get_logo(away, sport),
                 "bet_url": "#",
                 "comparisons": gen_bookmaker_odds(tip_odd),
             })

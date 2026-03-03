@@ -431,6 +431,8 @@ def get_history_games():
                             "time": game['time'],
                             "home": game['home_team'],
                             "away": game['away_team'],
+                            "home_logo": game.get('home_logo', ''),
+                            "away_logo": game.get('away_logo', ''),
                             "league": game['league'],
                             "selection": tip['selection'],
                             "odd": tip['odd'],

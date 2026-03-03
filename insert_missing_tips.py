@@ -30,6 +30,8 @@ for file in sorted(os.listdir('cache_games')):
                                 'time': g.get('time', '00:00'),
                                 'home': home,
                                 'away': away,
+                                'home_logo': g.get('home_logo', ''),
+                                'away_logo': g.get('away_logo', ''),
                                 'league': g.get('league', ''),
                                 'selection': best_tip.get('selection'),
                                 'odd': best_tip.get('odd', g.get('odd', 1.0)),

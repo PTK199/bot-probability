@@ -140,6 +140,8 @@ def _fetch_single_league(league, espn_date):
 
                 h_name = home_c["team"].get("name", home_c["team"]["displayName"])
                 a_name = away_c["team"].get("name", away_c["team"]["displayName"])
+                h_logo = home_c["team"].get("logo", "")
+                a_logo = away_c["team"].get("logo", "")
 
                 # Parse time UTC -> BRT (UTC-3)
                 game_time = "TBD"
@@ -169,6 +171,7 @@ def _fetch_single_league(league, espn_date):
 
                 games.append({
                     "home": h_name, "away": a_name,
+                    "home_logo": h_logo, "away_logo": a_logo,
                     "league": league["name"], "sport": league["sport"],
                     "time": game_time, "espn_odds": espn_odds,
                     "home_record": h_record, "away_record": a_record,
