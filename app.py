@@ -9,6 +9,7 @@ import time
 import datetime
 import requests
 import traceback
+import re
 import threading
 import importlib
 # Payment System Integration
@@ -318,27 +319,30 @@ def subscription_page():
 
 @app.route('/api/games')
 @login_required
+@rate_limit(30, 60)  # 30 req/min
 def games():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     date = request.args.get('date', today)
+    # 🛡️ Validate date format to prevent injection
+    if date and not re.match(r'^\d{4}-\d{2}-\d{2}$', date):
+        return jsonify({"error": "Invalid date format"}), 400
     try:
         updates = data_fetcher.get_games_for_date(date)
         return jsonify(updates)
     except Exception as e:
         print(f"CRITICAL ERROR /api/games: {e}")
-        import traceback
         traceback.print_exc()
-        # Return empty safe structure
         return jsonify({
             "games": [], 
             "trebles": [], 
             "status": "error", 
-            "message": str(e)
+            "message": "Erro ao carregar jogos."
         })
 
 @app.route('/api/history')
 @login_required
+@rate_limit(20, 60)  # 20 req/min
 def history():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     data = data_fetcher.get_history_games()
@@ -346,6 +350,7 @@ def history():
 
 @app.route('/api/history_stats')
 @login_required
+@rate_limit(20, 60)
 def history_stats():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     data = data_fetcher.get_history_stats()
@@ -353,6 +358,7 @@ def history_stats():
 
 @app.route('/api/today_scout')
 @login_required
+@rate_limit(20, 60)
 def today_scout():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     try:
@@ -366,6 +372,7 @@ def today_scout():
 
 @app.route('/api/history_trebles')
 @login_required
+@rate_limit(20, 60)
 def history_trebles():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     data = data_fetcher.get_history_trebles()
@@ -373,20 +380,30 @@ def history_trebles():
 
 @app.route('/api/analyze')
 @login_required
+@rate_limit(10, 60)  # 10 req/min (heavy computation)
 def analyze():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
-    game_id = request.args.get('id')
+    game_id = request.args.get('id', '')
+    if not game_id or len(game_id) > 100:
+        return jsonify({"error": "Invalid game ID"}), 400
     analysis = ai_engine.analyze_match(game_id)
     return jsonify(analysis)
 
 @app.route('/api/analyze_multiple', methods=['POST'])
 @login_required
+@rate_limit(5, 60)  # 5 req/min (very heavy)
 def analyze_multiple():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     
     data = request.json
+    if not data:
+        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
     ocr_text = data.get('text', '')
+    if len(ocr_text) > 5000:  # Limit OCR text size
+        return jsonify({"status": "error", "message": "Texto muito longo"}), 400
     bankroll = float(data.get('bankroll', 1000.0))
+    if bankroll < 0 or bankroll > 1000000:
+        return jsonify({"status": "error", "message": "Bankroll inválido"}), 400
     
     try:
         analysis = ai_engine.analyze_multiple_risk(ocr_text, bankroll)
@@ -397,6 +414,7 @@ def analyze_multiple():
 
 @app.route('/api/leverage')
 @login_required
+@rate_limit(20, 60)
 def leverage():
     if not current_user.is_active_subscriber: return jsonify({"error": "Subscription Required"}), 403
     data = data_fetcher.get_leverage_plan()
@@ -533,13 +551,13 @@ def logout_api():
     return jsonify({"status": "success", "message": "Logout realizado"})
 
 @app.route('/api/check_session')
+@rate_limit(30, 60)  # Prevent session enumeration
 def check_session():
     if current_user.is_authenticated:
         return jsonify({
             "logged_in": True, 
             "user": current_user.email, 
-            "is_valid": current_user.is_active_subscriber,
-            "is_admin": (current_user.role == 'admin')
+            "is_valid": current_user.is_active_subscriber
         })
     return jsonify({"logged_in": False})
 
