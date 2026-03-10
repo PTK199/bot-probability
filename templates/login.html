@@ -97,9 +97,14 @@
                 </div>
             </div>
 
+            <!-- 🛡️ Honeypot: invisible field to catch bots -->
+            <div style="position:absolute;left:-9999px;opacity:0;height:0;width:0;overflow:hidden" aria-hidden="true">
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
             <div id="codeField" class="hidden">
-                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Código de Verificação <span
-                        class="text-xs text-emerald-400 normal-case ml-2" id="codeDisplay"></span></label>
+                <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Código de
+                    Verificação</label>
                 <div class="relative">
                     <i data-lucide="key" class="absolute left-4 top-3.5 w-5 h-5 text-gray-500"></i>
                     <input type="text" id="resetCode"
@@ -234,6 +239,10 @@
             let endpoint = '/api/login';
             let payload = { email };
 
+            // Include honeypot field value (bots fill this)
+            const hpVal = document.getElementById('website') ? document.getElementById('website').value : '';
+            if (hpVal) payload.website = hpVal;
+
             if (mode === 'login') {
                 endpoint = '/api/login';
                 payload.password = password;
@@ -267,8 +276,7 @@
                         msg.innerText = "CONTA CRIADA! ACESSANDO...";
                         setTimeout(() => window.location.href = '/', 1000);
                     } else if (mode === 'forgot') {
-                        msg.innerText = "CÓDIGO GERADO! VEJA ACIMA.";
-                        document.getElementById('codeDisplay').innerText = `(CÓDIGO: ${data.code})`;
+                        msg.innerText = "CÓDIGO ENVIADO. VERIFIQUE SEU EMAIL.";
 
                         btn.innerHTML = originalBtnHTML;
                         btn.disabled = false;

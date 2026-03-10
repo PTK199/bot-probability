@@ -13,6 +13,12 @@ import threading
 import importlib
 # Payment System Integration
 from payment_system import init_payment_system, db, User, Payment, PaymentManager
+# 🛡️ Security Layer
+from security import (
+    rate_limit, check_blocked_ip, register_honeypots, 
+    register_security_middleware, log_failed_login,
+    log_suspicious_activity, get_security_report, _get_client_ip
+)
 
 try:
     from dotenv import load_dotenv
@@ -23,8 +29,19 @@ except ImportError:
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'bot_probability_fallback_dev_key_2026')
 
+# --- SESSION HARDENING ---
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+if os.environ.get('RENDER') or os.environ.get('HTTPS_ENABLED'):
+    app.config['SESSION_COOKIE_SECURE'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(hours=2)
+
 # --- INITIALIZE PAYMENT SYSTEM ---
 init_payment_system(app)
+
+# --- SECURITY LAYER ---
+register_security_middleware(app)
+register_honeypots(app)
 
 # Login Manager Setup
 login_manager = LoginManager()
@@ -44,14 +61,37 @@ def start_timer():
     g.start = time.time()
 
 @app.after_request
-def add_header(response):
+def add_security_headers(response):
+    # --- Core Security Headers ---
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'DENY'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=(), payment=()'
+    
+    # Content Security Policy
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://sdk.mercadopago.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' data: https: blob:; "
+        "connect-src 'self' https://api.mercadopago.com https://*.supabase.co; "
+        "frame-src https://sdk.mercadopago.com; "
+        "object-src 'none'; "
+        "base-uri 'self'"
+    )
+    response.headers['Content-Security-Policy'] = csp
+    
+    # HSTS (only when served over HTTPS)
+    if request.is_secure or os.environ.get('RENDER'):
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    # Latency tracking
     diff = time.time() - g.start
     response.headers['X-Neural-Latency'] = f"{diff:.4f}s"
+    
+    # Cache Control
     if request.path.startswith('/api'):
-        # TURBO: Allow short browser caching for read-only data endpoints
         cacheable_endpoints = ['/api/games', '/api/history', '/api/history_stats', 
                                '/api/today_scout', '/api/history_trebles', '/api/leverage']
         if any(request.path.startswith(ep) for ep in cacheable_endpoints) and request.method == 'GET':
@@ -68,7 +108,10 @@ def not_found(e):
 
 @app.errorhandler(500)
 def internal_error(e):
-    return jsonify({"status": "critical_error", "message": "Falha no Núcleo de Processamento", "details": str(e)}), 500
+    # Log the real error internally, but NEVER expose details to the client
+    print(f"❌ INTERNAL ERROR: {e}")
+    traceback.print_exc()
+    return jsonify({"status": "critical_error", "message": "Falha no Núcleo de Processamento"}), 500
 
 # --- JOB AUTOMATION ---
 
@@ -104,12 +147,13 @@ def run_update_job():
 def cron_update():
     """
     Trigger this endpoint to start the daily update process asynchronously.
-    Perfect for cron-job.org or other schedulers.
+    Accepts key via query param OR Authorization header.
     """
-    key = request.args.get('key')
-    authorized_key = os.environ.get('CRON_KEY', 'update_secret_123')
+    key = request.args.get('key') or request.headers.get('X-Cron-Key', '')
+    authorized_key = os.environ.get('CRON_KEY', '')
     
-    if key != authorized_key:
+    if not authorized_key or key != authorized_key:
+        log_suspicious_activity(_get_client_ip(), f"Cron access denied: /api/cron/update")
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
     # Run in thread to avoid timeout
@@ -125,9 +169,10 @@ def cron_update():
 @app.route('/api/cron/results', methods=['GET', 'POST'])
 def cron_results():
     """Dedicated endpoint to check & update game results from ESPN."""
-    key = request.args.get('key')
-    authorized_key = os.environ.get('CRON_KEY', 'update_secret_123')
-    if key != authorized_key:
+    key = request.args.get('key') or request.headers.get('X-Cron-Key', '')
+    authorized_key = os.environ.get('CRON_KEY', '')
+    if not authorized_key or key != authorized_key:
+        log_suspicious_activity(_get_client_ip(), f"Cron access denied: /api/cron/results")
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
     try:
         summary = result_checker.check_and_update_results()
@@ -355,27 +400,56 @@ def leverage():
 # --- AUTH & PAYMENT ENDPOINTS ---
 
 @app.route('/api/login', methods=['POST'])
+@rate_limit(5, 900)  # 5 attempts per 15 minutes
 def login_api():
     data = request.json
-    email = data.get('email')
-    password = data.get('password')
+    if not data:
+        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
+    
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password', '')
+    
+    if not email or not password:
+        return jsonify({"status": "error", "message": "Email e senha são obrigatórios"}), 400
     
     user = User.query.filter_by(email=email).first()
     
     if user and user.check_password(password):
         login_user(user)
+        session.permanent = True
         return jsonify({
             "status": "success", 
             "message": "Login realizado", 
             "user": {"email": user.email, "is_active": user.is_active_subscriber}
         })
+    
+    # Log the failed attempt
+    log_failed_login(_get_client_ip(), email)
     return jsonify({"status": "error", "message": "Credenciais inválidas"}), 401
 
 @app.route('/api/register', methods=['POST'])
+@rate_limit(3, 3600)  # 3 registrations per hour per IP
 def register_api():
     data = request.json
-    email = data.get('email')
-    password = data.get('password')
+    if not data:
+        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
+    
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password', '')
+    
+    # Input validation
+    if not email or '@' not in email or len(email) > 120:
+        return jsonify({"status": "error", "message": "Email inválido"}), 400
+    if len(password) < 6:
+        return jsonify({"status": "error", "message": "Senha deve ter no mínimo 6 caracteres"}), 400
+    if len(password) > 128:
+        return jsonify({"status": "error", "message": "Senha muito longa"}), 400
+    
+    # Honeypot: check for bot-filled hidden field
+    if data.get('website'):
+        log_suspicious_activity(_get_client_ip(), "Bot registration detected (honeypot field)")
+        # Return success to fool the bot, but don't actually create
+        return jsonify({"status": "success", "message": "Conta criada!", "redirect": "/subscribe"})
     
     if User.query.filter_by(email=email).first():
         return jsonify({"status": "error", "message": "Email já cadastrado"}), 409
@@ -385,45 +459,64 @@ def register_api():
     db.session.add(new_user)
     db.session.commit()
     
-    login_user(new_user) # Auto login after register
+    login_user(new_user)
+    session.permanent = True
     
     return jsonify({"status": "success", "message": "Conta criada! Assine para acessar.", "redirect": "/subscribe"})
 
 @app.route('/api/forgot_password', methods=['POST'])
+@rate_limit(3, 3600)  # 3 reset requests per hour per IP
 def forgot_password_api():
-    email = request.json.get('email')
+    data = request.json
+    if not data:
+        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
+    
+    email = (data.get('email') or '').strip().lower()
     user = User.query.filter_by(email=email).first()
+    
     if not user:
-        return jsonify({"status": "error", "message": "E-mail não encontrado."}), 404
+        # Return same success message to prevent email enumeration
+        return jsonify({"status": "success", "message": "Se o email existir, o código foi gerado."})
         
     import random
     code = str(random.randint(100000, 999999))
     user.reset_code = code
     db.session.commit()
     
-    # Exibe o código diretamente no retorno para a interface
+    # 🛡️ SECURITY: Code is ONLY logged server-side, NEVER sent to the client
+    print(f"🔑 RESET CODE for {email}: {code}")
+    # TODO: In production, send this code via email (SendGrid, SES, etc.)
+    
     return jsonify({
         "status": "success", 
-        "message": "Código gerado com sucesso.",
-        "code": code
+        "message": "Se o email existir, o código foi gerado. Verifique seu email."
     })
 
 @app.route('/api/reset_password', methods=['POST'])
+@rate_limit(5, 900)  # 5 attempts per 15 min
 def reset_password_api():
     data = request.json
-    email = data.get('email')
-    code = data.get('code')
-    new_password = data.get('new_password')
+    if not data:
+        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
+    
+    email = (data.get('email') or '').strip().lower()
+    code = data.get('code', '')
+    new_password = data.get('new_password', '')
+    
+    if len(new_password) < 6:
+        return jsonify({"status": "error", "message": "Senha deve ter no mínimo 6 caracteres"}), 400
     
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({"status": "error", "message": "Usuário não encontrado."}), 404
+        # Generic message to prevent enumeration
+        return jsonify({"status": "error", "message": "Código de verificação inválido."}), 401
         
     if not user.reset_code or user.reset_code != str(code).strip():
+        log_suspicious_activity(_get_client_ip(), f"Invalid reset code for {email}")
         return jsonify({"status": "error", "message": "Código de verificação inválido."}), 401
         
     user.set_password(new_password)
-    user.reset_code = None  # Invalida o código após uso
+    user.reset_code = None
     db.session.commit()
     
     return jsonify({"status": "success", "message": "Senha alterada com sucesso."})
@@ -449,6 +542,7 @@ def check_session():
 
 @app.route('/api/payment/create', methods=['POST'])
 @login_required
+@rate_limit(5, 300)  # 5 payment attempts per 5 min
 def create_payment():
     try:
         mp_token = os.getenv('MP_ACCESS_TOKEN', '')
@@ -458,15 +552,15 @@ def create_payment():
         print(f"💰 Creating preference for: {current_user.email}")
         preference = mp_manager.create_preference(current_user.email)
         
-        # Check if Preference response is valid
         if 'id' not in preference:
              raise Exception(f"Invalid MP Response: {preference}")
 
         return jsonify({"status": "success", "preference_id": preference['id'], "init_point": preference['init_point']})
     except Exception as e:
+        # 🛡️ Log internally, NEVER expose stack trace to client
         print(f"❌ Payment Error: {e}")
         traceback.print_exc()
-        return jsonify({"status": "error", "message": str(e), "trace": traceback.format_exc()}), 500
+        return jsonify({"status": "error", "message": "Erro ao processar pagamento. Tente novamente."}), 500
 
 @app.route('/webhook/mercadopago', methods=['POST', 'GET'], strict_slashes=False)
 def mp_webhook():

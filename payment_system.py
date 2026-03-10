@@ -84,7 +84,12 @@ def init_payment_system(app):
         
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_secret_key_change_in_prod')
+    
+    # 🛡️ SECRET_KEY security check
+    secret = os.getenv('SECRET_KEY', '')
+    if not secret or secret == 'dev_secret_key_change_in_prod':
+        print("⚠️  WARNING: SECRET_KEY not set! Using fallback. Set SECRET_KEY in .env for production!")
+    app.config['SECRET_KEY'] = secret or 'dev_secret_key_change_in_prod'
     
     db.init_app(app)
     
@@ -94,6 +99,11 @@ def init_payment_system(app):
         if not User.query.filter_by(role='admin').first():
             admin_email = os.getenv('ADMIN_EMAIL', 'admin@bot.com')
             admin_pass = os.getenv('ADMIN_PASSWORD', 'admin123')
+            
+            # 🛡️ SECURITY: Warn loudly if using default credentials
+            if admin_pass == 'admin123':
+                print("🔴🔴🔴 CRITICAL: Admin password is 'admin123'! Set ADMIN_PASSWORD in .env IMMEDIATELY! 🔴🔴🔴")
+            
             print(f"[INIT] Creating default admin: {admin_email}")
             admin = User(email=admin_email, role='admin', subscription_end=datetime.utcnow() + timedelta(days=36500))
             admin.set_password(admin_pass)
