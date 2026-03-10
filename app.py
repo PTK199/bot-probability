@@ -569,31 +569,77 @@ def create_payment():
 
 @app.route('/webhook/mercadopago', methods=['POST', 'GET'], strict_slashes=False)
 def mp_webhook():
-    print(f"🔔 Webhook received: {request.method} {request.url}")
+    print(f"Webhook received: {request.method} {request.url}")
     
+    # 🛡️ WEBHOOK SIGNATURE VERIFICATION (MercadoPago HMAC-SHA256)
+    webhook_secret = os.environ.get('MP_WEBHOOK_SECRET', '')
+    
+    if request.method == 'POST' and webhook_secret:
+        import hmac
+        import hashlib
+        
+        x_signature = request.headers.get('x-signature', '')
+        x_request_id = request.headers.get('x-request-id', '')
+        data_id = request.args.get('data.id', '')
+        
+        if not x_signature:
+            log_suspicious_activity(_get_client_ip(), "Webhook without x-signature header")
+            return jsonify({"status": "error", "message": "Signature missing"}), 401
+        
+        # Parse x-signature: "ts=123456,v1=abc123..."
+        sig_parts = {}
+        for part in x_signature.split(','):
+            if '=' in part:
+                k, v = part.strip().split('=', 1)
+                sig_parts[k] = v
+        
+        ts = sig_parts.get('ts', '')
+        received_hash = sig_parts.get('v1', '')
+        
+        if not ts or not received_hash:
+            log_suspicious_activity(_get_client_ip(), "Webhook with malformed x-signature")
+            return jsonify({"status": "error", "message": "Invalid signature"}), 401
+        
+        # Build manifest: id:{data.id};request-id:{x-request-id};ts:{ts};
+        manifest = f"id:{data_id};request-id:{x_request_id};ts:{ts};"
+        
+        # Compute HMAC-SHA256
+        computed_hash = hmac.new(
+            webhook_secret.encode('utf-8'),
+            manifest.encode('utf-8'),
+            hashlib.sha256
+        ).hexdigest()
+        
+        # Constant-time comparison to prevent timing attacks
+        if not hmac.compare_digest(computed_hash, received_hash):
+            log_suspicious_activity(_get_client_ip(), f"Webhook HMAC mismatch! Forged request detected. data.id={data_id}")
+            return jsonify({"status": "error", "message": "Invalid signature"}), 401
+        
+        print(f"Webhook signature VERIFIED for data.id={data_id}")
+    
+    # Process the webhook notification
     topic = request.args.get('topic') or request.args.get('type')
     p_id = request.args.get('id') or request.args.get('data.id')
 
     if topic == 'payment' and p_id:
-        print(f"🔎 Checking payment {p_id}...")
+        print(f"Checking payment {p_id}...")
         try:
             payment_info = mp_manager.check_payment_status(p_id)
-            print(f"💳 Status: {payment_info['status']}")
+            print(f"Payment Status: {payment_info['status']}")
             
             if payment_info['status'] == 'approved':
                 payer_email = payment_info['payer']['email']
-                # Try to match by email first
                 user = User.query.filter_by(email=payer_email).first()
                 if user:
-                    # Upgrade Subscription
                     user.subscription_end = datetime.datetime.utcnow() + datetime.timedelta(days=7)
                     db.session.commit()
-                    print(f"✅ Subscription ACTIVATED for {user.email}")
+                    print(f"Subscription ACTIVATED for {user.email}")
                 else:
-                    print(f"⚠️ User not found for email {payer_email}")
+                    print(f"User not found for email {payer_email}")
         except Exception as e:
-            print(f"❌ Webhook Processing Error: {e}")
-            return jsonify({"status": "error", "error": str(e)}), 500
+            print(f"Webhook Processing Error: {e}")
+            traceback.print_exc()
+            return jsonify({"status": "error"}), 500
                 
     return jsonify({"status": "ok"}), 200
 
