@@ -544,6 +544,18 @@ def reset_password_api():
     
     return jsonify({"status": "success", "message": "Senha alterada com sucesso."})
 
+@app.route('/api/admin/security')
+@login_required
+def admin_security_dashboard():
+    """🛡️ Live security monitoring dashboard — admin only."""
+    if current_user.role != 'admin':
+        return jsonify({"status": "error", "message": "Forbidden"}), 403
+    
+    from security import get_security_report
+    report = get_security_report()
+    report["server_time"] = datetime.datetime.utcnow().isoformat()
+    return jsonify(report)
+
 @app.route('/api/logout')
 @login_required
 def logout_api():
