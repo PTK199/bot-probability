@@ -423,17 +423,34 @@ def leverage():
 # --- AUTH & PAYMENT ENDPOINTS ---
 
 @app.route('/api/login', methods=['POST'])
-@rate_limit(5, 900)  # 5 attempts per 15 minutes
+@rate_limit(5, 900)  # Per-IP: 5 per 15 min (still useful for single-IP bots)
 def login_api():
+    # 🛡️ GLOBAL LOGIN THROTTLE: Max 20 logins/min system-wide
+    # Even with 70k proxies, only 20 total attempts reach the DB per minute
+    global_limited, _ = limiter.is_rate_limited("global_login_throttle", 20, 60)
+    if global_limited:
+        log_rate_limited(_get_client_ip(), "GLOBAL_LOGIN_THROTTLE")
+        return jsonify({"status": "error", "message": "Sistema sob alta demanda. Tente em 1 minuto."}), 429
+    
     data = request.json
     if not data:
-        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
+        return jsonify({"status": "error", "message": "Dados inv\u00e1lidos"}), 400
     
     email = (data.get('email') or '').strip().lower()
     password = data.get('password', '')
     
     if not email or not password:
-        return jsonify({"status": "error", "message": "Email e senha são obrigatórios"}), 400
+        return jsonify({"status": "error", "message": "Email e senha s\u00e3o obrigat\u00f3rios"}), 400
+    
+    # 🛡️ ACCOUNT LOCKOUT: Check if this account is locked (too many failed attempts)
+    account_key = f"account_lockout:{email}"
+    failed_count = limiter.get_count(account_key, 1800)  # failures in last 30 min
+    if failed_count >= 5:
+        log_suspicious_activity(_get_client_ip(), f"Account locked: {email} ({failed_count} fails)")
+        return jsonify({
+            "status": "error", 
+            "message": "Conta temporariamente bloqueada por tentativas excessivas. Aguarde 30 minutos."
+        }), 429
     
     user = User.query.filter_by(email=email).first()
     
@@ -446,25 +463,41 @@ def login_api():
             "user": {"email": user.email, "is_active": user.is_active_subscriber}
         })
     
-    # Log the failed attempt
+    # Failed login — record against the ACCOUNT (not just IP)
+    limiter.record_hit(account_key)
     log_failed_login(_get_client_ip(), email)
-    return jsonify({"status": "error", "message": "Credenciais inválidas"}), 401
+    
+    # 🛡️ PROGRESSIVE DELAY: slow down automated tools (1s per failure, max 5s)
+    delay = min(failed_count + 1, 5)
+    time.sleep(delay)
+    
+    return jsonify({"status": "error", "message": "Credenciais inv\u00e1lidas"}), 401
 
 @app.route('/api/register', methods=['POST'])
-@rate_limit(3, 3600)  # 3 registrations per hour per IP
+@rate_limit(3, 3600)  # Per-IP: 3 per hour
 def register_api():
+    # 🛡️ GLOBAL REGISTRATION FREEZE: Max 10 registrations/hour system-wide
+    global_reg_limited, _ = limiter.is_rate_limited("global_register_throttle", 10, 3600)
+    if global_reg_limited:
+        log_rate_limited(_get_client_ip(), "GLOBAL_REGISTER_THROTTLE")
+        return jsonify({"status": "error", "message": "Sistema sob alta demanda. Tente novamente mais tarde."}), 429
+    
     data = request.json
     if not data:
-        return jsonify({"status": "error", "message": "Dados inválidos"}), 400
+        return jsonify({"status": "error", "message": "Dados inv\u00e1lidos"}), 400
     
     email = (data.get('email') or '').strip().lower()
     password = data.get('password', '')
     
-    # Input validation
+    # 🛡️ Enhanced input validation
     if not email or '@' not in email or len(email) > 120:
-        return jsonify({"status": "error", "message": "Email inválido"}), 400
-    if len(password) < 6:
-        return jsonify({"status": "error", "message": "Senha deve ter no mínimo 6 caracteres"}), 400
+        return jsonify({"status": "error", "message": "Email inv\u00e1lido"}), 400
+    # Validate email domain has a dot (basic check)
+    domain = email.split('@')[-1]
+    if '.' not in domain or len(domain) < 4:
+        return jsonify({"status": "error", "message": "Email inv\u00e1lido"}), 400
+    if len(password) < 8:
+        return jsonify({"status": "error", "message": "Senha deve ter no m\u00ednimo 8 caracteres"}), 400
     if len(password) > 128:
         return jsonify({"status": "error", "message": "Senha muito longa"}), 400
     
@@ -472,10 +505,16 @@ def register_api():
     if data.get('website'):
         log_suspicious_activity(_get_client_ip(), "Bot registration detected (honeypot field)")
         # Return success to fool the bot, but don't actually create
+        time.sleep(3)
         return jsonify({"status": "success", "message": "Conta criada!", "redirect": "/subscribe"})
     
     if User.query.filter_by(email=email).first():
-        return jsonify({"status": "error", "message": "Email já cadastrado"}), 409
+        # 🛡️ Don't reveal if email exists — generic message
+        time.sleep(2)
+        return jsonify({"status": "error", "message": "N\u00e3o foi poss\u00edvel criar a conta. Tente outro email."}), 409
+    
+    # 🛡️ Progressive delay on registration too
+    time.sleep(2)
         
     new_user = User(email=email)
     new_user.set_password(password)
