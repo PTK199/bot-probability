@@ -282,19 +282,20 @@ BLOCKED_EXTENSIONS = {
 }
 
 # Patterns that indicate SQL injection, path traversal, or command injection
-ATTACK_PATTERNS = [
-    # SQL Injection
-    re.compile(r"('|\"|;|--|\bOR\b\s+\b1\b\s*=\s*\b1\b|\bUNION\b\s+\bSELECT\b|\bDROP\b\s+\bTABLE\b|\bINSERT\b\s+\bINTO\b)", re.IGNORECASE),
+# NOTE: These are tuned to avoid false positives on normal JSON payloads
+ATTACK_PATTERNS_URL = [
+    # SQL Injection (URL-specific — these don't appear in normal URLs)
+    re.compile(r"(\bUNION\b\s+\bSELECT\b|\bDROP\b\s+\bTABLE\b|\bSELECT\b\s+\bFROM\b|\bINSERT\b\s+\bINTO\b|\bDELETE\b\s+\bFROM\b|\bUPDATE\b\s+\bSET\b)", re.IGNORECASE),
+    re.compile(r"(\bOR\b\s+\d+\s*=\s*\d+|\bAND\b\s+\d+\s*=\s*\d+|'\s*OR\s*'|'\s*=\s*')", re.IGNORECASE),
+    re.compile(r"(--\s|/\*|\*/|;\s*DROP|;\s*SELECT|;\s*INSERT|;\s*UPDATE|;\s*DELETE)", re.IGNORECASE),
     # Path traversal
-    re.compile(r"(\.\.\/|\.\.\\|%2e%2e|%252e%252e|\.\.%2f|\.\.%5c)", re.IGNORECASE),
-    # Command injection
-    re.compile(r"(;\s*(ls|cat|whoami|id|pwd|uname|ping|curl|wget|nc|bash|sh|cmd)\b|`.*`|\$\(.*\)|\|\||\&\&)", re.IGNORECASE),
+    re.compile(r"(\.\./\.\./|\.\.\\\.\.\\|%2e%2e%2f|%252e%252e|\.\.%2f|\.\.%5c)", re.IGNORECASE),
+    # Command injection (in URLs)
+    re.compile(r"(;\s*(ls|cat|whoami|id|pwd|uname|ping|curl|wget|nc|bash|sh)\s|`[^`]+`|\$\([^)]+\))", re.IGNORECASE),
     # XSS attempts
-    re.compile(r"(<script|javascript:|on(error|load|click|mouseover)\s*=|<img\s+src\s*=\s*[\"']?javascript)", re.IGNORECASE),
-    # LDAP injection
-    re.compile(r"(\*\)\(\||\)\(\&|\(cn=\*|\(objectClass=\*)", re.IGNORECASE),
+    re.compile(r"(<script[\s>]|javascript\s*:|on(error|load|click|mouseover)\s*=)", re.IGNORECASE),
     # Null byte injection
-    re.compile(r"(%00|\\x00|\\0)", re.IGNORECASE),
+    re.compile(r"(%00|%0a|%0d)", re.IGNORECASE),
 ]
 
 # Scanner user agents (expanded list)
@@ -336,7 +337,7 @@ def _is_scanner_ua(ua):
 
 def _has_attack_payload(text):
     """Check if text contains attack patterns (SQLi, XSS, traversal, etc.)."""
-    for pattern in ATTACK_PATTERNS:
+    for pattern in ATTACK_PATTERNS_URL:
         if pattern.search(text):
             return True
     return False
@@ -397,24 +398,20 @@ def register_security_middleware(app):
             # Don't block immediately, but track as scan behavior
         
         # ─── LAYER 5: Attack Payload Detection ───
-        # Check URL path + query string
+        # Check URL path + query string (NOT the body — JSON naturally has quotes)
         full_url = request.url
         if _has_attack_payload(full_url):
             log_scan_detected(ip, f"Attack payload in URL: {full_url[:200]}")
             ip_blocker.block(ip, duration_seconds=14400, reason="Attack payload in URL")
             return jsonify({"status": "error", "message": "Forbidden"}), 403
         
-        # Check POST body for attacks
-        if request.method == 'POST' and request.content_type and 'json' in request.content_type:
+        # Payload size limit (50KB max for any POST)
+        if request.method == 'POST':
             try:
-                raw = request.get_data(as_text=True)
-                if len(raw) > 50000:  # 50KB max payload
-                    log_scan_detected(ip, f"Oversized payload: {len(raw)} bytes")
+                content_length = request.content_length or 0
+                if content_length > 50000:
+                    log_scan_detected(ip, f"Oversized payload: {content_length} bytes")
                     return jsonify({"status": "error", "message": "Payload too large"}), 413
-                if _has_attack_payload(raw):
-                    log_scan_detected(ip, f"Attack payload in body")
-                    ip_blocker.block(ip, duration_seconds=14400, reason="Attack payload in body")
-                    return jsonify({"status": "error", "message": "Forbidden"}), 403
             except Exception:
                 pass
         
