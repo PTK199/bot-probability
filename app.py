@@ -104,6 +104,11 @@ def add_security_headers(response):
 def not_found(e):
     if request.path.startswith('/api'):
         return jsonify({"status": "error", "message": "Endpoint Neural não encontrado"}), 404
+    # 🛡️ SECURITY: Never serve index.html without authentication
+    if not current_user.is_authenticated:
+        return redirect(url_for('login_page'))
+    if not current_user.is_active_subscriber:
+        return redirect(url_for('subscription_page'))
     return render_template('index.html'), 200
 
 @app.errorhandler(500)
@@ -593,14 +598,17 @@ def mp_webhook():
     return jsonify({"status": "ok"}), 200
 
 @app.route('/payment/success')
+@login_required
 def payment_success():
     return render_template('payment_success.html')
 
 @app.route('/payment/failure')
+@login_required
 def payment_failure():
     return render_template('payment_failure.html')
 
 @app.route('/payment/pending')
+@login_required
 def payment_pending():
     return render_template('payment_pending.html')
 
