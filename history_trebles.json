@@ -1,5 +1,676 @@
 [
   {
+    "created_at": "2026-03-10T21:04:15.551634",
+    "date": "10/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.47",
+    "total_odd": "3.47",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Villarreal ou Empate (@1.52)",
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Brighton & Hove Albion ou Empate (@1.5)"
+    ],
+    "components": [
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 77,
+        "status": "LOST"
+      },
+      {
+        "match": "Brighton & Hove Albion @ Sunderland",
+        "pick": "Brighton & Hove Albion ou Empate (@1.5)",
+        "prob": 71,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:04:15.551622",
+    "date": "10/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Villarreal ou Empate (@1.52)",
+      "Borussia Mönchengladbach ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 77,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:03:42.025130",
+    "date": "09/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.47",
+    "total_odd": "3.47",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Villarreal ou Empate (@1.52)",
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Brighton & Hove Albion ou Empate (@1.5)"
+    ],
+    "components": [
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 77,
+        "status": "LOST"
+      },
+      {
+        "match": "Brighton & Hove Albion @ Sunderland",
+        "pick": "Brighton & Hove Albion ou Empate (@1.5)",
+        "prob": 71,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:03:42.025116",
+    "date": "09/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Villarreal ou Empate (@1.52)",
+      "Borussia Mönchengladbach ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 77,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:02:58.969419",
+    "date": "08/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.47",
+    "total_odd": "3.47",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Villarreal ou Empate (@1.52)",
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Brighton & Hove Albion ou Empate (@1.5)"
+    ],
+    "components": [
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 77,
+        "status": "LOST"
+      },
+      {
+        "match": "Brighton & Hove Albion @ Sunderland",
+        "pick": "Brighton & Hove Albion ou Empate (@1.5)",
+        "prob": 71,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:02:58.969406",
+    "date": "08/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Villarreal ou Empate (@1.52)",
+      "Borussia Mönchengladbach ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 77,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:02:16.869603",
+    "date": "07/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.47",
+    "total_odd": "3.47",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)",
+      "Brighton & Hove Albion ou Empate (@1.5)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 78,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Brighton & Hove Albion @ Sunderland",
+        "pick": "Brighton & Hove Albion ou Empate (@1.5)",
+        "prob": 71,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:02:16.869583",
+    "date": "07/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 78,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:01:37.637011",
+    "date": "06/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.51",
+    "total_odd": "3.51",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)",
+      "Torino ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      },
+      {
+        "match": "Parma @ Torino",
+        "pick": "Torino ou Empate (@1.52)",
+        "prob": 79,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:01:37.636997",
+    "date": "06/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:00:54.547996",
+    "date": "05/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.51",
+    "total_odd": "3.51",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)",
+      "Torino ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      },
+      {
+        "match": "Parma @ Torino",
+        "pick": "Torino ou Empate (@1.52)",
+        "prob": 79,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:00:54.547976",
+    "date": "05/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:00:06.497982",
+    "date": "04/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.51",
+    "total_odd": "3.51",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)",
+      "Torino ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      },
+      {
+        "match": "Parma @ Torino",
+        "pick": "Torino ou Empate (@1.52)",
+        "prob": 79,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T21:00:06.497967",
+    "date": "04/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:59:27.750307",
+    "date": "03/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.47",
+    "total_odd": "3.47",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)",
+      "Brighton & Hove Albion ou Empate (@1.5)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      },
+      {
+        "match": "Brighton & Hove Albion @ Sunderland",
+        "pick": "Brighton & Hove Albion ou Empate (@1.5)",
+        "prob": 78,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:59:27.750295",
+    "date": "03/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:58:43.844513",
+    "date": "02/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.47",
+    "total_odd": "3.47",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)",
+      "Brighton & Hove Albion ou Empate (@1.5)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      },
+      {
+        "match": "Brighton & Hove Albion @ Sunderland",
+        "pick": "Brighton & Hove Albion ou Empate (@1.5)",
+        "prob": 78,
+        "status": "WON"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:58:43.844493",
+    "date": "02/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.31",
+    "total_odd": "2.31",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:57:42.127165",
+    "date": "01/03",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.37",
+    "total_odd": "3.37",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Manchester City ou Empate (@1.46)",
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Manchester City @ West Ham United",
+        "pick": "Manchester City ou Empate (@1.46)",
+        "prob": 80,
+        "status": "WON"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:57:42.127153",
+    "date": "01/03",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.22",
+    "total_odd": "2.22",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Manchester City ou Empate (@1.46)",
+      "Borussia Mönchengladbach ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Manchester City @ West Ham United",
+        "pick": "Manchester City ou Empate (@1.46)",
+        "prob": 80,
+        "status": "WON"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:56:41.048494",
+    "date": "28/02",
+    "name": "🏰 FORTRESS (3-LEGS)",
+    "odd": "3.37",
+    "total_odd": "3.37",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Manchester City ou Empate (@1.46)",
+      "Borussia Mönchengladbach ou Empate (@1.52)",
+      "Villarreal ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Manchester City @ West Ham United",
+        "pick": "Manchester City ou Empate (@1.46)",
+        "prob": 80,
+        "status": "WON"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      },
+      {
+        "match": "Villarreal @ Alavés",
+        "pick": "Villarreal ou Empate (@1.52)",
+        "prob": 80,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
+    "created_at": "2026-03-10T20:56:41.048485",
+    "date": "28/02",
+    "name": "🛡️ BUNKER BLINDADO",
+    "odd": "2.22",
+    "total_odd": "2.22",
+    "status": "LOST",
+    "profit": "-100%",
+    "selections": [
+      "Manchester City ou Empate (@1.46)",
+      "Borussia Mönchengladbach ou Empate (@1.52)"
+    ],
+    "components": [
+      {
+        "match": "Manchester City @ West Ham United",
+        "pick": "Manchester City ou Empate (@1.46)",
+        "prob": 80,
+        "status": "WON"
+      },
+      {
+        "match": "St. Pauli @ Borussia Mönchengladbach",
+        "pick": "Borussia Mönchengladbach ou Empate (@1.52)",
+        "prob": 79,
+        "status": "LOST"
+      }
+    ]
+  },
+  {
     "created_at": "2026-02-27T01:13:07.358018",
     "date": "26/02",
     "name": "🏰 FORTRESS (3-LEGS)",

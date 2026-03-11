@@ -74,3 +74,39 @@
 2026-03-03 00:30:29,131 [INFO] Iniciando avaliacao de trincas (update_trebles)...
 2026-03-03 00:32:43,008 [INFO] Nenhuma mudança — push ignorado.
 2026-03-03 00:32:43,010 [INFO] auto_updater finalizado.
+2026-03-04 00:30:03,114 [INFO] ============================================================
+2026-03-04 00:30:03,115 [INFO] Iniciando auto_updater
+2026-03-04 00:30:03,138 [INFO] Picks pendentes: 1
+2026-03-04 00:30:03,138 [INFO] Buscando ESPN: 2026-03-03 e 2026-03-04
+2026-03-04 00:30:25,414 [INFO] Jogos finalizados encontrados: 14
+2026-03-04 00:30:25,415 [INFO]   [WON ] Port Vale 1x0 Bristol City | ?: Port Vale ou Empate
+2026-03-04 00:30:25,416 [INFO] Atualizados: 1 | WON: 1 | LOST: 0 | Ainda pendente: 0
+2026-03-04 00:30:25,426 [INFO] history.json salvo.
+2026-03-04 00:30:25,427 [INFO] GREEN RATE: 73.2% | WON:134 LOST:49 PEND:0
+2026-03-04 00:30:25,428 [INFO] Iniciando avaliacao de trincas (update_trebles)...
+2026-03-04 00:32:33,863 [INFO] Push ao GitHub: OK
+2026-03-04 00:32:33,863 [INFO] auto_updater finalizado.
+2026-03-05 00:30:03,103 [INFO] ============================================================
+2026-03-05 00:30:03,103 [INFO] Iniciando auto_updater
+2026-03-05 00:30:03,125 [INFO] Picks pendentes: 0
+2026-03-05 00:30:03,125 [INFO] Nenhum pick pendente. Nada a fazer.
+2026-03-06 00:30:02,278 [INFO] ============================================================
+2026-03-06 00:30:02,279 [INFO] Iniciando auto_updater
+2026-03-06 00:30:02,301 [INFO] Picks pendentes: 0
+2026-03-06 00:30:02,301 [INFO] Nenhum pick pendente. Nada a fazer.
+2026-03-07 00:30:02,504 [INFO] ============================================================
+2026-03-07 00:30:02,505 [INFO] Iniciando auto_updater
+2026-03-07 00:30:02,523 [INFO] Picks pendentes: 0
+2026-03-07 00:30:02,523 [INFO] Nenhum pick pendente. Nada a fazer.
+2026-03-08 12:07:59,158 [INFO] ============================================================
+2026-03-08 12:07:59,158 [INFO] Iniciando auto_updater
+2026-03-08 12:07:59,177 [INFO] Picks pendentes: 0
+2026-03-08 12:07:59,177 [INFO] Nenhum pick pendente. Nada a fazer.
+2026-03-09 03:34:41,843 [INFO] ============================================================
+2026-03-09 03:34:41,844 [INFO] Iniciando auto_updater
+2026-03-09 03:34:41,875 [INFO] Picks pendentes: 0
+2026-03-09 03:34:41,875 [INFO] Nenhum pick pendente. Nada a fazer.
+2026-03-10 00:30:01,784 [INFO] ============================================================
+2026-03-10 00:30:01,784 [INFO] Iniciando auto_updater
+2026-03-10 00:30:01,794 [INFO] Picks pendentes: 0
+2026-03-10 00:30:01,794 [INFO] Nenhum pick pendente. Nada a fazer.
